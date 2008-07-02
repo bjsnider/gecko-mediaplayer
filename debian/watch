@@ -1,0 +1,3 @@
+version=3
+http://code.google.com/p/gecko-mediaplayer/downloads/list \
+http://gecko-mediaplayer.googlecode.com/files/gecko-mediaplayer-(.*)\.tar\.gz

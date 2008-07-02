@@ -1,0 +1,103 @@
+Format-Specification: http://wiki.debian.org/Proposals/CopyrightFormat
+Upstream-Author: Kevin DeKorte <kdekorte@gmail.com>
+Packaged-By: Cesare Tirabassi <norsetto@ubuntu.com>
+Packaged-Date: Wed, 02 Jul 2008 15:21:38 +0200
+Original-Source-Location: http://code.google.com/p/gecko-mediaplayer/
+
+Files: *, po/*.po
+Copyright: © 2007-2008 Kevin DeKorte
+License: GPL-2+
+
+Files: src/*.cpp, src/*.hpp
+Copyright: © 1998 Netscape Communications Corporation
+License: MPL-1.1 | GPL-2+ | LGPL-2.1+
+
+Files: debian/*
+Copyright: © 2008 Cesare Tirabassi <norsetto@ubuntu.com>
+License: GPL-2+
+
+Files: missing, ltmain.sh, depcomp
+Copyright: © 1994-2006  Free Software Foundation, Inc.
+License: GPL-2+
+
+Files: src/makefile.in, Makefile.in, configure, aclocal.m4
+Copyright: © 1994-2006  Free Software Foundation, Inc.
+License: GAP
+
+Files: install-sh
+Copyright: © 1994 X Consortium
+License: X11
+
+Files: INSTALL
+Copyright: © 1994-2005 Free Software Foundation, Inc.
+License: GFDL
+
+Files: po/Makefile.in.in
+Copyright: © 1995-1997 by Ulrich Drepper <drepper@gnu.ai.mit.edu>
+License: other
+
+License: GPL-2+
+
+ This package is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ (at your option) any later version.
+ .
+ This package is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+ .
+ You should have received a copy of the GNU General Public License
+ along with this package; if not, write to the Free Software
+ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
+ .
+ On Debian systems, the complete text of the GNU General Public License
+ version 2 can be found in `/usr/share/common-licenses/GPL-2'.
+
+License: X11
+
+ Permission is hereby granted, free of charge, to any person obtaining a copy
+ of this software and associated documentation files (the "Software"), to
+ deal in the Software without restriction, including without limitation the
+ rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+ sell copies of the Software, and to permit persons to whom the Software is
+ furnished to do so, subject to the following conditions:
+ .
+ The above copyright notice and this permission notice shall be included in
+ all copies or substantial portions of the Software.
+ .
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL THE
+ X CONSORTIUM BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN
+ AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNEC-
+ TION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ .
+ Except as contained in this notice, the name of the X Consortium shall not
+ be used in advertising or otherwise to promote the sale, use or other deal-
+ ings in this Software without prior written authorization from the X Consor-
+ tium.
+
+License: GFDL
+
+ This file is free documentation; the Free Software Foundation gives
+ unlimited permission to copy, distribute and modify it.
+
+License: GAP
+
+ This software is free software; you are given unlimited permission to
+ copy and/or distribute it, with or without modifications, as long as
+ this notice is preserved.
+ .
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY, to the extent permitted by law; without
+ even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+ PARTICULAR PURPOSE.
+
+License: other
+
+ This file can be copied and used freely without restrictions. It can
+ be used in projects which are not available under the GNU Public License
+ but which still want to provide support for the GNU gettext functionality.
+ Please note that the actual code is *not* freely available.
