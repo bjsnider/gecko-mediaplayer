@@ -1,0 +1,59 @@
+Index: gecko-mediaplayer-0.7.0/src/Makefile.in
+===================================================================
+--- gecko-mediaplayer-0.7.0.orig/src/Makefile.in	2008-08-15 23:37:19.000000000 +0200
++++ gecko-mediaplayer-0.7.0/src/Makefile.in	2008-08-15 23:41:04.000000000 +0200
+@@ -60,44 +60,35 @@
+ gecko_mediaplayer_dvx_so_OBJECTS =  \
+ 	$(am_gecko_mediaplayer_dvx_so_OBJECTS)
+ gecko_mediaplayer_dvx_so_LDADD = $(LDADD)
+-gecko_mediaplayer_dvx_so_LINK = $(LIBTOOL) --tag=CXX \
+-	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CXXLD) \
+-	$(AM_CXXFLAGS) $(CXXFLAGS) $(gecko_mediaplayer_dvx_so_LDFLAGS) \
+-	$(LDFLAGS) -o $@
++gecko_mediaplayer_dvx_so_LINK = $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) \
++	$(gecko_mediaplayer_dvx_so_LDFLAGS) $(LDFLAGS) -o $@
+ am_gecko_mediaplayer_qt_so_OBJECTS = plugin_types_qt.$(OBJEXT) \
+ 	$(am__objects_1)
+ gecko_mediaplayer_qt_so_OBJECTS =  \
+ 	$(am_gecko_mediaplayer_qt_so_OBJECTS)
+ gecko_mediaplayer_qt_so_LDADD = $(LDADD)
+-gecko_mediaplayer_qt_so_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
+-	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
+-	$(CXXFLAGS) $(gecko_mediaplayer_qt_so_LDFLAGS) $(LDFLAGS) -o \
+-	$@
++gecko_mediaplayer_qt_so_LINK = $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) \
++	$(gecko_mediaplayer_qt_so_LDFLAGS) $(LDFLAGS) -o $@
+ am_gecko_mediaplayer_rm_so_OBJECTS = plugin_types_rm.$(OBJEXT) \
+ 	$(am__objects_1)
+ gecko_mediaplayer_rm_so_OBJECTS =  \
+ 	$(am_gecko_mediaplayer_rm_so_OBJECTS)
+ gecko_mediaplayer_rm_so_LDADD = $(LDADD)
+-gecko_mediaplayer_rm_so_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
+-	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
+-	$(CXXFLAGS) $(gecko_mediaplayer_rm_so_LDFLAGS) $(LDFLAGS) -o \
+-	$@
++gecko_mediaplayer_rm_so_LINK = $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) \
++	$(gecko_mediaplayer_rm_so_LDFLAGS) $(LDFLAGS) -o $@
+ am_gecko_mediaplayer_wmp_so_OBJECTS = plugin_types_wmp.$(OBJEXT) \
+ 	$(am__objects_1)
+ gecko_mediaplayer_wmp_so_OBJECTS =  \
+ 	$(am_gecko_mediaplayer_wmp_so_OBJECTS)
+ gecko_mediaplayer_wmp_so_LDADD = $(LDADD)
+-gecko_mediaplayer_wmp_so_LINK = $(LIBTOOL) --tag=CXX \
+-	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CXXLD) \
+-	$(AM_CXXFLAGS) $(CXXFLAGS) $(gecko_mediaplayer_wmp_so_LDFLAGS) \
+-	$(LDFLAGS) -o $@
++gecko_mediaplayer_wmp_so_LINK = $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) \
++	$(gecko_mediaplayer_wmp_so_LDFLAGS) $(LDFLAGS) -o $@
+ am_gecko_mediaplayer_so_OBJECTS = plugin_types_std.$(OBJEXT) \
+ 	$(am__objects_1)
+ gecko_mediaplayer_so_OBJECTS = $(am_gecko_mediaplayer_so_OBJECTS)
+ gecko_mediaplayer_so_LDADD = $(LDADD)
+-gecko_mediaplayer_so_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
+-	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
+-	$(CXXFLAGS) $(gecko_mediaplayer_so_LDFLAGS) $(LDFLAGS) -o $@
++gecko_mediaplayer_so_LINK = $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) \
++	$(gecko_mediaplayer_so_LDFLAGS) $(LDFLAGS) -o $@
+ DEFAULT_INCLUDES = -I. -I$(top_builddir)@am__isrc@
+ depcomp = $(SHELL) $(top_srcdir)/depcomp
+ am__depfiles_maybe = depfiles

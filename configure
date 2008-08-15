@@ -2309,7 +2309,7 @@ fi
 
 # Define the identity of the package.
  PACKAGE=gecko-mediaplayer
- VERSION=0.6.3
+ VERSION=0.7.0
 
 
 cat >>confdefs.h <<_ACEOF
@@ -23368,12 +23368,12 @@ if test -n "$PKG_CONFIG"; then
         pkg_cv_GECKO_CFLAGS="$GECKO_CFLAGS"
     else
         if test -n "$PKG_CONFIG" && \
-    { (echo "$as_me:$LINENO: \$PKG_CONFIG --exists --print-errors \"mozilla-plugin libxul\"") >&5
-  ($PKG_CONFIG --exists --print-errors "mozilla-plugin libxul") 2>&5
+    { (echo "$as_me:$LINENO: \$PKG_CONFIG --exists --print-errors \"libxul\"") >&5
+  ($PKG_CONFIG --exists --print-errors "libxul") 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); }; then
-  pkg_cv_GECKO_CFLAGS=`$PKG_CONFIG --cflags "mozilla-plugin libxul" 2>/dev/null`
+  pkg_cv_GECKO_CFLAGS=`$PKG_CONFIG --cflags "libxul" 2>/dev/null`
 else
   pkg_failed=yes
 fi
@@ -23386,12 +23386,12 @@ if test -n "$PKG_CONFIG"; then
         pkg_cv_GECKO_LIBS="$GECKO_LIBS"
     else
         if test -n "$PKG_CONFIG" && \
-    { (echo "$as_me:$LINENO: \$PKG_CONFIG --exists --print-errors \"mozilla-plugin libxul\"") >&5
-  ($PKG_CONFIG --exists --print-errors "mozilla-plugin libxul") 2>&5
+    { (echo "$as_me:$LINENO: \$PKG_CONFIG --exists --print-errors \"libxul\"") >&5
+  ($PKG_CONFIG --exists --print-errors "libxul") 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); }; then
-  pkg_cv_GECKO_LIBS=`$PKG_CONFIG --libs "mozilla-plugin libxul" 2>/dev/null`
+  pkg_cv_GECKO_LIBS=`$PKG_CONFIG --libs "libxul" 2>/dev/null`
 else
   pkg_failed=yes
 fi
@@ -23410,20 +23410,20 @@ else
         _pkg_short_errors_supported=no
 fi
         if test $_pkg_short_errors_supported = yes; then
-	        GECKO_PKG_ERRORS=`$PKG_CONFIG --short-errors --errors-to-stdout --print-errors "mozilla-plugin libxul"`
+	        GECKO_PKG_ERRORS=`$PKG_CONFIG --short-errors --errors-to-stdout --print-errors "libxul"`
         else
-	        GECKO_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "mozilla-plugin libxul"`
+	        GECKO_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "libxul"`
         fi
 	# Put the nasty error message in config.log where it belongs
 	echo "$GECKO_PKG_ERRORS" >&5
 
 	{ echo "$as_me:$LINENO: result: no" >&5
 echo "${ECHO_T}no" >&6; }
-                { echo "$as_me:$LINENO: WARNING: libxul/mozilla-plugin not found, trying another" >&5
-echo "$as_me: WARNING: libxul/mozilla-plugin not found, trying another" >&2;}
+                { echo "$as_me:$LINENO: WARNING: libxul not found, trying another" >&5
+echo "$as_me: WARNING: libxul not found, trying another" >&2;}
 elif test $pkg_failed = untried; then
-	{ echo "$as_me:$LINENO: WARNING: libxul/mozilla-plugin not found, trying another" >&5
-echo "$as_me: WARNING: libxul/mozilla-plugin not found, trying another" >&2;}
+	{ echo "$as_me:$LINENO: WARNING: libxul not found, trying another" >&5
+echo "$as_me: WARNING: libxul not found, trying another" >&2;}
 else
 	GECKO_CFLAGS=$pkg_cv_GECKO_CFLAGS
 	GECKO_LIBS=$pkg_cv_GECKO_LIBS
@@ -23435,6 +23435,86 @@ echo "${ECHO_T}yes" >&6; }
 
 fi
 fi
+
+if test "$GECKO_CFLAGS" = ""; then
+
+pkg_failed=no
+{ echo "$as_me:$LINENO: checking for GECKO" >&5
+echo $ECHO_N "checking for GECKO... $ECHO_C" >&6; }
+
+if test -n "$PKG_CONFIG"; then
+    if test -n "$GECKO_CFLAGS"; then
+        pkg_cv_GECKO_CFLAGS="$GECKO_CFLAGS"
+    else
+        if test -n "$PKG_CONFIG" && \
+    { (echo "$as_me:$LINENO: \$PKG_CONFIG --exists --print-errors \"libxul-unstable\"") >&5
+  ($PKG_CONFIG --exists --print-errors "libxul-unstable") 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; then
+  pkg_cv_GECKO_CFLAGS=`$PKG_CONFIG --cflags "libxul-unstable" 2>/dev/null`
+else
+  pkg_failed=yes
+fi
+    fi
+else
+	pkg_failed=untried
+fi
+if test -n "$PKG_CONFIG"; then
+    if test -n "$GECKO_LIBS"; then
+        pkg_cv_GECKO_LIBS="$GECKO_LIBS"
+    else
+        if test -n "$PKG_CONFIG" && \
+    { (echo "$as_me:$LINENO: \$PKG_CONFIG --exists --print-errors \"libxul-unstable\"") >&5
+  ($PKG_CONFIG --exists --print-errors "libxul-unstable") 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; then
+  pkg_cv_GECKO_LIBS=`$PKG_CONFIG --libs "libxul-unstable" 2>/dev/null`
+else
+  pkg_failed=yes
+fi
+    fi
+else
+	pkg_failed=untried
+fi
+
+
+
+if test $pkg_failed = yes; then
+
+if $PKG_CONFIG --atleast-pkgconfig-version 0.20; then
+        _pkg_short_errors_supported=yes
+else
+        _pkg_short_errors_supported=no
+fi
+        if test $_pkg_short_errors_supported = yes; then
+	        GECKO_PKG_ERRORS=`$PKG_CONFIG --short-errors --errors-to-stdout --print-errors "libxul-unstable"`
+        else
+	        GECKO_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "libxul-unstable"`
+        fi
+	# Put the nasty error message in config.log where it belongs
+	echo "$GECKO_PKG_ERRORS" >&5
+
+	{ echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6; }
+                { echo "$as_me:$LINENO: WARNING: libxul-unstable not found, trying another" >&5
+echo "$as_me: WARNING: libxul-unstable not found, trying another" >&2;}
+elif test $pkg_failed = untried; then
+	{ echo "$as_me:$LINENO: WARNING: libxul-unstable not found, trying another" >&5
+echo "$as_me: WARNING: libxul-unstable not found, trying another" >&2;}
+else
+	GECKO_CFLAGS=$pkg_cv_GECKO_CFLAGS
+	GECKO_LIBS=$pkg_cv_GECKO_LIBS
+        { echo "$as_me:$LINENO: result: yes" >&5
+echo "${ECHO_T}yes" >&6; }
+
+    GECKO_HOME=`$PKG_CONFIG --variable=libdir libxul-unstable`
+    GECKO_IDLDIR=`$PKG_CONFIG --variable=idldir libxul-unstable`
+
+fi
+fi
+
 
 if test "$GECKO_CFLAGS" = ""; then
 

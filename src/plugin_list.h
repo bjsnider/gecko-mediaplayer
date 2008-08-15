@@ -65,6 +65,7 @@ typedef struct _ListItem {
     gboolean loop;              // TRUE if we should loop
     gint loopcount;             // 0 - loop done, -1 loop forever
     gint bitrate;
+    gint bitrate_requests;
 } ListItem;
 
 

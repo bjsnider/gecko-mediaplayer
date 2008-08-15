@@ -10,6 +10,7 @@ DEB_BUILD_GNU_TYPE  ?= $(shell dpkg-architecture -qDEB_BUILD_GNU_TYPE)
 
 CXXFLAGS = -Wall -g
 LDFLAGS  = -Wl,-z,defs
+GLIBS = -lglib-2.0
 
 ifneq (,$(findstring noopt,$(DEB_BUILD_OPTIONS)))
 	CXXFLAGS += -O0
@@ -30,7 +31,7 @@ endif
 	./configure \
 		--host=$(DEB_HOST_GNU_TYPE) --build=$(DEB_BUILD_GNU_TYPE) \
 		--prefix=/usr --sysconfdir=\$${prefix}/share \
-		CXXFLAGS="$(CXXFLAGS)" LDFLAGS="$(LDFLAGS)"
+		CXXFLAGS="$(CXXFLAGS)" LDFLAGS="$(LDFLAGS)" GLIB_LIBS="$(GLIBS)"
 
 	touch configure-stamp
 
@@ -59,14 +60,11 @@ install: build
 	dh_testdir
 	dh_testroot
 	dh_clean -k
-	dh_installdirs
 
 	$(MAKE) DESTDIR=$(CURDIR)/debian/gecko-mediaplayer install
 
 	# remove docs installed by upstream
 	rm -rf $(CURDIR)/debian/gecko-mediaplayer/usr/share/doc/gecko-mediaplayer
-	# remove hardcoded rpath in shared libraries
-	chrpath -d $(CURDIR)/debian/gecko-mediaplayer/usr/lib/mozilla/plugins/*.so
 
 binary-indep: build install
 

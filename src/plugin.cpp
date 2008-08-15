@@ -594,8 +594,9 @@ int32 nsPluginInstance::Write(NPStream * stream, int32 offset, int32 len, void *
             if (ok_to_play == FALSE && (item->localsize > (cache_size * 2 * 1024)) && (cache_size >= 512))
                 ok_to_play = TRUE;
             if (ok_to_play == FALSE) {
-                if (item->bitrate == 0) {
+                if (item->bitrate == 0 && item->bitrate_requests < 5) {
                     item->bitrate = request_bitrate(this,item,item->local);
+                    item->bitrate_requests++;
                 }
                 if (item->bitrate > 0) {
                     if (item->localsize / item->bitrate >= 10) {
