@@ -60,65 +60,47 @@ am_gecko_mediaplayer_dvx_so_OBJECTS = plugin_types_dvx.$(OBJEXT) \
 gecko_mediaplayer_dvx_so_OBJECTS =  \
 	$(am_gecko_mediaplayer_dvx_so_OBJECTS)
 gecko_mediaplayer_dvx_so_LDADD = $(LDADD)
-gecko_mediaplayer_dvx_so_LINK = $(LIBTOOL) --tag=CXX \
-	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CXXLD) \
-	$(AM_CXXFLAGS) $(CXXFLAGS) $(gecko_mediaplayer_dvx_so_LDFLAGS) \
-	$(LDFLAGS) -o $@
+gecko_mediaplayer_dvx_so_LINK = $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) \
+	$(gecko_mediaplayer_dvx_so_LDFLAGS) $(LDFLAGS) -o $@
 am_gecko_mediaplayer_qt_so_OBJECTS = plugin_types_qt.$(OBJEXT) \
 	$(am__objects_1)
 gecko_mediaplayer_qt_so_OBJECTS =  \
 	$(am_gecko_mediaplayer_qt_so_OBJECTS)
 gecko_mediaplayer_qt_so_LDADD = $(LDADD)
-gecko_mediaplayer_qt_so_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
-	$(CXXFLAGS) $(gecko_mediaplayer_qt_so_LDFLAGS) $(LDFLAGS) -o \
-	$@
+gecko_mediaplayer_qt_so_LINK = $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) \
+	$(gecko_mediaplayer_qt_so_LDFLAGS) $(LDFLAGS) -o $@
 am_gecko_mediaplayer_rm_so_OBJECTS = plugin_types_rm.$(OBJEXT) \
 	$(am__objects_1)
 gecko_mediaplayer_rm_so_OBJECTS =  \
 	$(am_gecko_mediaplayer_rm_so_OBJECTS)
 gecko_mediaplayer_rm_so_LDADD = $(LDADD)
-gecko_mediaplayer_rm_so_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
-	$(CXXFLAGS) $(gecko_mediaplayer_rm_so_LDFLAGS) $(LDFLAGS) -o \
-	$@
+gecko_mediaplayer_rm_so_LINK = $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) \
+	$(gecko_mediaplayer_rm_so_LDFLAGS) $(LDFLAGS) -o $@
 am_gecko_mediaplayer_wmp_so_OBJECTS = plugin_types_wmp.$(OBJEXT) \
 	$(am__objects_1)
 gecko_mediaplayer_wmp_so_OBJECTS =  \
 	$(am_gecko_mediaplayer_wmp_so_OBJECTS)
 gecko_mediaplayer_wmp_so_LDADD = $(LDADD)
-gecko_mediaplayer_wmp_so_LINK = $(LIBTOOL) --tag=CXX \
-	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CXXLD) \
-	$(AM_CXXFLAGS) $(CXXFLAGS) $(gecko_mediaplayer_wmp_so_LDFLAGS) \
-	$(LDFLAGS) -o $@
+gecko_mediaplayer_wmp_so_LINK = $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) \
+	$(gecko_mediaplayer_wmp_so_LDFLAGS) $(LDFLAGS) -o $@
 am_gecko_mediaplayer_so_OBJECTS = plugin_types_std.$(OBJEXT) \
 	$(am__objects_1)
 gecko_mediaplayer_so_OBJECTS = $(am_gecko_mediaplayer_so_OBJECTS)
 gecko_mediaplayer_so_LDADD = $(LDADD)
-gecko_mediaplayer_so_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
-	$(CXXFLAGS) $(gecko_mediaplayer_so_LDFLAGS) $(LDFLAGS) -o $@
+gecko_mediaplayer_so_LINK = $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) \
+	$(gecko_mediaplayer_so_LDFLAGS) $(LDFLAGS) -o $@
 DEFAULT_INCLUDES = -I. -I$(top_builddir)@am__isrc@
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
 CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
-LTCXXCOMPILE = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
-	--mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
-	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
 CXXLD = $(CXX)
-CXXLINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
-	--mode=link $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) \
-	$(LDFLAGS) -o $@
+CXXLINK = $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) \
+	-o $@
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
-LTCOMPILE = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
-	--mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
-	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)
-LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
-	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
-	$(LDFLAGS) -o $@
+LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 SOURCES = $(gecko_mediaplayer_dvx_so_SOURCES) \
 	$(gecko_mediaplayer_qt_so_SOURCES) \
 	$(gecko_mediaplayer_rm_so_SOURCES) \
@@ -142,7 +124,6 @@ CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 ACLOCAL = @ACLOCAL@
 AMTAR = @AMTAR@
-AR = @AR@
 AUTOCONF = @AUTOCONF@
 AUTOHEADER = @AUTOHEADER@
 AUTOMAKE = @AUTOMAKE@
@@ -155,7 +136,6 @@ CFLAGS = @CFLAGS@
 CPP = @CPP@
 CPPFLAGS = @CPPFLAGS@
 CXX = @CXX@
-CXXCPP = @CXXCPP@
 CXXDEPMODE = @CXXDEPMODE@
 CXXFLAGS = @CXXFLAGS@
 CYGPATH_W = @CYGPATH_W@
@@ -164,16 +144,16 @@ DBUS_CFLAGS = @DBUS_CFLAGS@
 DBUS_LIBS = @DBUS_LIBS@
 DEFS = @DEFS@
 DEPDIR = @DEPDIR@
-ECHO = @ECHO@
 ECHO_C = @ECHO_C@
 ECHO_N = @ECHO_N@
 ECHO_T = @ECHO_T@
 EGREP = @EGREP@
 EXEEXT = @EXEEXT@
-F77 = @F77@
-FFLAGS = @FFLAGS@
 GCONF_CFLAGS = @GCONF_CFLAGS@
+GCONF_DEFINES = @GCONF_DEFINES@
 GCONF_LIBS = @GCONF_LIBS@
+GCONF_SCHEMA_CONFIG_SOURCE = @GCONF_SCHEMA_CONFIG_SOURCE@
+GCONF_SCHEMA_FILE_DIR = @GCONF_SCHEMA_FILE_DIR@
 GECKO_CFLAGS = @GECKO_CFLAGS@
 GECKO_HOME = @GECKO_HOME@
 GECKO_IDLDIR = @GECKO_IDLDIR@
@@ -195,8 +175,6 @@ INTLLIBS = @INTLLIBS@
 LDFLAGS = @LDFLAGS@
 LIBOBJS = @LIBOBJS@
 LIBS = @LIBS@
-LIBTOOL = @LIBTOOL@
-LN_S = @LN_S@
 LTLIBOBJS = @LTLIBOBJS@
 MAINT = @MAINT@
 MAKEINFO = @MAKEINFO@
@@ -217,8 +195,6 @@ POFILES = @POFILES@
 POSUB = @POSUB@
 PO_IN_DATADIR_FALSE = @PO_IN_DATADIR_FALSE@
 PO_IN_DATADIR_TRUE = @PO_IN_DATADIR_TRUE@
-RANLIB = @RANLIB@
-SED = @SED@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
@@ -231,7 +207,6 @@ abs_top_builddir = @abs_top_builddir@
 abs_top_srcdir = @abs_top_srcdir@
 ac_ct_CC = @ac_ct_CC@
 ac_ct_CXX = @ac_ct_CXX@
-ac_ct_F77 = @ac_ct_F77@
 am__include = @am__include@
 am__leading_dot = @am__leading_dot@
 am__quote = @am__quote@
@@ -285,11 +260,12 @@ INCLUDES = \
 	$(GECKO_CFLAGS) \
 	$(GLIB_CFLAGS) \
 	$(DBUS_CFLAGS) \
-	$(GCONF_CFLAGS)
+	$(GCONF_CFLAGS) \
+	$(GCONF_DEFINES)
 
 AM_CFLAGS = \
 	 -Wall \
-	 -g
+	 -g 
 
 DEFINES = -DMOZILLA_STRICT_API -DXP_UNIX
 xpt_DATA = \
@@ -324,36 +300,36 @@ gecko_mediaplayer_so_SOURCES = \
 	plugin_types_std.cpp \
 	$(COMMONCODE)
 
-gecko_mediaplayer_so_CFLAGS = -fPIC
+gecko_mediaplayer_so_CFLAGS = -fPIC 
 gecko_mediaplayer_so_LDFLAGS = -shared $(GLIB_LIBS) $(DBUS_LIBS) $(GCONF_LIBS) -fPIC
 gecko_mediaplayer_qt_so_SOURCES = \
 	plugin_types_qt.cpp \
 	$(COMMONCODE)
 
-gecko_mediaplayer_qt_so_CFLAGS = -fPIC
+gecko_mediaplayer_qt_so_CFLAGS = -fPIC 
 gecko_mediaplayer_qt_so_LDFLAGS = -shared $(GLIB_LIBS) $(DBUS_LIBS) $(GCONF_LIBS) -fPIC
 gecko_mediaplayer_wmp_so_SOURCES = \
 	plugin_types_wmp.cpp \
 	$(COMMONCODE)
 
-gecko_mediaplayer_wmp_so_CFLAGS = -fPIC
+gecko_mediaplayer_wmp_so_CFLAGS = -fPIC 
 gecko_mediaplayer_wmp_so_LDFLAGS = -shared $(GLIB_LIBS) $(DBUS_LIBS) $(GCONF_LIBS) -fPIC
 gecko_mediaplayer_dvx_so_SOURCES = \
 	plugin_types_dvx.cpp \
 	$(COMMONCODE)
 
-gecko_mediaplayer_dvx_so_CFLAGS = -fPIC
+gecko_mediaplayer_dvx_so_CFLAGS = -fPIC 
 gecko_mediaplayer_dvx_so_LDFLAGS = -shared $(GLIB_LIBS) $(DBUS_LIBS) $(GCONF_LIBS) -fPIC
 gecko_mediaplayer_rm_so_SOURCES = \
 	plugin_types_rm.cpp \
 	$(COMMONCODE)
 
-gecko_mediaplayer_rm_so_CFLAGS = -fPIC
+gecko_mediaplayer_rm_so_CFLAGS = -fPIC 
 gecko_mediaplayer_rm_so_LDFLAGS = -shared $(GLIB_LIBS) $(DBUS_LIBS) $(GCONF_LIBS) -fPIC
 all: all-am
 
 .SUFFIXES:
-.SUFFIXES: .cpp .lo .o .obj
+.SUFFIXES: .cpp .o .obj
 $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
@@ -389,11 +365,10 @@ install-install_libexecPROGRAMS: $(install_libexec_PROGRAMS)
 	@list='$(install_libexec_PROGRAMS)'; for p in $$list; do \
 	  p1=`echo $$p|sed 's/$(EXEEXT)$$//'`; \
 	  if test -f $$p \
-	     || test -f $$p1 \
 	  ; then \
 	    f=`echo "$$p1" | sed 's,^.*/,,;$(transform);s/$$/$(EXEEXT)/'`; \
-	   echo " $(INSTALL_PROGRAM_ENV) $(LIBTOOL) --mode=install $(install_libexecPROGRAMS_INSTALL) '$$p' '$(DESTDIR)$(install_libexecdir)/$$f'"; \
-	   $(INSTALL_PROGRAM_ENV) $(LIBTOOL) --mode=install $(install_libexecPROGRAMS_INSTALL) "$$p" "$(DESTDIR)$(install_libexecdir)/$$f" || exit 1; \
+	   echo " $(INSTALL_PROGRAM_ENV) $(install_libexecPROGRAMS_INSTALL) '$$p' '$(DESTDIR)$(install_libexecdir)/$$f'"; \
+	   $(INSTALL_PROGRAM_ENV) $(install_libexecPROGRAMS_INSTALL) "$$p" "$(DESTDIR)$(install_libexecdir)/$$f" || exit 1; \
 	  else :; fi; \
 	done
 
@@ -406,11 +381,7 @@ uninstall-install_libexecPROGRAMS:
 	done
 
 clean-install_libexecPROGRAMS:
-	@list='$(install_libexec_PROGRAMS)'; for p in $$list; do \
-	  f=`echo $$p|sed 's/$(EXEEXT)$$//'`; \
-	  echo " rm -f $$p $$f"; \
-	  rm -f $$p $$f ; \
-	done
+	-test -z "$(install_libexec_PROGRAMS)" || rm -f $(install_libexec_PROGRAMS)
 gecko-mediaplayer-dvx.so$(EXEEXT): $(gecko_mediaplayer_dvx_so_OBJECTS) $(gecko_mediaplayer_dvx_so_DEPENDENCIES) 
 	@rm -f gecko-mediaplayer-dvx.so$(EXEEXT)
 	$(gecko_mediaplayer_dvx_so_LINK) $(gecko_mediaplayer_dvx_so_OBJECTS) $(gecko_mediaplayer_dvx_so_LDADD) $(LIBS)
@@ -460,19 +431,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXXCOMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
-
-.cpp.lo:
-@am__fastdepCXX_TRUE@	$(LTCXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
-@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LTCXXCOMPILE) -c -o $@ $<
-
-mostlyclean-libtool:
-	-rm -f *.lo
-
-clean-libtool:
-	-rm -rf .libs _libs
 install-xptDATA: $(xpt_DATA)
 	@$(NORMAL_INSTALL)
 	test -z "$(xptdir)" || $(MKDIR_P) "$(DESTDIR)$(xptdir)"
@@ -598,8 +556,7 @@ maintainer-clean-generic:
 	@echo "it deletes files that may require special tools to rebuild."
 clean: clean-am
 
-clean-am: clean-generic clean-install_libexecPROGRAMS clean-libtool \
-	mostlyclean-am
+clean-am: clean-generic clean-install_libexecPROGRAMS mostlyclean-am
 
 distclean: distclean-am
 	-rm -rf ./$(DEPDIR)
@@ -642,8 +599,7 @@ maintainer-clean-am: distclean-am maintainer-clean-generic
 
 mostlyclean: mostlyclean-am
 
-mostlyclean-am: mostlyclean-compile mostlyclean-generic \
-	mostlyclean-libtool
+mostlyclean-am: mostlyclean-compile mostlyclean-generic
 
 pdf: pdf-am
 
@@ -658,19 +614,19 @@ uninstall-am: uninstall-install_libexecPROGRAMS uninstall-xptDATA
 .MAKE: install-am install-strip
 
 .PHONY: CTAGS GTAGS all all-am check check-am clean clean-generic \
-	clean-install_libexecPROGRAMS clean-libtool ctags distclean \
-	distclean-compile distclean-generic distclean-libtool \
-	distclean-tags distdir dvi dvi-am html html-am info info-am \
-	install install-am install-data install-data-am install-dvi \
-	install-dvi-am install-exec install-exec-am install-html \
-	install-html-am install-info install-info-am \
-	install-install_libexecPROGRAMS install-man install-pdf \
-	install-pdf-am install-ps install-ps-am install-strip \
-	install-xptDATA installcheck installcheck-am installdirs \
-	maintainer-clean maintainer-clean-generic mostlyclean \
-	mostlyclean-compile mostlyclean-generic mostlyclean-libtool \
-	pdf pdf-am ps ps-am tags uninstall uninstall-am \
-	uninstall-install_libexecPROGRAMS uninstall-xptDATA
+	clean-install_libexecPROGRAMS ctags distclean \
+	distclean-compile distclean-generic distclean-tags distdir dvi \
+	dvi-am html html-am info info-am install install-am \
+	install-data install-data-am install-dvi install-dvi-am \
+	install-exec install-exec-am install-html install-html-am \
+	install-info install-info-am install-install_libexecPROGRAMS \
+	install-man install-pdf install-pdf-am install-ps \
+	install-ps-am install-strip install-xptDATA installcheck \
+	installcheck-am installdirs maintainer-clean \
+	maintainer-clean-generic mostlyclean mostlyclean-compile \
+	mostlyclean-generic pdf pdf-am ps ps-am tags uninstall \
+	uninstall-am uninstall-install_libexecPROGRAMS \
+	uninstall-xptDATA
 
 
 gecko-mediaplayer-dvx.xpt: nsIScriptableGeckoMediaPlayer.idl

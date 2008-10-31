@@ -40,14 +40,14 @@
 gchar *GetMIMEDescription()
 {
     gchar MimeTypes[4000];
-    GConfClient *gconf = NULL;
+    gpointer store = NULL;
     gboolean wmp_disabled = FALSE;
     
     g_type_init();
-    gconf = gconf_client_get_default();
-    if (gconf != NULL) {
-        wmp_disabled = gconf_client_get_bool(gconf, DISABLE_WMP, NULL);
-        g_object_unref(G_OBJECT(gconf));
+    store = init_preference_store();
+    if (store != NULL) {
+        wmp_disabled = read_preference_bool(store, DISABLE_WMP);
+        release_preference_store(store);
     }
     
     if (wmp_disabled) {

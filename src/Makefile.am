@@ -12,11 +12,12 @@ INCLUDES = \
 	$(GECKO_CFLAGS) \
 	$(GLIB_CFLAGS) \
 	$(DBUS_CFLAGS) \
-	$(GCONF_CFLAGS)
+	$(GCONF_CFLAGS) \
+	$(GCONF_DEFINES)
 
 AM_CFLAGS =\
 	 -Wall \
-	 -g
+	 -g 
 
 DEFINES = -DMOZILLA_STRICT_API -DXP_UNIX
 
@@ -71,34 +72,34 @@ gecko_mediaplayer_so_SOURCES = \
 	plugin_types_std.cpp \
 	$(COMMONCODE)
 		
-gecko_mediaplayer_so_CFLAGS = -fPIC
+gecko_mediaplayer_so_CFLAGS = -fPIC 
 gecko_mediaplayer_so_LDFLAGS = -shared $(GLIB_LIBS) $(DBUS_LIBS) $(GCONF_LIBS) -fPIC
 
 gecko_mediaplayer_qt_so_SOURCES = \
 	plugin_types_qt.cpp \
 	$(COMMONCODE)
 	
-gecko_mediaplayer_qt_so_CFLAGS = -fPIC
+gecko_mediaplayer_qt_so_CFLAGS = -fPIC 
 gecko_mediaplayer_qt_so_LDFLAGS = -shared $(GLIB_LIBS) $(DBUS_LIBS) $(GCONF_LIBS) -fPIC
 
 gecko_mediaplayer_wmp_so_SOURCES = \
 	plugin_types_wmp.cpp \
 	$(COMMONCODE)
 	
-gecko_mediaplayer_wmp_so_CFLAGS = -fPIC
+gecko_mediaplayer_wmp_so_CFLAGS = -fPIC 
 gecko_mediaplayer_wmp_so_LDFLAGS = -shared $(GLIB_LIBS) $(DBUS_LIBS) $(GCONF_LIBS) -fPIC
 
 gecko_mediaplayer_dvx_so_SOURCES = \
 	plugin_types_dvx.cpp \
 	$(COMMONCODE)
 	
-gecko_mediaplayer_dvx_so_CFLAGS = -fPIC
+gecko_mediaplayer_dvx_so_CFLAGS = -fPIC 
 gecko_mediaplayer_dvx_so_LDFLAGS = -shared $(GLIB_LIBS) $(DBUS_LIBS) $(GCONF_LIBS) -fPIC
 
 gecko_mediaplayer_rm_so_SOURCES = \
 	plugin_types_rm.cpp \
 	$(COMMONCODE)
 	
-gecko_mediaplayer_rm_so_CFLAGS = -fPIC
+gecko_mediaplayer_rm_so_CFLAGS = -fPIC 
 gecko_mediaplayer_rm_so_LDFLAGS = -shared $(GLIB_LIBS) $(DBUS_LIBS) $(GCONF_LIBS) -fPIC
 

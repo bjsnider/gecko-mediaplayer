@@ -40,9 +40,12 @@
 #include <X11/Xlib.h>
 #include <dbus/dbus.h>
 #include <dbus/dbus-glib-lowlevel.h>
+#ifdef HAVE_GCONF
 #include <gconf/gconf.h>
 #include <gconf/gconf-client.h>
 #include <gconf/gconf-value.h>
+#endif
+
 #include <glib.h>
 #include "pluginbase.h"
 #include "nsScriptablePeer.h"
@@ -53,6 +56,11 @@
 #else
 # define _(x) (x)
 #endif
+
+gpointer init_preference_store();
+gboolean read_preference_bool(gpointer store, gchar * key);
+gint read_preference_int(gpointer store, gchar * key);
+void release_preference_store(gpointer store);
 
 // JavaScript Playstates
 #define STATE_UNDEFINED     0
@@ -160,6 +168,7 @@ class nsPluginInstance:public nsPluginInstanceBase {
     gboolean disable_context_menu;
     gboolean disable_fullscreen;
     gboolean debug;
+    gint show_controls;
     gchar *name;
     gchar *console;
     gchar *controls;

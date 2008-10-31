@@ -8,9 +8,11 @@ Homepage: http://kdekorte.googlepages.com/gecko-mediaplayer
 
 Package: gecko-mediaplayer
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, gnome-mplayer (>= 0.7.0), iceweasel | firefox-3.0 | firefox-2 | iceape-browser | epiphany-browser | galeon | midbrowser | xulrunner
+Depends: ${shlibs:Depends}, ${misc:Depends}, gnome-mplayer (>= 0.9.0), iceweasel | firefox-3.0 | iceape-browser | epiphany-browser | galeon | midbrowser | xulrunner
 Xb-Npp-Applications: ec8030f7-c20a-464f-9b0e-13a3a9e97384, 92650c4d-4b8e-4d2a-b7eb-24ecf4f6b63a, aa5ca914-c309-495d-91cf-3141bbb04115
-Xb-Npp-Name: Media plug-in for Gecko browsers
+Xb-Npp-Name: Gecko Media Player
+Xb-Npp-Description: Play media off the net using the gnome-mplayer
+Xb-Npp-File: gecko-mediaplayer
 Xb-Npp-MimeType: video/mpeg, audio/mpeg, video/x-mpeg, video/x-mpeg2, audio/x-mpeg, audio/mpeg2, audio/x-mpeg2, audio/mpeg3, audio/x-mpeg3, audio/mp3, audio/x-mpegurl, video/mp4, application/x-ogg, audio/ogg, application/ogg, video/fli, video/x-fli, video/vnd.vivo, application/x-nsv-vp3-mp3, audio/basic, audio/x-basic, audio/x-scpls, video/divx, video/vnd.divx, audio/midi, video/quicktime, video/x-quicktime, image/x-quicktime, video/quicktime, video/quicktime, application/x-quicktimeplayer, application/asx, video/x-ms-asf-plugin, video/x-msvideo, video/msvideo, application/x-mplayer2, application/x-ms-wmv, video/x-ms-asf, video/x-ms-wm, video/x-ms-wmv, audio/x-ms-wmv, video/x-ms-wmp, video/x-ms-wvx, audio/x-ms-wax, audio/x-ms-wma, application/x-drm-v2, audio/wav, audio/x-wav, audio/x-pn-realaudio, application/vnd.rn-realmedia, application/vnd.rn-realaudio, video/vnd.rn-realvideo, audio/x-realaudio, audio/x-pn-realaudio-plugin, application/smil, audio/x-mod
 Description: Media plug-in for Gecko browsers
  Gecko Media Player is a browser plug-in that uses GNOME MPlayer

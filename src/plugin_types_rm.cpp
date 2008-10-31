@@ -40,14 +40,14 @@
 gchar *GetMIMEDescription()
 {
     gchar MimeTypes[4000];
-    GConfClient *gconf = NULL;
+    gpointer store = NULL;
     gboolean real_disabled = FALSE;
     
     g_type_init();
-    gconf = gconf_client_get_default();
-    if (gconf != NULL) {
-        real_disabled = gconf_client_get_bool(gconf, DISABLE_REAL, NULL);
-        g_object_unref(G_OBJECT(gconf));
+    store = init_preference_store();
+    if (store != NULL) {
+        real_disabled = read_preference_bool(store, DISABLE_REAL);
+        release_preference_store(store);
     }
     
     if (real_disabled) {

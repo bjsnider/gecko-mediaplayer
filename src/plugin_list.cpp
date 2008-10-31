@@ -422,6 +422,8 @@ asx_start_element(GMarkupParseContext * context,
     ListItem *newitem;
     gchar *value;
     gint i = 0;
+    gchar *ptr;
+    gchar url[1024];
 
     if (g_ascii_strcasecmp(element_name, "REF") == 0) {
         while (attribute_names[i] != NULL) {
@@ -433,7 +435,19 @@ asx_start_element(GMarkupParseContext * context,
                     newitem = g_new0(ListItem, 1);
                     value = g_strdup(attribute_values[i]);
                     unreplace_amp(value);
-                    g_strlcpy(newitem->src, value, 1024);
+                    ptr = g_strrstr(value, "/");
+                    if (ptr == NULL) {
+                        g_strlcpy(url, parser_item->src, 1024);
+                        ptr = g_strrstr(url, "/");
+                        if (ptr != NULL) {
+                            ptr[1] = (char) NULL;
+                            g_strlcpy(newitem->src,url,1024);
+                            g_strlcat(newitem->src,value,1024);
+                        }
+                    } else {
+                        g_strlcpy(newitem->src, value, 1024);
+                    }
+
                     g_free(value);
                     newitem->streaming = streaming(newitem->src);
                     // crappy hack, mplayer needs the protocol in lower case, some sites don't
@@ -476,7 +490,18 @@ asx_start_element(GMarkupParseContext * context,
                     newitem = g_new0(ListItem, 1);
                     value = g_strdup(attribute_values[i]);
                     unreplace_amp(value);
-                    g_strlcpy(newitem->src, value, 1024);
+                    ptr = g_strrstr(value, "/");
+                    if (ptr == NULL) {
+                        g_strlcpy(url, parser_item->src, 1024);
+                        ptr = g_strrstr(url, "/");
+                        if (ptr != NULL) {
+                            ptr[1] = (char) NULL;
+                            g_strlcpy(newitem->src,url,1024);
+                            g_strlcat(newitem->src,value,1024);
+                        }
+                    } else {
+                        g_strlcpy(newitem->src, value, 1024);
+                    }
                     g_free(value);
                     newitem->streaming = streaming(newitem->src);
                     // crappy hack, mplayer needs the protocol in lower case, some sites don't

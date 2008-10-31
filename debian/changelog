@@ -1,3 +1,26 @@
+gecko-mediaplayer (0.9.0-1) unstable; urgency=low
+
+  * New upstream release:
+    - remove avoid_libtool.patch, finally applied upstream
+    - add --with-gconf flag to configure call in debian/rules
+    - add --disable-schemas-install to configure call in debian/rules and add
+      installation of schema file in debian/install
+    - updated dependancy on gnome-mplayer
+  * Add Xb-Npp-Description and Xb-Npp-File tags to debian/control
+  * Reword Xb-Npp-Name tag in debian/control
+	
+ -- Cesare Tirabassi <norsetto@ubuntu.com>  Fri, 31 Oct 2008 23:26:04 +0100
+
+gecko-mediaplayer (0.8.0-1) unstable; urgency=low
+
+  * New upstream release:
+    - bump gnome-mplayer versioned dependency in debian/control
+    - avoid explicitly passing GLIB_LIBS, gthread was removed upstream
+  * Add configure as a PHONY target in debian/rules
+  * Remove or-ed dependency on firefox-2 (LP: #272959)
+
+ -- Cesare Tirabassi <norsetto@ubuntu.com>  Mon, 29 Sep 2008 22:54:49 +0200
+
 gecko-mediaplayer (0.7.0-1) unstable; urgency=low
 
   * New upstream release

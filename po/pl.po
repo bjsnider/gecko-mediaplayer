@@ -3,13 +3,13 @@
 # This file is distributed under the same license as the gecko-mediaplayer package.
 # Julian Sikorski <belegdol@gmail.com>, 2007.
 # , fuzzy
-# 
-# 
+#
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: gecko-mediaplayer 0.5.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-08-15 12:31-0600\n"
+"POT-Creation-Date: 2008-10-30 12:56-0600\n"
 "PO-Revision-Date: 2007-12-08 12:56+0100\n"
 "Last-Translator: Julian Sikorski <belegdol@gmail.com>\n"
 "Language-Team: Polish <gnomepl@pandora.info.bielsko.pl>\n"
@@ -17,17 +17,17 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/plugin.cpp:369
+#: src/plugin.cpp:371
 #, c-format
 msgid "Cache fill: %2.2f%%"
 msgstr "Zapełnienie bufora: %2.2f%%"
 
-#: src/plugin.cpp:530
+#: src/plugin.cpp:532
 #, c-format
 msgid "Write unable to write because item is NULL"
 msgstr "Zapis niemożliwy ponieważ element jest NULL"
 
-#: src/plugin.cpp:582
+#: src/plugin.cpp:584
 #, c-format
 msgid "Cache fill: %2.2f%% (%0.1f K/s)"
 msgstr "Zapełnienie bufora: %2.2f%% (%0.1f K/s)"

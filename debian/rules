@@ -31,7 +31,8 @@ endif
 	./configure \
 		--host=$(DEB_HOST_GNU_TYPE) --build=$(DEB_BUILD_GNU_TYPE) \
 		--prefix=/usr --sysconfdir=\$${prefix}/share \
-		CXXFLAGS="$(CXXFLAGS)" LDFLAGS="$(LDFLAGS)" GLIB_LIBS="$(GLIBS)"
+		--with-gconf --disable-schemas-install \
+		CXXFLAGS="$(CXXFLAGS)" LDFLAGS="$(LDFLAGS)"
 
 	touch configure-stamp
 
@@ -73,6 +74,7 @@ binary-arch: build install
 	dh_testroot
 	dh_installchangelogs ChangeLog
 	dh_installdocs
+	dh_install
 	dh_gconf
 	dh_link
 	dh_strip
@@ -85,4 +87,4 @@ binary-arch: build install
 	dh_builddeb
 
 binary: binary-indep binary-arch
-.PHONY: build clean binary-indep binary-arch binary install
+.PHONY: build clean binary-indep binary-arch binary install configure
