@@ -2,7 +2,7 @@ dnl Process this file with autoconf to produce a configure script.
 dnl Created by Anjuta application wizard.
 
 AC_INIT(configure.in)
-AM_INIT_AUTOMAKE(gecko-mediaplayer, 0.9.2)
+AM_INIT_AUTOMAKE(gecko-mediaplayer, 0.9.3)
 AM_CONFIG_HEADER(config.h)
 AM_MAINTAINER_MODE
 
@@ -30,10 +30,24 @@ PKG_CHECK_MODULES(GLIB, [glib-2.0 ])
 AC_SUBST(GLIB_CFLAGS)
 AC_SUBST(GLIB_LIBS)
 
+AC_ARG_WITH([xulrunner-sdk],
+    [AS_HELP_STRING([--with-xulrunner-sdk],
+        [Use xulrunner SDK for build])],
+        [
+	XULRUNNER_SDK_PREFIX=$with_xulrunner_sdk
+	GECKO_CFLAGS="-I$XULRUNNER_SDK_PREFIX/include -I$XULRUNNER_SDK_PREFIX/include/plugin -I$XULRUNNER_SDK_PREFIX/include/nspr -I$XULRUNNER_SDK_PREFIX/include/xpcom -I$XULRUNNER_SDK_PREFIX/include/string -I$XULRUNNER_SDK_PREFIX/include/java"
+	GECKO_LIBS="-L$XULRUNNER_SDK_PREFIX/lib -lxpcomglue_s -lxul -lxpcom -lplds4 -lplc4 -lnspr4 -lpthread -ldl"
+	GECKO_HOME="$XULRUNNER_SDK_PREFIX/bin"
+	GECKO_IDLDIR="$XULRUNNER_SDK_PREFIX/idl"
+	],
+        [])
+
+if test "$GECKO_CFLAGS" = ""; then
 PKG_CHECK_MODULES(GECKO, [mozilla-plugin mozilla-xpcom],[
     GECKO_HOME=`$PKG_CONFIG --variable=libdir mozilla-plugin`
     GECKO_IDLDIR=`$PKG_CONFIG --variable=idldir mozilla-xpcom`
     ],[AC_MSG_WARN([mozilla-plugin not found, trying another])])
+fi
 
 if test "$GECKO_CFLAGS" = ""; then
 PKG_CHECK_MODULES(GECKO, [firefox-plugin firefox-xpcom],[
@@ -90,7 +104,7 @@ AC_SUBST(GECKO_HOME)
 
 AC_PATH_PROG([GECKO_XPIDL], [xpidl], [no], [$GECKO_HOME:$PATH])
 if test "x$GECKO_XPIDL" = "xno"; then
-	AC_MSG_ERROR([xpidl compiler not found])
+	AC_MSG_ERROR([xpidl compiler not found in $GECKO_HOME:$PATH])
 fi
 
 if test "x$GECKO_IDLDIR" = "x"; then

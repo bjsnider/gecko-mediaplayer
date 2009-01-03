@@ -42,6 +42,7 @@ gecko-mediaplayer-wmp.xpt: nsIScriptableGeckoMediaPlayer.idl
 	$(GECKO_XPIDL) -w -m typelib -I $(GECKO_IDLDIR) -I $(srcdir) -e $@ $<
 
 COMMONCODE = \
+	../config.h \
 	plugin.cpp \
 	plugin.h \
 	plugin_list.h \

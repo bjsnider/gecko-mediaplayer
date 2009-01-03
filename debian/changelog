@@ -1,3 +1,11 @@
+gecko-mediaplayer (0.9.3-1) unstable; urgency=low
+
+  * New upstream release
+    - updated dependency on gnome-mplayer
+  * Add Vcs-* fields to debian/control.
+
+ -- Cesare Tirabassi <norsetto@ubuntu.com>  Sat, 03 Jan 2009 10:12:33 +0100
+
 gecko-mediaplayer (0.9.2-1) unstable; urgency=low
 
   * New upstream release

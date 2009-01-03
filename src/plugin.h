@@ -40,6 +40,9 @@
 #include <X11/Xlib.h>
 #include <dbus/dbus.h>
 #include <dbus/dbus-glib-lowlevel.h>
+#ifdef HAVE_CONFIG_H
+#  include <config.h>
+#endif
 #ifdef HAVE_GCONF
 #include <gconf/gconf.h>
 #include <gconf/gconf-client.h>
@@ -47,14 +50,13 @@
 #endif
 
 #include <glib.h>
+#include <glib/gstdio.h>
+#include <glib/gi18n.h>
 #include "pluginbase.h"
 #include "nsScriptablePeer.h"
 #include "plugin_list.h"
-#ifdef HAVE_GETTEXT
-# include <libintl.h>
-# define _(x) (gettext(x))
-#else
-# define _(x) (x)
+#ifdef ENABLE_NLS
+#include <libintl.h>
 #endif
 
 gpointer init_preference_store();
