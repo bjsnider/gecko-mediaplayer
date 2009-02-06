@@ -49,22 +49,22 @@
 
 // extern void dbus_connection_setup_with_qt_main (DBusConnection *connection);
 
-DBusConnection *dbus_hookup(nsPluginInstance * instance);
-DBusConnection *dbus_unhook(DBusConnection * connection, nsPluginInstance * instance);
-void open_location(nsPluginInstance * instance, ListItem * item, gboolean uselocal);
-void resize_window(nsPluginInstance * instance, ListItem * item, gint x, gint y);
-void send_signal(nsPluginInstance * instance, ListItem * item, const gchar * signal);
-void send_signal_when_ready(nsPluginInstance * instance, ListItem * item, const gchar * signal);
-void send_signal_with_string(nsPluginInstance * instance, ListItem * item, const gchar * signal,
+DBusConnection *dbus_hookup(CPlugin * instance);
+DBusConnection *dbus_unhook(DBusConnection * connection, CPlugin * instance);
+void open_location(CPlugin * instance, ListItem * item, gboolean uselocal);
+void resize_window(CPlugin * instance, ListItem * item, gint x, gint y);
+void send_signal(CPlugin * instance, ListItem * item, const gchar * signal);
+void send_signal_when_ready(CPlugin * instance, ListItem * item, const gchar * signal);
+void send_signal_with_string(CPlugin * instance, ListItem * item, const gchar * signal,
                              gchar * str);
-void send_signal_with_double(nsPluginInstance * instance, ListItem * item, const gchar * signal,
+void send_signal_with_double(CPlugin * instance, ListItem * item, const gchar * signal,
                              gdouble dbl);
-void send_signal_with_boolean(nsPluginInstance * instance, ListItem * item, const gchar * signal,
+void send_signal_with_boolean(CPlugin * instance, ListItem * item, const gchar * signal,
                               gboolean boolean);
-gboolean request_boolean_value(nsPluginInstance * instance, ListItem * item, const gchar * member);
-gdouble request_double_value(nsPluginInstance * instance, ListItem * item, const gchar * member);
-gint request_int_value(nsPluginInstance * instance, ListItem * item, const gchar * member);
-gboolean is_valid_path(nsPluginInstance * instance, const char *message);
-gint request_bitrate(nsPluginInstance * instance, ListItem * item, gchar * name);
+gboolean request_boolean_value(CPlugin * instance, ListItem * item, const gchar * member);
+gdouble request_double_value(CPlugin * instance, ListItem * item, const gchar * member);
+gint request_int_value(CPlugin * instance, ListItem * item, const gchar * member);
+gboolean is_valid_path(CPlugin * instance, const char *message);
+gint request_bitrate(CPlugin * instance, ListItem * item, gchar * name);
 
 #endif                          // _PLUGIN_DBUS_H

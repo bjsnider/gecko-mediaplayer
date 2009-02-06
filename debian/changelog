@@ -1,3 +1,17 @@
+gecko-mediaplayer (0.9.4-1) unstable; urgency=low
+
+  * New upstream release:
+    - update dependency on gnome-mplayer
+    - debian/copyright:
+      + src/np_entry.cpp, src/npn_gate.cpp, src/npp_gate.cpp are now
+        licensed under the NPL-1.1 license
+      + source header files have now an h extension
+      + update packaging copyright date
+    - remove quilt to keep lintian happy
+    - add konqueror >= 4:4 to list of supported browsers
+
+ -- Cesare Tirabassi <norsetto@ubuntu.com>  Fri, 06 Feb 2009 21:57:53 +0100
+
 gecko-mediaplayer (0.9.3-1) unstable; urgency=low
 
   * New upstream release

@@ -1,7 +1,6 @@
 src/np_entry.cpp
 src/npn_gate.cpp
 src/npp_gate.cpp
-src/nsScriptablePeer.cpp
 src/plugin.cpp
 src/plugin_dbus.cpp
 src/plugin_list.cpp

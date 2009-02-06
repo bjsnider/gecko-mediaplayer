@@ -37,6 +37,9 @@
 
 #ifndef __PLUGIN_H__
 #define __PLUGIN_H__
+#include <npapi.h>
+#include <npruntime.h>
+#include "npupp.h"
 #include <X11/Xlib.h>
 #include <dbus/dbus.h>
 #include <dbus/dbus-glib-lowlevel.h>
@@ -52,8 +55,6 @@
 #include <glib.h>
 #include <glib/gstdio.h>
 #include <glib/gi18n.h>
-#include "pluginbase.h"
-#include "nsScriptablePeer.h"
 #include "plugin_list.h"
 #ifdef ENABLE_NLS
 #include <libintl.h>
@@ -63,7 +64,7 @@ gpointer init_preference_store();
 gboolean read_preference_bool(gpointer store, const gchar * key);
 gint read_preference_int(gpointer store, const gchar * key);
 void release_preference_store(gpointer store);
-gchar *gmp_tempname(gchar *path,const gchar *name_template);
+gchar *gmp_tempname(gchar * path, const gchar * name_template);
 
 // JavaScript Playstates
 #define STATE_UNDEFINED     0
@@ -88,14 +89,25 @@ gchar *gmp_tempname(gchar *path,const gchar *name_template);
 #define DEBUG_LEVEL		"/apps/gecko-mediaplayer/preferences/debug_level"
 
 
-class nsPluginInstance:public nsPluginInstanceBase {
+class CPlugin {
+  private:
+    NPWindow * m_Window;
+    NPStream *m_pNPStream;
+    NPBool mInitialized;
+    NPObject *m_pScriptableObject;
+    NPObject *m_pScriptableObjectControls;
+
   public:
-    nsPluginInstance(NPP aInstance);
-    virtual ~ nsPluginInstance();
+     CPlugin(NPP pNPInstance);
+    ~CPlugin();
 
     NPBool init(NPWindow * aWindow);
     void shut();
     NPBool isInitialized();
+    int16 handleEvent(void *event);
+
+    NPObject *GetScriptableObject();
+    NPObject *GetScriptableObjectControls();
 
     NPError GetValue(NPPVariable variable, void *value);
     NPError SetWindow(NPWindow * aWindow);
@@ -106,8 +118,6 @@ class nsPluginInstance:public nsPluginInstanceBase {
     int32 Write(NPStream * stream, int32 offset, int32 len, void *buffer);
 
 
-    nsScriptablePeer *getScriptablePeer();
-    nsControlsScriptablePeer *getControlsScriptablePeer();
 
     void Play();
     void Pause();
@@ -138,15 +148,11 @@ class nsPluginInstance:public nsPluginInstanceBase {
     void SetOnMouseOut(const char *event);
     void SetOnMouseOver(const char *event);
     void SetOnDestroy(const char *event);
-    
+
   private:
-     NPBool mInitialized;
 
-    gint mX, mY;
+     gint mX, mY;
     gint mWidth, mHeight;
-
-    nsScriptablePeer *mScriptablePeer;
-    nsControlsScriptablePeer *mControlsScriptablePeer;
 
   public:
      Window mWindow;
@@ -187,15 +193,15 @@ class nsPluginInstance:public nsPluginInstanceBase {
 
     // options
     gint debug_level;
-    
+
     // tv options
     gchar *tv_device;
     gchar *tv_driver;
     gchar *tv_input;
     gint tv_width;
     gint tv_height;
-    
-    
+
+
 };
 
 #endif                          // __PLUGIN_H__

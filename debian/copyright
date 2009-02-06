@@ -8,12 +8,16 @@ Files: *, po/*.po
 Copyright: © 2007-2008 Kevin DeKorte
 License: GPL-2+
 
-Files: src/*.cpp, src/*.hpp
+Files: src/*.cpp, src/*.h
 Copyright: © 1998 Netscape Communications Corporation
 License: MPL-1.1 | GPL-2+ | LGPL-2.1+
 
+Files: src/np_entry.cpp, src/npn_gate.cpp, src/npp_gate.cpp
+Copyright: © 1998 Netscape Communications Corporation
+License: NPL-1.1 | GPL-2+ | LGPL-2.1+
+
 Files: debian/*
-Copyright: © 2008 Cesare Tirabassi <norsetto@ubuntu.com>
+Copyright: © 2009 Cesare Tirabassi <norsetto@ubuntu.com>
 License: GPL-2+
 
 Files: missing, ltmain.sh, depcomp

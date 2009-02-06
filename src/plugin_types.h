@@ -44,4 +44,4 @@
 gchar *GetMIMEDescription();
 NPError PluginGetValue(NPPVariable variable, void *value);
 
-#endif                          // _PLUGIN_TYPES_QT_H
+#endif                          // _PLUGIN_TYPES_H

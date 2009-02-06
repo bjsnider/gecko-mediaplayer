@@ -28,6 +28,9 @@
 /* Define to 1 if you have the <locale.h> header file. */
 #define HAVE_LOCALE_H 1
 
+/* Define to 1 if you have the `memmem' function. */
+#define HAVE_MEMMEM 1
+
 /* Define to 1 if you have the <memory.h> header file. */
 #define HAVE_MEMORY_H 1
 
@@ -52,6 +55,9 @@
 /* Define to 1 if you have the <unistd.h> header file. */
 #define HAVE_UNISTD_H 1
 
+/* Define to 1 if your C compiler doesn't accept -c and -o together. */
+/* #undef NO_MINUS_C_MINUS_O */
+
 /* Name of package */
 #define PACKAGE "gecko-mediaplayer"
 
@@ -74,4 +80,4 @@
 #define STDC_HEADERS 1
 
 /* Version number of package */
-#define VERSION "0.9.3"
+#define VERSION "0.9.4"

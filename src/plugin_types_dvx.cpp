@@ -42,14 +42,14 @@ gchar *GetMIMEDescription()
     gchar MimeTypes[4000];
     gpointer store = NULL;
     gboolean dvx_disabled = FALSE;
-    
+
     g_type_init();
     store = init_preference_store();
     if (store != NULL) {
         dvx_disabled = read_preference_bool(store, DISABLE_DVX);
         release_preference_store(store);
     }
-    
+
     if (dvx_disabled) {
         return NULL;
     } else {

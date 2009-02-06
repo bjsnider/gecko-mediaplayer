@@ -48,7 +48,7 @@ static DBusHandlerResult filter_func(DBusConnection * connection,
     DBusError error;
     DBusMessage *reply_message;
     gchar *path;
-    nsPluginInstance *instance;
+    CPlugin *instance;
     ListItem *item = NULL;
     gchar *arg[10];
     gint i;
@@ -60,13 +60,13 @@ static DBusHandlerResult filter_func(DBusConnection * connection,
     sender = dbus_message_get_sender(message);
     destination = dbus_message_get_destination(message);
 
-	/*
-    printf("path=%s; interface=%s; member=%s; data=%s\n",
-           dbus_message_get_path(message),
-           dbus_message_get_interface(message), dbus_message_get_member(message), s);
-	*/
-	
-    instance = (nsPluginInstance *) user_data;
+    /*
+       printf("path=%s; interface=%s; member=%s; data=%s\n",
+       dbus_message_get_path(message),
+       dbus_message_get_interface(message), dbus_message_get_member(message), s);
+     */
+
+    instance = (CPlugin *) user_data;
     path = instance->path;
 
     if (dbus_message_get_path(message) != NULL
@@ -91,7 +91,7 @@ static DBusHandlerResult filter_func(DBusConnection * connection,
                 instance->cache_size = request_int_value(instance, item, "GetCacheSize");
                 //printf("cache size = %i\n",instance->cache_size);
                 if (instance->cache_size == 0) {
-                	item->streaming = 1;
+                    item->streaming = 1;
                 }
                 return DBUS_HANDLER_RESULT_HANDLED;
             }
@@ -144,12 +144,13 @@ static DBusHandlerResult filter_func(DBusConnection * connection,
                             arg[i] = NULL;
                             gerror = NULL;
                             if (g_spawn_async(NULL, arg, NULL,
-                                          G_SPAWN_SEARCH_PATH, NULL, NULL, NULL, &gerror) == FALSE) {
-                                printf("Unable to launch gnome-mplayer: %s\n",gerror->message);
+                                              G_SPAWN_SEARCH_PATH, NULL, NULL, NULL,
+                                              &gerror) == FALSE) {
+                                printf("Unable to launch gnome-mplayer: %s\n", gerror->message);
                                 g_error_free(gerror);
                                 gerror = NULL;
                             }
-                            printf("requesting %s \n",item->src);
+                            printf("requesting %s \n", item->src);
                             NPN_GetURLNotify(instance->mInstance, item->src, NULL, item);
                         }
                         instance->lastopened->played = TRUE;
@@ -279,7 +280,7 @@ static DBusHandlerResult filter_func(DBusConnection * connection,
     return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
 }
 
-DBusConnection *dbus_hookup(nsPluginInstance * instance)
+DBusConnection *dbus_hookup(CPlugin * instance)
 {
     DBusConnection *connection;
     DBusError dberror;
@@ -298,18 +299,18 @@ DBusConnection *dbus_hookup(nsPluginInstance * instance)
     return connection;
 }
 
-DBusConnection *dbus_unhook(DBusConnection * connection, nsPluginInstance * instance)
+DBusConnection *dbus_unhook(DBusConnection * connection, CPlugin * instance)
 {
 
     dbus_connection_flush(connection);
     dbus_connection_remove_filter(connection, filter_func, instance);
     dbus_connection_close(connection);
     dbus_connection_unref(connection);
-    
+
     return NULL;
 }
 
-void open_location(nsPluginInstance * instance, ListItem * item, gboolean uselocal)
+void open_location(CPlugin * instance, ListItem * item, gboolean uselocal)
 {
     DBusMessage *message;
     const char *file;
@@ -395,13 +396,13 @@ void open_location(nsPluginInstance * instance, ListItem * item, gboolean useloc
             dbus_connection_send(instance->connection, message, NULL);
             dbus_message_unref(message);
         }
-        send_signal_with_string(instance,item,"SetURL",item->src);
+        send_signal_with_string(instance, item, "SetURL", item->src);
         item->opened = TRUE;
         instance->lastopened = item;
     }
 }
 
-void resize_window(nsPluginInstance * instance, ListItem * item, gint x, gint y)
+void resize_window(CPlugin * instance, ListItem * item, gint x, gint y)
 {
     DBusMessage *message;
     gchar *path;
@@ -429,7 +430,7 @@ void resize_window(nsPluginInstance * instance, ListItem * item, gint x, gint y)
 }
 
 
-void send_signal(nsPluginInstance * instance, ListItem * item, const gchar * signal)
+void send_signal(CPlugin * instance, ListItem * item, const gchar * signal)
 {
     DBusMessage *message;
     const char *localsignal;
@@ -440,7 +441,7 @@ void send_signal(nsPluginInstance * instance, ListItem * item, const gchar * sig
         return;
 
     if (instance->console != NULL) {
-        path = g_strdup_printf("/console/%s",instance->console);
+        path = g_strdup_printf("/console/%s", instance->console);
     } else {
         if (item != NULL && strlen(item->path) > 0) {
             path = g_strdup(item->path);
@@ -448,19 +449,19 @@ void send_signal(nsPluginInstance * instance, ListItem * item, const gchar * sig
             path = g_strdup(instance->path);
         }
     }
-    
+
     if (instance->playerready && instance->connection != NULL) {
         localsignal = g_strdup(signal);
         message = dbus_message_new_signal(path, "com.gnome.mplayer", localsignal);
         dbus_connection_send(instance->connection, message, NULL);
         dbus_message_unref(message);
     }
-    
+
     g_free(path);
 
 }
 
-void send_signal_when_ready(nsPluginInstance * instance, ListItem * item, const gchar * signal)
+void send_signal_when_ready(CPlugin * instance, ListItem * item, const gchar * signal)
 {
     DBusMessage *message;
     const char *localsignal;
@@ -477,7 +478,7 @@ void send_signal_when_ready(nsPluginInstance * instance, ListItem * item, const 
 
     if (instance->player_launched) {
         while (!(instance->playerready)) {
-            g_main_context_iteration(NULL,FALSE);
+            g_main_context_iteration(NULL, FALSE);
             g_usleep(1000);
         }
         if (instance->playerready && (instance->connection != NULL)) {
@@ -491,8 +492,7 @@ void send_signal_when_ready(nsPluginInstance * instance, ListItem * item, const 
     }
 }
 
-void send_signal_with_string(nsPluginInstance * instance, ListItem * item,
-                             const gchar * signal, gchar * str)
+void send_signal_with_string(CPlugin * instance, ListItem * item, const gchar * signal, gchar * str)
 {
     DBusMessage *message;
     const char *localsignal;
@@ -504,7 +504,7 @@ void send_signal_with_string(nsPluginInstance * instance, ListItem * item,
         return;
 
     if (instance->console != NULL) {
-        path = g_strdup_printf("/console/%s",instance->console);
+        path = g_strdup_printf("/console/%s", instance->console);
     } else {
         if (item != NULL && strlen(item->path) > 0) {
             path = g_strdup(item->path);
@@ -525,8 +525,7 @@ void send_signal_with_string(nsPluginInstance * instance, ListItem * item,
     g_free(path);
 }
 
-void send_signal_with_double(nsPluginInstance * instance, ListItem * item,
-                             const gchar * signal, gdouble dbl)
+void send_signal_with_double(CPlugin * instance, ListItem * item, const gchar * signal, gdouble dbl)
 {
     DBusMessage *message;
     const char *localsignal;
@@ -537,7 +536,7 @@ void send_signal_with_double(nsPluginInstance * instance, ListItem * item,
         return;
 
     if (instance->console != NULL) {
-        path = g_strdup_printf("/console/%s",instance->console);
+        path = g_strdup_printf("/console/%s", instance->console);
     } else {
         if (item != NULL && strlen(item->path) > 0) {
             path = g_strdup(item->path);
@@ -553,11 +552,11 @@ void send_signal_with_double(nsPluginInstance * instance, ListItem * item,
         dbus_connection_send(instance->connection, message, NULL);
         dbus_message_unref(message);
     }
-    
+
     g_free(path);
 }
 
-void send_signal_with_boolean(nsPluginInstance * instance, ListItem * item,
+void send_signal_with_boolean(CPlugin * instance, ListItem * item,
                               const gchar * signal, gboolean boolean)
 {
     DBusMessage *message;
@@ -569,7 +568,7 @@ void send_signal_with_boolean(nsPluginInstance * instance, ListItem * item,
         return;
 
     if (instance->console != NULL) {
-        path = g_strdup_printf("/console/%s",instance->console);
+        path = g_strdup_printf("/console/%s", instance->console);
     } else {
         if (item != NULL && strlen(item->path) > 0) {
             path = g_strdup(item->path);
@@ -589,7 +588,7 @@ void send_signal_with_boolean(nsPluginInstance * instance, ListItem * item,
     g_free(path);
 }
 
-gboolean request_boolean_value(nsPluginInstance * instance, ListItem * item, const gchar * member)
+gboolean request_boolean_value(CPlugin * instance, ListItem * item, const gchar * member)
 {
     DBusMessage *message;
     DBusMessage *replymessage;
@@ -628,11 +627,11 @@ gboolean request_boolean_value(nsPluginInstance * instance, ListItem * item, con
         dbus_message_unref(replymessage);
     }
     g_free(dest);
-    
+
     return result;
 }
 
-gdouble request_double_value(nsPluginInstance * instance, ListItem * item, const gchar * member)
+gdouble request_double_value(CPlugin * instance, ListItem * item, const gchar * member)
 {
     DBusMessage *message;
     DBusMessage *replymessage;
@@ -676,7 +675,7 @@ gdouble request_double_value(nsPluginInstance * instance, ListItem * item, const
     return result;
 }
 
-gint request_int_value(nsPluginInstance * instance, ListItem * item, const gchar * member)
+gint request_int_value(CPlugin * instance, ListItem * item, const gchar * member)
 {
     DBusMessage *message;
     DBusMessage *replymessage;
@@ -719,7 +718,7 @@ gint request_int_value(nsPluginInstance * instance, ListItem * item, const gchar
     return result;
 }
 
-gboolean is_valid_path(nsPluginInstance * instance, const char *message)
+gboolean is_valid_path(CPlugin * instance, const char *message)
 {
     gboolean result = FALSE;
     ListItem *item;
@@ -750,7 +749,7 @@ gboolean is_valid_path(nsPluginInstance * instance, const char *message)
     return result;
 }
 
-gint request_bitrate(nsPluginInstance * instance, ListItem * item, gchar * name)
+gint request_bitrate(CPlugin * instance, ListItem * item, gchar * name)
 {
     DBusMessage *message;
     DBusMessage *replymessage;
@@ -788,7 +787,8 @@ gint request_bitrate(nsPluginInstance * instance, ListItem * item, gchar * name)
             printf("Error message = %s\n", error.message);
         }
         if (replymessage != NULL) {
-            dbus_message_get_args(replymessage, &error, DBUS_TYPE_INT32, &result, DBUS_TYPE_INVALID);
+            dbus_message_get_args(replymessage, &error, DBUS_TYPE_INT32, &result,
+                                  DBUS_TYPE_INVALID);
             dbus_message_unref(replymessage);
         }
         dbus_message_unref(message);
@@ -797,4 +797,3 @@ gint request_bitrate(nsPluginInstance * instance, ListItem * item, gchar * name)
 
     return result;
 }
-

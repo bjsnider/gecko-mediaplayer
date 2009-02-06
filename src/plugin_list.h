@@ -42,6 +42,12 @@
 #include <stdio.h>
 #include <string.h>
 
+#ifndef HAVE_MEMMEM
+void *memmem(const void *haystack, const size_t haystack_len,
+	     const void *needle, const size_t needle_len);
+#endif
+
+
 typedef struct _ListItem {
     gchar src[4096];
     gchar local[1024];

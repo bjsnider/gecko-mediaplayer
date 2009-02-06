@@ -1,3 +1,16 @@
+0.9.4
+	Add support for OpenBSD which does not have memmem
+	Add Italian translation by Francesco Groccia
+	Make gecko-mediaplayer work in Konqueror 4
+	Keep updating progress text until file is completely downloaded
+	Try to get bitrate from media at 1-5% markers
+	Remove gconftool --shutdown from makefile
+	Cleanup configure.in and Makefile.am files
+	Remove unnecessary files from build tree
+	Switch from XPCom to NPRuntime support
+	Fix a problem with the dbus path when the side provides and invalid path
+	Fix some compliation issues with xulrunner-sdk 1.9.1
+	Workaround file rename in xulrunner sdk
 0.9.3
 	Make http://everadio.gamingradio.net work
 	Fix compilation dependancy

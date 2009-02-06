@@ -42,14 +42,14 @@ gchar *GetMIMEDescription()
     gchar MimeTypes[4000];
     gpointer store = NULL;
     gboolean real_disabled = FALSE;
-    
+
     g_type_init();
     store = init_preference_store();
     if (store != NULL) {
         real_disabled = read_preference_bool(store, DISABLE_REAL);
         release_preference_store(store);
     }
-    
+
     if (real_disabled) {
         return NULL;
     } else {
