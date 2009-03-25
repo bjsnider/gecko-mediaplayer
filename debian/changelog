@@ -1,3 +1,15 @@
+gecko-mediaplayer (0.9.5-1) unstable; urgency=low
+
+  [Cesare Tirabassi]
+  * New upstream release:
+    - update dependency on gnome-mplayer
+
+  [Reinhard Tartler]
+  * debian/rules:
+    replace copy of up-to-date config.{sub/guess} with symlinks
+
+ -- Cesare Tirabassi <norsetto@ubuntu.com>  Wed, 25 Mar 2009 13:22:08 +0100
+
 gecko-mediaplayer (0.9.4-1) unstable; urgency=low
 
   * New upstream release:

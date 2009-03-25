@@ -17,9 +17,6 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307,
    USA.  */
 
-#include "../config.h"
-
-#ifndef HAVE_MEMMEM
 
 
 #include <stddef.h>
@@ -28,7 +25,7 @@
 
 /* This function implements the Boyer-Moore algorithm.
    It is assumed that chars have eight bits.  */
-void *memmem(const void *haystack, const size_t haystack_len,
+void *memmem_compat(const void *haystack, const size_t haystack_len,
 	     const void *needle, const size_t needle_len)
 {
     const unsigned char *const haystack_endptr =
@@ -136,4 +133,4 @@ void *memmem(const void *haystack, const size_t haystack_len,
     return 0;
 }
 
-#endif
+

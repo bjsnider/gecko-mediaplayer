@@ -22,8 +22,9 @@ AM_CFLAGS =\
 
 COMMONCODE = \
 	../config.h \
-	memmem_compat.c \
 	plugin.cpp \
+	memmem_compat.h \
+	memmem_compat.cpp \
 	plugin.h \
 	plugin_list.h \
 	plugin_list.cpp \
