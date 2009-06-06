@@ -1,3 +1,22 @@
+gecko-mediaplayer (0.9.6-1) unstable; urgency=low
+
+  * New upstream release:
+    - update dependency on gnome-mplayer
+    - update debian/copyright with the newly added upstream source files
+    - add debian/patches/fix_NPNVSupportsWindowless_missing.patch:
+      horrible hack needed to fix FTBFS due to current headers not defining
+      NPNVSupportsWindowless
+    - add debian/patches/remove_rpath.patch:
+      remove hardcoded rpath used by braindead libtool for 64 bits arches
+  * Update debian/copyright in line with updated proposal specification
+  * No change bump of Standards-Version to 3.8.1
+  * Changed Section to video in line with the new sections recently added
+    to the Debian archive
+  * Add quilt support in debian/rules and debian/control
+  * Reformat debian/control to make Build-Depends more readable
+
+ -- Cesare Tirabassi <norsetto@ubuntu.com>  Sun, 07 Jun 2009 00:51:01 +0200
+
 gecko-mediaplayer (0.9.5-1) unstable; urgency=low
 
   [Cesare Tirabassi]

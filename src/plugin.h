@@ -60,11 +60,7 @@
 #include <libintl.h>
 #endif
 
-gpointer init_preference_store();
-gboolean read_preference_bool(gpointer store, const gchar * key);
-gint read_preference_int(gpointer store, const gchar * key);
-void release_preference_store(gpointer store);
-gchar *gmp_tempname(gchar * path, const gchar * name_template);
+#include "libgmlib/gmlib.h"
 
 // JavaScript Playstates
 #define STATE_UNDEFINED     0
@@ -81,13 +77,13 @@ gchar *gmp_tempname(gchar * path, const gchar * name_template);
 #define STATE_RECONNECTING  11
 
 // config settings stored in gconf
-#define CACHE_SIZE		"/apps/gnome-mplayer/preferences/cache_size"
-#define DISABLE_QT		"/apps/gecko-mediaplayer/preferences/disable_qt"
-#define DISABLE_REAL	"/apps/gecko-mediaplayer/preferences/disable_real"
-#define DISABLE_WMP		"/apps/gecko-mediaplayer/preferences/disable_wmp"
-#define DISABLE_DVX		"/apps/gecko-mediaplayer/preferences/disable_dvx"
-#define DEBUG_LEVEL		"/apps/gecko-mediaplayer/preferences/debug_level"
-
+#define CACHE_SIZE		"cache_size"
+#define DISABLE_QT		"disable_qt"
+#define DISABLE_REAL	"disable_real"
+#define DISABLE_WMP		"disable_wmp"
+#define DISABLE_DVX		"disable_dvx"
+#define DEBUG_LEVEL		"debug_level"
+#define DISABLE_MIDI    "disable_midi"
 
 class CPlugin {
   private:
@@ -157,6 +153,7 @@ class CPlugin {
   public:
      Window mWindow;
     NPP mInstance;
+    gboolean windowless;
     gint nextid;
     uint16 mode;
     gchar *mimetype;
@@ -179,10 +176,12 @@ class CPlugin {
     gboolean debug;
     gint show_controls;
     gchar *name;
+    gchar *id;
     gchar *console;
     gchar *controls;
 
     // events
+    gboolean post_dom_events;
     gchar *event_mediacomplete;
     gchar *event_destroy;
     gchar *event_mousedown;

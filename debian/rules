@@ -8,7 +8,6 @@ DEB_BUILD_GNU_TYPE  ?= $(shell dpkg-architecture -qDEB_BUILD_GNU_TYPE)
 
 CXXFLAGS = -Wall -g
 LDFLAGS  = -Wl,-z,defs
-GLIBS = -lglib-2.0
 
 ifneq (,$(findstring noopt,$(DEB_BUILD_OPTIONS)))
 	CXXFLAGS += -O0
@@ -19,6 +18,7 @@ endif
 configure: configure-stamp
 configure-stamp:
 	dh_testdir
+	dh_quilt_patch
 
 	ln -sf /usr/share/misc/config.sub config.sub
 	ln -sf /usr/share/misc/config.guess config.guess
@@ -43,6 +43,7 @@ build-stamp: configure-stamp
 clean:
 	dh_testdir
 	dh_testroot
+	dh_quilt_unpatch
 	rm -f build-stamp configure-stamp
 
 	[ ! -f Makefile ] || $(MAKE) distclean

@@ -40,15 +40,16 @@
 gchar *GetMIMEDescription()
 {
     gchar MimeTypes[4000];
-    gpointer store = NULL;
+    GmPrefStore * store;
     gboolean wmp_disabled = FALSE;
 
     g_type_init();
-    store = init_preference_store();
+    store = gm_pref_store_new("gecko-mediaplayer");
     if (store != NULL) {
-        wmp_disabled = read_preference_bool(store, DISABLE_WMP);
-        release_preference_store(store);
+        wmp_disabled = gm_pref_store_get_boolean(store, DISABLE_WMP);
+        gm_pref_store_free(store);
     }
+
 
     if (wmp_disabled) {
         return NULL;

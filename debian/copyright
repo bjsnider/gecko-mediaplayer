@@ -1,11 +1,10 @@
-Format-Specification: http://wiki.debian.org/Proposals/CopyrightFormat
-Upstream-Author: Kevin DeKorte <kdekorte@gmail.com>
-Packaged-By: Cesare Tirabassi <norsetto@ubuntu.com>
-Packaged-Date: Wed, 02 Jul 2008 15:21:38 +0200
-Original-Source-Location: http://code.google.com/p/gecko-mediaplayer/
+Format-Specification: http://dep.debian.net/deps/dep5/
+Name: Gecko Media Player
+Contact: Kevin DeKorte <kdekorte@gmail.com>
+Source: http://code.google.com/p/gecko-mediaplayer/
 
-Files: *, po/*.po
-Copyright: © 2007-2008 Kevin DeKorte
+Files: *, src/libgmlib/*.[c,h], po/*.po
+Copyright: © 2006-2009 Kevin DeKorte
 License: GPL-2+
 
 Files: src/*.cpp, src/*.h
@@ -24,8 +23,8 @@ Files: missing, ltmain.sh, depcomp
 Copyright: © 1994-2006  Free Software Foundation, Inc.
 License: GPL-2+
 
-Files: src/makefile.in, Makefile.in, configure, aclocal.m4
-Copyright: © 1994-2006  Free Software Foundation, Inc.
+Files: src/Makefile.in, src/libgmlib/Makefile.in, Makefile.in, configure, aclocal.m4
+Copyright: © 1994-2008  Free Software Foundation, Inc.
 License: GAP
 
 Files: install-sh

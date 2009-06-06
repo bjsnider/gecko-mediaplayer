@@ -158,7 +158,20 @@ void NS_DestroyPluginInstance(CPlugin * aPlugin)
     if (aPlugin)
         delete(CPlugin *) aPlugin;
 }
+
+
 */
+void postDOMEvent(NPP mInstance, const gchar *id, const gchar *event) {
+    gchar *jscript;
+
+    jscript = g_strdup_printf("javascript:obj=document.getElementById('%s');"
+                                "e=document.createEvent('Events');"
+                                "e.initEvent('%s',true,true);"
+                                "obj.dispatchEvent(e);",id,event);
+    NPN_GetURL(mInstance, jscript, NULL);
+    g_free(jscript);
+}
+
 ////////////////////////////////////////
 //
 // CPlugin class implementation
@@ -170,6 +183,7 @@ mInitialized(FALSE),
 m_pScriptableObject(NULL),
 m_pScriptableObjectControls(NULL),
 mWindow(0),
+windowless(FALSE),
 playlist(NULL),
 player_launched(FALSE),
 connection(NULL),
@@ -185,10 +199,12 @@ autostart(1),
 lastupdate(0),
 show_controls(1),
 name(NULL),
+id(NULL),
 console(NULL),
 controls(NULL),
 disable_context_menu(FALSE),
 disable_fullscreen(FALSE),
+post_dom_events(FALSE),
 event_mediacomplete(NULL),
 event_destroy(NULL),
 event_mousedown(NULL),
@@ -197,7 +213,8 @@ event_mouseclicked(NULL), event_enterwindow(NULL), event_leavewindow(NULL), debu
 tv_driver(NULL), tv_device(NULL), tv_input(NULL), tv_width(0), tv_height(0)
 {
     GRand *rand;
-    gpointer store = NULL;
+    GmPrefStore *store;
+    gchar *jscript;
 
     NPN_GetValue(mInstance, NPNVWindowNPObject, &sWindowObj);
 
@@ -278,16 +295,17 @@ tv_driver(NULL), tv_device(NULL), tv_input(NULL), tv_width(0), tv_height(0)
 #endif
 
     g_type_init();
-    store = init_preference_store();
+    store = gm_pref_store_new("gecko-mediaplayer");
     if (store != NULL) {
-        debug_level = read_preference_int(store, DEBUG_LEVEL);
-        release_preference_store(store);
+        debug_level = gm_pref_store_get_int(store, DEBUG_LEVEL);
+        gm_pref_store_free(store);
     }
 
 
     if (connection == NULL) {
         connection = dbus_hookup(this);
     }
+    
     mInitialized = TRUE;
 }
 
@@ -433,6 +451,10 @@ NPError CPlugin::SetWindow(NPWindow * aWindow)
             g_error_free(error);
             error = NULL;
         }
+
+        if (post_dom_events && id != NULL) {
+            postDOMEvent(mInstance, id, "qt_begin");
+        }
     }
 
     if (playlist != NULL) {
@@ -522,6 +544,9 @@ NPError CPlugin::DestroyStream(NPStream * stream, NPError reason)
             text = g_strdup_printf(_("Cache fill: %2.2f%%"), 100.0);
             send_signal_with_string(this, item, "SetProgressText", text);
             g_free(text);
+            if (post_dom_events && this->id != NULL) {
+                postDOMEvent(mInstance, this->id, "qt_progress");
+            }
         }
 
         if (!item->opened && item->play) {
@@ -534,6 +559,9 @@ NPError CPlugin::DestroyStream(NPStream * stream, NPError reason)
             playlist = list_parse_qml(playlist, item);
             if (item->play) {
                 open_location(this, item, TRUE);
+                if (post_dom_events && this->id != NULL) {
+                    postDOMEvent(mInstance, this->id, "qt_play");
+                }
             } else {
                 item = list_find_next_playable(playlist);
                 if (!item->streaming) {
@@ -546,6 +574,9 @@ NPError CPlugin::DestroyStream(NPStream * stream, NPError reason)
                         NPN_GetURLNotify(mInstance, item->src, NULL, item);
                 } else {
                     open_location(this, item, FALSE);
+                    if (post_dom_events && this->id != NULL) {
+                        postDOMEvent(mInstance, this->id, "qt_play");
+                    }
                 }
             }
             g_free(path);
@@ -557,6 +588,10 @@ NPError CPlugin::DestroyStream(NPStream * stream, NPError reason)
         printf("Exiting destroy stream reason = %i for %s\n", reason, stream->url);
         if (item == NULL) {
             return NPERR_NO_ERROR;
+        } else {
+            if (post_dom_events && this->id != NULL) {
+                postDOMEvent(mInstance, this->id, "qt_load");
+            }
         }
 
         if (item->localfp) {
@@ -629,8 +664,13 @@ int32 CPlugin::WriteReady(NPStream * stream)
             NPN_DestroyStream(mInstance, stream, NPRES_DONE);
             return -1;
         }
+    } else {
+        if (g_ascii_strcasecmp(item->src,stream->url) != 0) {
+            g_strlcpy(item->src,stream->url,4096);
+        }
     }
-    //printf("Write Ready item url = %s\n",item->src);
+            
+    // printf("Write Ready item url = %s\n%s\n",item->src,stream->url);
 
     if (item->cancelled)
         NPN_DestroyStream(mInstance, stream, NPRES_USER_BREAK);
@@ -640,7 +680,7 @@ int32 CPlugin::WriteReady(NPStream * stream)
         if (!g_file_test(path, G_FILE_TEST_IS_DIR)) {
             g_mkdir_with_parents(path, 0775);
         }
-        tmp = gmp_tempname(path, "gecko-mediaplayerXXXXXX");
+        tmp = gm_tempname(path, "gecko-mediaplayerXXXXXX");
         g_snprintf(item->local, 1024, "%s", tmp);
         g_free(tmp);
         g_free(path);
@@ -714,6 +754,9 @@ int32 CPlugin::Write(NPStream * stream, int32 offset, int32 len, void *buffer)
     if (strstr((char *) buffer, "Content-length:") != NULL || item->streaming == TRUE) {
         item->streaming = TRUE;
         open_location(this, item, FALSE);
+        if (post_dom_events && this->id != NULL) {
+            postDOMEvent(mInstance, this->id, "qt_play");
+        }
         item->requested = TRUE;
         if (item->localfp) {
             fclose(item->localfp);
@@ -725,6 +768,9 @@ int32 CPlugin::Write(NPStream * stream, int32 offset, int32 len, void *buffer)
     if (strstr((char *) buffer, "<HTML>") != NULL || item->streaming == TRUE) {
         item->streaming = TRUE;
         open_location(this, item, FALSE);
+        if (post_dom_events && this->id != NULL) {
+            postDOMEvent(mInstance, this->id, "qt_play");
+        }
         item->requested = TRUE;
         if (item->localfp) {
             fclose(item->localfp);
@@ -768,6 +814,9 @@ int32 CPlugin::Write(NPStream * stream, int32 offset, int32 len, void *buffer)
                 send_signal_with_string(this, item, "SetProgressText", text);
                 if (!item->opened)
                     send_signal_with_string(this, item, "SetURL", item->src);
+                if (post_dom_events && this->id != NULL) {
+                    postDOMEvent(mInstance, this->id, "qt_progress");
+                }
 
                 time(&lastupdate);
                 item->lastsize = item->localsize;
@@ -787,6 +836,9 @@ int32 CPlugin::Write(NPStream * stream, int32 offset, int32 len, void *buffer)
                 if (item->bitrate > 0) {
                     if (item->localsize / item->bitrate >= 10) {
                         ok_to_play = TRUE;
+                        if (post_dom_events && this->id != NULL) {
+                            postDOMEvent(mInstance, this->id, "qt_canplay");
+                        }
                     }
                 }
             }
@@ -803,6 +855,10 @@ int32 CPlugin::Write(NPStream * stream, int32 offset, int32 len, void *buffer)
             playlist = list_parse_qml(playlist, item);
             if (item->play) {
                 open_location(this, item, TRUE);
+                if (post_dom_events && this->id != NULL) {
+                    postDOMEvent(mInstance, this->id, "qt_canplay");
+                    postDOMEvent(mInstance, this->id, "qt_play");
+                }
             } else {
                 item = list_find_next_playable(playlist);
                 if (item != NULL) {
@@ -826,11 +882,17 @@ int32 CPlugin::Write(NPStream * stream, int32 offset, int32 len, void *buffer)
 void CPlugin::Play()
 {
     send_signal(this, this->lastopened, "Play");
+    if (post_dom_events && this->id != NULL) {
+        postDOMEvent(mInstance, this->id, "qt_play");
+    }
 }
 
 void CPlugin::Pause()
 {
     send_signal(this, this->lastopened, "Pause");
+    if (post_dom_events && this->id != NULL) {
+        postDOMEvent(mInstance, this->id, "qt_pause");
+    }
 }
 
 void CPlugin::Stop()
@@ -866,6 +928,9 @@ void CPlugin::SetFullScreen(PRBool value)
 void CPlugin::SetVolume(double value)
 {
     send_signal_with_double(this, this->lastopened, "Volume", value);
+    if (post_dom_events && this->id != NULL) {
+        postDOMEvent(mInstance, this->id, "qt_volumechange");
+    }
 }
 
 void CPlugin::GetVolume(double *_retval)
@@ -1725,30 +1790,4 @@ NPObject *CPlugin::GetScriptableObjectControls()
     return m_pScriptableObjectControls;
 }
 
-gchar *gmp_tempname(gchar * path, const gchar * name_template)
-{
-    gchar *result;
-    gchar *replace;
-    gchar *basename;
-    gchar *localpath;
 
-    basename = g_strdup(name_template);
-
-    if (path == NULL && g_getenv("TMPDIR") == NULL) {
-        localpath = g_strdup("/tmp");
-    } else if (path == NULL && g_getenv("TMPDIR") != NULL) {
-        localpath = g_strdup(g_getenv("TMPDIR"));
-    } else {
-        localpath = g_strdup(path);
-    }
-
-    while ((replace = g_strrstr(basename, "X"))) {
-        replace[0] = (gchar) g_random_int_range((gint) 'a', (gint) 'z');
-    }
-
-    result = g_strdup_printf("%s/%s", localpath, basename);
-    g_free(basename);
-    g_free(localpath);
-
-    return result;
-}

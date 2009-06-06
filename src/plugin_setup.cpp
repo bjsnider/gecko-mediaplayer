@@ -57,6 +57,8 @@ void new_instance(CPlugin * instance, int16 argc, char *argn[], char *argv[])
     gchar **parse;
     gint width = 0, height = 0;
     GError *error;
+    NPError nperror;
+    guint32 supportsWindowless = FALSE; // NPBool + padding
 
     if (instance->mode == NP_EMBED) {
         for (i = 0; i < argc; i++) {
@@ -64,6 +66,10 @@ void new_instance(CPlugin * instance, int16 argc, char *argn[], char *argv[])
 
             if (g_ascii_strcasecmp(argn[i], "name") == 0) {
                 instance->name = g_strdup(argv[i]);
+            }
+
+            if (g_ascii_strcasecmp(argn[i], "id") == 0) {
+                instance->id = g_strdup(argv[i]);
             }
 
             if (g_ascii_strcasecmp(argn[i], "console") == 0) {
@@ -261,6 +267,15 @@ void new_instance(CPlugin * instance, int16 argc, char *argn[], char *argv[])
                 }
             }
 
+            if (g_ascii_strcasecmp(argn[i], "postdomevents") == 0) {
+                if (strstr(argv[i], "true")
+                    || strstr(argv[i], "yes")
+                    || strstr(argv[i], "1")) {
+                    instance->post_dom_events = TRUE;
+                } else {
+                    instance->post_dom_events = FALSE;
+                }
+            }
             if (g_ascii_strcasecmp(argn[i], "onmediacomplete") == 0
                 || g_ascii_strcasecmp(argn[i], "onendofstream") == 0) {
                 if (g_ascii_strncasecmp(argv[i], "javascript:", 11) == 0) {
@@ -332,10 +347,31 @@ void new_instance(CPlugin * instance, int16 argc, char *argn[], char *argv[])
                 }
             }
 
+            if (g_ascii_strcasecmp(argn[i], "windowless") == 0) {
+                if (g_ascii_strcasecmp(argv[i], "true") == 0
+                    || g_ascii_strcasecmp(argv[i], "yes") == 0
+                    || g_ascii_strcasecmp(argv[i], "1") == 0) {
+                    instance->windowless = TRUE;
+                } else {
+                    instance->windowless = FALSE;
+                }
+            }
+
         };
     } else {
 
     }
+
+    nperror = NPN_GetValue (instance->mInstance, NPNVSupportsWindowless, &supportsWindowless);
+	supportsWindowless = (nperror == NPERR_NO_ERROR) && supportsWindowless;
+	if (instance->windowless) {
+		if (supportsWindowless) {
+			// NPN_SetValue (instance->mInstance, NPPVpluginWindowBool, (void *) FALSE);
+			// NPN_SetValue (instance->mInstance, NPPVpluginTransparentBool, (void *) TRUE);
+		} else {
+			instance->windowless = FALSE;
+		}
+	}
 
     if (src != NULL) {
         if (loop != 0) {
@@ -448,99 +484,3 @@ gint streaming(gchar * url)
     return ret;
 }
 
-gpointer init_preference_store()
-{
-#ifdef HAVE_GCONF
-    GConfClient *gconf;
-    gconf = gconf_client_get_default();
-    return gconf;
-
-#else
-    gchar *filename;
-    GKeyFile *config;
-
-    config = g_key_file_new();
-    filename = g_strdup_printf("%s/gnome-mplayer/gnome-mplayer.conf", g_get_user_config_dir());
-    g_key_file_load_from_file(config,
-                              filename,
-                              (GKeyFileFlags) (G_KEY_FILE_KEEP_COMMENTS |
-                                               G_KEY_FILE_KEEP_TRANSLATIONS), NULL);
-
-    return config;
-#endif
-
-}
-
-gboolean read_preference_bool(gpointer store, const gchar * key)
-{
-    gboolean value = FALSE;
-#ifdef HAVE_GCONF
-    gchar *full_key = NULL;
-
-    if (strstr(key, "/")) {
-        full_key = g_strdup_printf("%s", key);
-    } else {
-        full_key = g_strdup_printf("/apps/gnome-mplayer/preferences/%s", key);
-    }
-    value = gconf_client_get_bool((GConfClient *) store, full_key, NULL);
-    g_free(full_key);
-#else
-    gchar *short_key;
-
-    if (strstr(key, "/")) {
-        short_key = g_strrstr(key, "/") + sizeof(gchar);
-    } else {
-        short_key = g_strdup_printf("%s", key);
-    }
-
-    value = g_key_file_get_boolean((GKeyFile *) store, "gnome-mplayer", short_key, NULL);
-#endif
-    return value;
-}
-
-gint read_preference_int(gpointer store, const gchar * key)
-{
-    gint value = 0;
-#ifdef HAVE_GCONF
-    gchar *full_key = NULL;
-
-    if (strstr(key, "/")) {
-        full_key = g_strdup(key);
-    } else {
-        full_key = g_strdup_printf("/apps/gnome-mplayer/preferences/%s", key);
-    }
-    value = gconf_client_get_int((GConfClient *) store, full_key, NULL);
-    g_free(full_key);
-#else
-    gchar *short_key;
-
-    if (strstr(key, "/")) {
-        short_key = g_strrstr(key, "/") + sizeof(gchar);
-    } else {
-        short_key = g_strdup_printf("%s", key);
-    }
-
-    value = g_key_file_get_integer((GKeyFile *) store, "gnome-mplayer", short_key, NULL);
-#endif
-    return value;
-}
-
-void release_preference_store(gpointer store)
-{
-#ifdef HAVE_GCONF
-    if (G_IS_OBJECT(store))
-        g_object_unref(G_OBJECT(store));
-#else
-    gchar *filename;
-    gchar *data;
-
-    filename = g_strdup_printf("%s/gnome-mplayer/gnome-mplayer.conf", g_get_user_config_dir());
-    data = g_key_file_to_data((GKeyFile *) store, NULL, NULL);
-
-    g_file_set_contents(filename, data, -1, NULL);
-    g_free(data);
-    g_free(filename);
-    g_key_file_free((GKeyFile *) store);
-
-#endif
-}
