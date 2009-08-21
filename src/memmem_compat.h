@@ -39,6 +39,6 @@
 #define _MEMMEM_COMPAT_H
 
 void *memmem_compat(const void *haystack, const size_t haystack_len,
-	     const void *needle, const size_t needle_len);
+                    const void *needle, const size_t needle_len);
 
 #endif

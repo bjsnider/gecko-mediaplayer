@@ -40,7 +40,7 @@
 gchar *GetMIMEDescription()
 {
     gchar MimeTypes[4000];
-    GmPrefStore * store;
+    GmPrefStore *store;
     gboolean qt_disabled = FALSE;
 
     g_type_init();

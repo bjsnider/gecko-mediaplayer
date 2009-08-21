@@ -1,24 +1,23 @@
 ## Process this file with automake to produce Makefile.in
 
-noinst_LTLIBRARIES = \
-        libgmlib.la
+noinst_LIBRARIES = \
+        libgmlib.a
 
 
-libgmlib_la_SOURCES = \
+libgmlib_a_SOURCES = \
    	gmlib.h \
    	gm_file.h \
    	gm_file.c \
+   	gm_parse.h \
+   	gm_parse.c \
 	gm_pref_store.h \
-	gm_pref_store.c
+	gm_pref_store.c \
+	gm_strfuncs.h \
+	gm_strfuncs.c
 
-libgmlib_la_CFLAGS = \
+libgmlib_a_CFLAGS = -fPIC \
 	$(GLIB_CFLAGS) \
 	$(GCONF_CFLAGS) \
-	$(GCONF_DEFINES)
-
-libgmlib_la_LDFLAGS = \
-	$(GLIB_LDFLAGS) \
-	$(GCONF_LDFLAGS)
-
-
- 
+	$(GIO_CFLAGS) \
+	$(GCONF_DEFINES) \
+	$(GIO_DEFINES)

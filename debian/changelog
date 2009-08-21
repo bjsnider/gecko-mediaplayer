@@ -1,3 +1,16 @@
+gecko-mediaplayer (0.9.7-1) unstable; urgency=low
+
+  * New upstream release:
+    - added a RAM parser
+    - update dependency on gnome-mplayer
+    - remove all patches, now applied upstream
+    - add --with-gio to debian/rules
+  * No change bump of Standards-Version to 3.8.3
+  * Change deprecated dh_clean -k to dh_prep (requires debhelper > 7)
+  * Update long/short descriptions
+
+ -- Cesare Tirabassi <norsetto@ubuntu.com>  Fri, 21 Aug 2009 15:25:57 +0200
+
 gecko-mediaplayer (0.9.6-1) unstable; urgency=low
 
   * New upstream release:

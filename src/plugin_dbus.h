@@ -61,6 +61,7 @@ void send_signal_with_double(CPlugin * instance, ListItem * item, const gchar * 
                              gdouble dbl);
 void send_signal_with_boolean(CPlugin * instance, ListItem * item, const gchar * signal,
                               gboolean boolean);
+void send_signal_with_integer(CPlugin * instance, ListItem * item, const gchar * signal, gint val);
 gboolean request_boolean_value(CPlugin * instance, ListItem * item, const gchar * member);
 gdouble request_double_value(CPlugin * instance, ListItem * item, const gchar * member);
 gint request_int_value(CPlugin * instance, ListItem * item, const gchar * member);

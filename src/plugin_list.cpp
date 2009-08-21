@@ -261,8 +261,12 @@ GList *list_parse_qt(GList * list, ListItem * item)
                 }
 
                 while (p != NULL) {
-                    rdrf = (gchar *) memmem_compat(p, datalen - ((long) nextrmda - (long) p), "rdrf", 4);
-                    rmdr = (gchar *) memmem_compat(p, datalen - ((long) nextrmda - (long) p), "rmdr", 4);
+                    rdrf =
+                        (gchar *) memmem_compat(p, datalen - ((long) nextrmda - (long) p), "rdrf",
+                                                4);
+                    rmdr =
+                        (gchar *) memmem_compat(p, datalen - ((long) nextrmda - (long) p), "rmdr",
+                                                4);
 
                     if (rdrf != NULL) {
                         code = (unsigned int) (rdrf[15]);
@@ -618,4 +622,82 @@ qml_start_element(GMarkupParseContext * context,
             i++;
         }
     }
+}
+
+GList *list_parse_ram(GList * list, ListItem * item)
+{
+    gchar *data;
+    gsize datalen;
+    gchar **output;
+    gint i;
+    gboolean addline;
+    ListItem *newitem;
+    gchar *value;
+    gchar *ptr;
+    gchar url[1024];
+
+    printf("Entering list_parse_ram localsize = %i\n", item->localsize);
+
+    if (item->localsize < (16 * 1024)) {
+        if (g_file_get_contents(item->local, &data, &datalen, NULL)) {
+            if (data != NULL) {
+                output = g_strsplit(data, "\n", 0);
+                parser_list = list;
+                parser_item = item;
+                i = 0;
+                while (output != NULL && output[i] != NULL) {
+                    // printf("%s\n", output[i]);
+                    addline = FALSE;
+                    if (g_ascii_strncasecmp(output[i], "rtsp://", strlen("rtsp://")) == 0) {
+                        addline = TRUE;
+                    }
+                    if (g_ascii_strncasecmp(output[i], "http://", strlen("http://")) == 0) {
+                        addline = TRUE;
+                    }
+                    if (addline) {
+                        if (list_find(parser_list, (gchar *) output[i])
+                            == NULL) {
+                            parser_item->play = FALSE;
+                            newitem = g_new0(ListItem, 1);
+                            value = g_strdup(output[i]);
+                            unreplace_amp(value);
+                            ptr = g_strrstr(value, "/");
+                            if (ptr == NULL) {
+                                g_strlcpy(url, parser_item->src, 1024);
+                                ptr = g_strrstr(url, "/");
+                                if (ptr != NULL) {
+                                    ptr[1] = (char) NULL;
+                                    g_strlcpy(newitem->src, url, 1024);
+                                    g_strlcat(newitem->src, value, 1024);
+                                }
+                            } else {
+                                g_strlcpy(newitem->src, value, 1024);
+                            }
+                            g_free(value);
+                            newitem->streaming = streaming(newitem->src);
+                            // crappy hack, mplayer needs the protocol in lower case, some sites don't
+                            if (newitem->streaming) {
+                                newitem->src[0] = g_ascii_tolower(newitem->src[0]);
+                                newitem->src[1] = g_ascii_tolower(newitem->src[1]);
+                                newitem->src[2] = g_ascii_tolower(newitem->src[2]);
+                                newitem->src[3] = g_ascii_tolower(newitem->src[3]);
+                            }
+                            newitem->play = TRUE;
+                            newitem->id = entry_id;
+                            newitem->controlid = parser_item->controlid;
+                            g_strlcpy(newitem->path, parser_item->path, 1024);
+                            parser_list = g_list_append(parser_list, newitem);
+                        }
+                    }
+                    i++;
+                }
+                g_strfreev(output);
+                parser_list = NULL;
+                parser_item = NULL;
+            }
+        }
+    }
+    list_dump(list);
+    printf("Exiting list_parse_ram\n");
+    return list;
 }

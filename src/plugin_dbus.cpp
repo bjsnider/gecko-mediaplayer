@@ -271,6 +271,16 @@ static DBusHandlerResult filter_func(DBusConnection * connection,
                             g_free(tmp);
                         }
                     }
+                    if (g_ascii_strcasecmp(s, "TimeChanged") == 0) {
+                        if (instance->post_dom_events && instance->id != NULL) {
+                            postDOMEvent(instance->mInstance, instance->id, "qt_timechanged");
+                        }
+                    }
+                    if (g_ascii_strcasecmp(s, "Ended") == 0) {
+                        if (instance->post_dom_events && instance->id != NULL) {
+                            postDOMEvent(instance->mInstance, instance->id, "qt_ended");
+                        }
+                    }
                 }
             }
         }
@@ -587,6 +597,38 @@ void send_signal_with_boolean(CPlugin * instance, ListItem * item,
 
     g_free(path);
 }
+
+void send_signal_with_integer(CPlugin * instance, ListItem * item, const gchar * signal, gint val)
+{
+    DBusMessage *message;
+    const char *localsignal;
+    gchar *path;
+
+    //printf("Sending %s to connection %p\n", signal, instance->connection);
+    if (instance == NULL)
+        return;
+
+    if (instance->console != NULL) {
+        path = g_strdup_printf("/console/%s", instance->console);
+    } else {
+        if (item != NULL && strlen(item->path) > 0) {
+            path = g_strdup(item->path);
+        } else {
+            path = g_strdup(instance->path);
+        }
+    }
+
+    if (instance->playerready && instance->connection != NULL) {
+        localsignal = g_strdup(signal);
+        message = dbus_message_new_signal(path, "com.gnome.mplayer", localsignal);
+        dbus_message_append_args(message, DBUS_TYPE_INT32, &val, DBUS_TYPE_INVALID);
+        dbus_connection_send(instance->connection, message, NULL);
+        dbus_message_unref(message);
+    }
+
+    g_free(path);
+}
+
 
 gboolean request_boolean_value(CPlugin * instance, ListItem * item, const gchar * member)
 {
