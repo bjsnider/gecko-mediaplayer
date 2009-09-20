@@ -1,3 +1,13 @@
+gecko-mediaplayer (0.9.8-1) unstable; urgency=low
+
+  * New upstream bug-fix only release:
+    - update dependency on gnome-mplayer
+    - fixed support for the apple.com trailers site
+    - fixed support for video at PBS.org
+  * Remove obsolete links to *.xpt files
+
+ -- Cesare Tirabassi <norsetto@ubuntu.com>  Sun, 20 Sep 2009 11:09:29 +0200
+
 gecko-mediaplayer (0.9.7-1) unstable; urgency=low
 
   * New upstream release:

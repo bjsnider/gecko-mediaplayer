@@ -49,7 +49,6 @@ clean:
 	[ ! -f Makefile ] || $(MAKE) distclean
 
 	rm -f config.sub config.guess
-	rm -f $(CURDIR)/src/gecko-mediaplayer*.xpt
 	rm -f $(CURDIR)/src/nsIScriptableGeckoMediaPlayer.h
 	dh_clean
 
