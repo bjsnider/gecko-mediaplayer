@@ -37,14 +37,14 @@
 
 
 #include "plugin.h"
-#include "npupp.h"
+//#include "npupp.h"
 #include "plugin_list.h"
 #include "plugin_setup.h"
 #include "plugin_types.h"
 #include "plugin_dbus.h"
-#include "nsIPrefBranch.h"
-#include "nsIPrefService.h"
-#include "nsIServiceManager.h"
+#include <nsIPrefBranch.h>
+#include <nsIPrefService.h>
+#include <nsIServiceManager.h>
 
 nsIPrefBranch *prefBranch = NULL;
 nsIPrefService *prefService = NULL;
@@ -170,9 +170,9 @@ void postDOMEvent(NPP mInstance, const gchar * id, const gchar * event)
 {
     gchar *jscript;
 
-    jscript = g_strdup_printf("javascript:obj=document.getElementById('%s');"
-                              "e=document.createEvent('Events');"
-                              "e.initEvent('%s',true,true);" "obj.dispatchEvent(e);", id, event);
+    jscript = g_strdup_printf("javascript:obj_gmp=document.getElementById('%s');"
+                              "e_gmp=document.createEvent('Events');"
+                              "e_gmp.initEvent('%s',true,true);" "obj_gmp.dispatchEvent(e_gmp);", id, event);
     NPN_GetURL(mInstance, jscript, NULL);
     g_free(jscript);
 }
@@ -180,20 +180,22 @@ void postDOMEvent(NPP mInstance, const gchar * id, const gchar * event)
 void setPreference(CPlugin * instance, const gchar * name, const gchar * value)
 {
     nsIServiceManager *sm = NULL;
-    NPN_GetValue(NULL, NPNVserviceManager, &sm);
+    NS_GetServiceManager(&sm);
     PRBool v;
 
     if (sm) {
-
         sm->GetServiceByContractID("@mozilla.org/preferences-service;1", NS_GET_IID(nsIPrefService), (void **)&prefService);
         if (prefService) {
             prefService->GetBranch("", &prefBranch);
             if (prefBranch) {
                 instance->user_agent = g_new0(gchar, 1024);
                 prefBranch->PrefHasUserValue(name,&v);
-                if (v)
+                if (v) {
                     prefBranch->GetCharPref(name, &(instance->user_agent));
+                    prefBranch->ClearUserPref(name);
+                }
                 prefBranch->SetCharPref(name, value);
+                printf("Set preference %s to %s, old value was '%s'\n", name, value, instance->user_agent);
             }
         }
         NS_RELEASE(sm);
@@ -204,7 +206,7 @@ void setPreference(CPlugin * instance, const gchar * name, const gchar * value)
 void clearPreference(CPlugin * instance, const gchar * name)
 {
     nsIServiceManager *sm = NULL;
-    NPN_GetValue(NULL, NPNVserviceManager, &sm);
+    NS_GetServiceManager(&sm);
 
     if (sm) {
 
@@ -215,9 +217,10 @@ void clearPreference(CPlugin * instance, const gchar * name)
                 if (instance->user_agent == NULL || strlen(instance->user_agent) == 0) {
                     prefBranch->ClearUserPref(name);
                 } else {
-                    if (g_strrstr(instance->user_agent,"QuickTime/7.6.2")) {
+                    if (g_strrstr(instance->user_agent,"QuickTime/7.6.4")) {
                         prefBranch->ClearUserPref(name);
                     } else {
+                        prefBranch->ClearUserPref(name);
                         prefBranch->SetCharPref(name, instance->user_agent);
                     }
                 }
@@ -259,6 +262,7 @@ id(NULL),
 console(NULL),
 controls(NULL),
 user_agent(NULL),
+player_backend(NULL),
 disable_context_menu(FALSE),
 disable_fullscreen(FALSE),
 post_dom_events(FALSE),
@@ -354,6 +358,8 @@ tv_driver(NULL), tv_device(NULL), tv_input(NULL), tv_width(0), tv_height(0)
     store = gm_pref_store_new("gecko-mediaplayer");
     if (store != NULL) {
         debug_level = gm_pref_store_get_int(store, DEBUG_LEVEL);
+        player_backend = gm_pref_store_get_string(store, PLAYER_BACKEND);
+        printf("Using player backend of '%s'\n",player_backend);
         gm_pref_store_free(store);
     }
 
@@ -458,12 +464,17 @@ NPError CPlugin::SetWindow(NPWindow * aWindow)
     }
 
     if (!player_launched && mWidth > 0 && mHeight > 0) {
-        app_name = g_find_program_in_path("gnome-mplayer");
-        if (app_name == NULL)
-            app_name = g_find_program_in_path("gnome-mplayer-minimal");
-
+        app_name = NULL;
+        if (player_backend != NULL) {
+            app_name = g_find_program_in_path(player_backend);
+        }
+        if (app_name == NULL) {
+            app_name = g_find_program_in_path("gnome-mplayer");
+            if (app_name == NULL)
+                app_name = g_find_program_in_path("gnome-mplayer-minimal");
+        }
+        
         argvn[arg++] = g_strdup_printf("%s", app_name);
-        g_free(app_name);
         argvn[arg++] = g_strdup_printf("--window=%i", (gint) mWindow);
         argvn[arg++] = g_strdup_printf("--controlid=%i", controlid);
         argvn[arg++] = g_strdup_printf("--width=%i", mWidth);
@@ -506,10 +517,12 @@ NPError CPlugin::SetWindow(NPWindow * aWindow)
         if (ok) {
             player_launched = TRUE;
         } else {
-            printf("Unable to launch gnome-mplayer: %s\n", error->message);
+            printf("Unable to launch %s: %s\n", app_name, error->message);
             g_error_free(error);
             error = NULL;
         }
+
+        g_free(app_name);
 
         if (post_dom_events && id != NULL) {
             postDOMEvent(mInstance, id, "qt_begin");
@@ -572,7 +585,7 @@ NPBool CPlugin::isInitialized()
 
 NPError CPlugin::NewStream(NPMIMEType type, NPStream * stream, NPBool seekable, uint16 * stype)
 {
-    printf("New Stream Requested\n");
+    printf("New Stream Requested - %s\n", stream->url);
     return NPERR_NO_ERROR;
 }
 
@@ -585,7 +598,9 @@ NPError CPlugin::DestroyStream(NPStream * stream, NPError reason)
     gboolean ready;
     gboolean newwindow;
 
-    printf("Entering destroy stream reason = %i for %s\n", reason, stream->url);
+    if (g_strrstr(stream->url, "javascript") == NULL)
+        printf("Entering destroy stream reason = %i for %s\n", reason, stream->url);
+        
     if (reason == NPRES_DONE) {
         item = (ListItem *) stream->notifyData;
         // item = list_find(playlist, (gchar*)stream->url);
@@ -643,6 +658,15 @@ NPError CPlugin::DestroyStream(NPStream * stream, NPError reason)
             g_free(path);
         }
         //printf("Leaving destroy stream src = %s\n", item->src);
+        
+    } else if (reason == NPRES_NETWORK_ERR) {
+        item = (ListItem *) stream->notifyData;
+        if (item) {
+            printf("Destroy Stream, network error, item is %s\n", item->src);
+        } else {
+            if (g_strrstr(stream->url, "javascript") == NULL)
+                printf("Destory Stream, network error, item is NULL\n");
+        }
     } else {
         item = (ListItem *) stream->notifyData;
         // item = list_find(playlist, (gchar*)stream->url);
@@ -692,9 +716,19 @@ void CPlugin::URLNotify(const char *url, NPReason reason, void *notifyData)
              */
         }
     } else {
-        if (item)
+        if (item) {
             item->played = TRUE;
-        if (!item->streaming) {
+            if (!item->streaming) {
+                item = list_find_next_playable(playlist);
+                if (item) {
+                    if (item->retrieved) {
+                        open_location(this, item, TRUE);
+                    } else {
+                        NPN_GetURLNotify(mInstance, item->src, NULL, item);
+                    }
+                }
+            }
+        } else {
             item = list_find_next_playable(playlist);
             if (item) {
                 if (item->retrieved) {
@@ -703,7 +737,7 @@ void CPlugin::URLNotify(const char *url, NPReason reason, void *notifyData)
                     NPN_GetURLNotify(mInstance, item->src, NULL, item);
                 }
             }
-        }
+        }        
     }
 }
 
@@ -875,12 +909,15 @@ int32 CPlugin::Write(NPStream * stream, int32 offset, int32 len, void *buffer)
             }
         }
         if (!item->opened) {
-            send_signal_with_integer(this, item, "SetGUIState", PLAYING);
-            if ((item->localsize >= (cache_size * 1024)) && (percent >= 0.2))
+            if ((item->localsize >= (cache_size * 1024)) && (percent >= 0.2)) {
+                printf("Setting to play because %i > %i\n",item->localsize, cache_size * 1024);
                 ok_to_play = TRUE;
+            }
             if (ok_to_play == FALSE && (item->localsize > (cache_size * 2 * 1024))
-                && (cache_size >= 512))
+                && (cache_size >= 512)) {
+                printf("Setting to play because %i > %i (double cache)\n",item->localsize, cache_size * 2 * 1024);
                 ok_to_play = TRUE;
+            }
             if (ok_to_play == FALSE) {
                 if (item->bitrate == 0 && item->bitrate_requests < 5
                     && ((gint) (percent * 100) > item->bitrate_requests)) {
@@ -888,7 +925,8 @@ int32 CPlugin::Write(NPStream * stream, int32 offset, int32 len, void *buffer)
                     item->bitrate_requests++;
                 }
                 if (item->bitrate > 0) {
-                    if (item->localsize / item->bitrate >= 10) {
+                    if (item->localsize / item->bitrate >= 10 && (percent >= 0.2)) {
+                        printf("Setting to play becuase %i >= 10\n", item->localsize / item->bitrate);
                         ok_to_play = TRUE;
                         if (post_dom_events && this->id != NULL) {
                             postDOMEvent(mInstance, this->id, "qt_canplay");
@@ -909,6 +947,7 @@ int32 CPlugin::Write(NPStream * stream, int32 offset, int32 len, void *buffer)
             playlist = list_parse_qml(playlist, item);
             playlist = list_parse_ram(playlist, item);
             if (item->play) {
+                send_signal_with_integer(this, item, "SetGUIState", PLAYING);
                 open_location(this, item, TRUE);
                 if (post_dom_events && this->id != NULL) {
                     postDOMEvent(mInstance, this->id, "qt_loadedfirstframe");
@@ -971,12 +1010,12 @@ void CPlugin::Seek(double counter)
     send_signal_with_double(this, this->lastopened, "Seek", counter);
 }
 
-void CPlugin::SetShowControls(PRBool value)
+void CPlugin::SetShowControls(bool value)
 {
     send_signal_with_boolean(this, this->lastopened, "SetShowControls", value);
 }
 
-void CPlugin::SetFullScreen(PRBool value)
+void CPlugin::SetFullScreen(bool value)
 {
     send_signal_with_boolean(this, this->lastopened, "SetFullScreen", value);
 }
@@ -994,12 +1033,12 @@ void CPlugin::GetVolume(double *_retval)
     *_retval = request_double_value(this, this->lastopened, "GetVolume");
 }
 
-void CPlugin::GetFullScreen(PRBool * _retval)
+void CPlugin::GetFullScreen(bool * _retval)
 {
     *_retval = request_boolean_value(this, this->lastopened, "GetFullScreen");
 }
 
-void CPlugin::GetShowControls(PRBool * _retval)
+void CPlugin::GetShowControls(bool * _retval)
 {
     *_retval = request_boolean_value(this, this->lastopened, "GetShowControls");
 }
@@ -1069,17 +1108,17 @@ void CPlugin::GetPlayState(PRInt32 * playstate)
     *playstate = request_int_value(this, this->lastopened, "GetPlayState");
 }
 
-void CPlugin::GetLoop(PRBool * _retval)
+void CPlugin::GetLoop(bool * _retval)
 {
     if (lastopened != NULL) {
-        *_retval = (PRBool) lastopened->loop;
+        *_retval = (bool) lastopened->loop;
     } else {
         *_retval = FALSE;
     }
 
 }
 
-void CPlugin::SetLoop(PRBool value)
+void CPlugin::SetLoop(bool value)
 {
     if (lastopened != NULL) {
         lastopened->loop = (int) value;
@@ -1558,7 +1597,7 @@ bool ScriptablePluginObject::Invoke(NPIdentifier name, const NPVariant * args,
 {
     double d;
     char *s;
-    PRBool b;
+    bool b;
 
     CPlugin *pPlugin = (CPlugin *) mNpp->pdata;
     if (pPlugin == NULL) {
@@ -1568,6 +1607,12 @@ bool ScriptablePluginObject::Invoke(NPIdentifier name, const NPVariant * args,
 
     if (name == Play_id || name == DoPlay_id) {
         pPlugin->Play();
+        return PR_TRUE;
+    }
+
+    if (name == PlayAt_id) {
+        pPlugin->Play();
+        pPlugin->Seek(NPVARIANT_TO_DOUBLE(args[0]));
         return PR_TRUE;
     }
 
@@ -1602,7 +1647,11 @@ bool ScriptablePluginObject::Invoke(NPIdentifier name, const NPVariant * args,
     }
 
     if (name == Open_id || name == SetFileName_id || name == SetHREF_id || name == SetURL_id) {
+#ifdef HAVE_NEW_XULRUNNER
+        pPlugin->SetFilename(NPVARIANT_TO_STRING(args[0]).UTF8Characters);
+#else
         pPlugin->SetFilename(NPVARIANT_TO_STRING(args[0]).utf8characters);
+#endif
         return PR_TRUE;
     }
 
@@ -1635,8 +1684,13 @@ bool ScriptablePluginObject::Invoke(NPIdentifier name, const NPVariant * args,
         return PR_TRUE;
     }
 
-    if (name == SetAutoPlay_id || name == GetAutoPlay_id) {
+    if (name == SetAutoPlay_id) {
+        pPlugin->autostart = NPVARIANT_TO_BOOLEAN(args[0]);
+        return PR_TRUE;
+    }
 
+    if (name == GetAutoPlay_id) {
+        BOOLEAN_TO_NPVARIANT(pPlugin->autostart, *result);
         return PR_TRUE;
     }
 
@@ -1670,37 +1724,65 @@ bool ScriptablePluginObject::Invoke(NPIdentifier name, const NPVariant * args,
     }
 
     if (name == onClick_id) {
+#ifdef HAVE_NEW_XULRUNNER
+        pPlugin->SetOnClick(NPVARIANT_TO_STRING(args[0]).UTF8Characters);
+#else
         pPlugin->SetOnClick(NPVARIANT_TO_STRING(args[0]).utf8characters);
+#endif
         return PR_TRUE;
     }
 
     if (name == onMediaComplete_id) {
+#ifdef HAVE_NEW_XULRUNNER
+        pPlugin->SetOnMediaComplete(NPVARIANT_TO_STRING(args[0]).UTF8Characters);
+#else
         pPlugin->SetOnMediaComplete(NPVARIANT_TO_STRING(args[0]).utf8characters);
+#endif
         return PR_TRUE;
     }
 
     if (name == onMouseUp_id) {
+#ifdef HAVE_NEW_XULRUNNER
+        pPlugin->SetOnMouseUp(NPVARIANT_TO_STRING(args[0]).UTF8Characters);
+#else
         pPlugin->SetOnMouseUp(NPVARIANT_TO_STRING(args[0]).utf8characters);
+#endif
         return PR_TRUE;
     }
 
     if (name == onMouseDown_id) {
+#ifdef HAVE_NEW_XULRUNNER
+        pPlugin->SetOnMouseDown(NPVARIANT_TO_STRING(args[0]).UTF8Characters);
+#else
         pPlugin->SetOnMouseDown(NPVARIANT_TO_STRING(args[0]).utf8characters);
+#endif
         return PR_TRUE;
     }
 
     if (name == onMouseOut_id) {
+#ifdef HAVE_NEW_XULRUNNER
+        pPlugin->SetOnMouseOut(NPVARIANT_TO_STRING(args[0]).UTF8Characters);
+#else
         pPlugin->SetOnMouseOut(NPVARIANT_TO_STRING(args[0]).utf8characters);
+#endif
         return PR_TRUE;
     }
 
     if (name == onMouseOver_id) {
+#ifdef HAVE_NEW_XULRUNNER
+        pPlugin->SetOnMouseOver(NPVARIANT_TO_STRING(args[0]).UTF8Characters);
+#else
         pPlugin->SetOnMouseOver(NPVARIANT_TO_STRING(args[0]).utf8characters);
+#endif
         return PR_TRUE;
     }
 
     if (name == onDestroy_id) {
+#ifdef HAVE_NEW_XULRUNNER
+        pPlugin->SetOnDestroy(NPVARIANT_TO_STRING(args[0]).UTF8Characters);
+#else
         pPlugin->SetOnDestroy(NPVARIANT_TO_STRING(args[0]).utf8characters);
+#endif
         return PR_TRUE;
     }
 
@@ -1733,7 +1815,7 @@ bool ScriptablePluginObject::HasProperty(NPIdentifier name)
 bool ScriptablePluginObject::GetProperty(NPIdentifier name, NPVariant * result)
 {
     char *filename;
-    PRBool setting;
+    bool setting;
     PRInt32 state;
 
     CPlugin *pPlugin = (CPlugin *) mNpp->pdata;
@@ -1791,7 +1873,11 @@ bool ScriptablePluginObject::SetProperty(NPIdentifier name, const NPVariant * va
     }
 
     if (name == filename_id || name == src_id) {
+#ifdef HAVE_NEW_XULRUNNER
+        pPlugin->SetFilename(NPVARIANT_TO_STRING(*value).UTF8Characters);
+#else
         pPlugin->SetFilename(NPVARIANT_TO_STRING(*value).utf8characters);
+#endif
         return true;
     }
 

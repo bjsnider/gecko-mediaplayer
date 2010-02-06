@@ -55,6 +55,7 @@ static DBusHandlerResult filter_func(DBusConnection * connection,
     GRand *rand;
     gchar *tmp;
     GError *gerror;
+    gchar *app_name;
 
     message_type = dbus_message_get_type(message);
     sender = dbus_message_get_sender(message);
@@ -109,6 +110,14 @@ static DBusHandlerResult filter_func(DBusConnection * connection,
                 return DBUS_HANDLER_RESULT_HANDLED;
             }
 
+            if (g_ascii_strcasecmp(dbus_message_get_member(message), "ListDump") == 0) {
+                
+                printf("playlist:\n");
+                list_dump(instance->playlist);
+                
+                return DBUS_HANDLER_RESULT_HANDLED;
+            }
+            
             if (g_ascii_strcasecmp(dbus_message_get_member(message), "RequestById") == 0) {
                 dbus_error_init(&error);
                 if (dbus_message_get_args(message, &error, DBUS_TYPE_STRING, &s, DBUS_TYPE_INVALID)) {
@@ -138,18 +147,28 @@ static DBusHandlerResult filter_func(DBusConnection * connection,
                             g_free(tmp);
 
                             // list_dump(instance->playlist);
+                            app_name = NULL;
+                            if (instance->player_backend != NULL) {
+                                app_name = g_find_program_in_path(instance->player_backend);
+                            }
+                            if (app_name == NULL) {
+                                app_name = g_find_program_in_path("gnome-mplayer");
+                                if (app_name == NULL)
+                                    app_name = g_find_program_in_path("gnome-mplayer-minimal");
+                            }
 
-                            arg[i++] = g_strdup("gnome-mplayer");
+                            arg[i++] = g_strdup(app_name);
                             arg[i++] = g_strdup_printf("--controlid=%i", item->controlid);
                             arg[i] = NULL;
                             gerror = NULL;
                             if (g_spawn_async(NULL, arg, NULL,
                                               G_SPAWN_SEARCH_PATH, NULL, NULL, NULL,
                                               &gerror) == FALSE) {
-                                printf("Unable to launch gnome-mplayer: %s\n", gerror->message);
+                                printf("Unable to launch %s: %s\n", app_name,gerror->message);
                                 g_error_free(gerror);
                                 gerror = NULL;
                             }
+                            g_free(app_name);
                             printf("requesting %s \n", item->src);
                             NPN_GetURLNotify(instance->mInstance, item->src, NULL, item);
                         }
@@ -330,6 +349,8 @@ void open_location(CPlugin * instance, ListItem * item, gboolean uselocal)
     gchar *argvn[255];
     gint arg = 0;
     gint ok;
+    gchar *app_name;
+    gint count = 0;
 
     //list_dump(instance->playlist);
     //printf("Opening %s to connection %p\n",file, instance->connection);
@@ -343,7 +364,16 @@ void open_location(CPlugin * instance, ListItem * item, gboolean uselocal)
             }
 
             //printf("launching gnome-mplayer from Open with id = %i\n",instance->controlid);
-            argvn[arg++] = g_strdup_printf("gnome-mplayer");
+            app_name = NULL;
+            if (instance->player_backend != NULL) {
+                app_name = g_find_program_in_path(instance->player_backend);
+            }
+            if (app_name == NULL) {
+                app_name = g_find_program_in_path("gnome-mplayer");
+                if (app_name == NULL)
+                    app_name = g_find_program_in_path("gnome-mplayer-minimal");
+            }
+            argvn[arg++] = g_strdup(app_name);
             argvn[arg++] = g_strdup_printf("--window=-1");
             argvn[arg++] = g_strdup_printf("--controlid=%i", instance->controlid);
             argvn[arg++] = g_strdup_printf("--autostart=%i", instance->autostart);
@@ -361,19 +391,21 @@ void open_location(CPlugin * instance, ListItem * item, gboolean uselocal)
                 instance->player_launched = TRUE;
             item->opened = TRUE;
             instance->lastopened = item;
+            g_free(app_name);
         }
 
         return;
 
     } else {
-
-        while (!(instance->playerready)) {
+        while (!(instance->playerready) && count < 1000) {
             g_main_context_iteration(NULL, FALSE);
+            count++;
         }
-
         if (item->controlid != 0) {
-            while (!(item->playerready)) {
-                g_main_context_iteration(NULL, FALSE);
+            count = 0;
+            while (!(item->playerready) && count < 1000) {
+               g_main_context_iteration(NULL, FALSE);
+               count++;
             }
         }
     }
@@ -770,6 +802,10 @@ gboolean is_valid_path(CPlugin * instance, const char *message)
         return result;
 
     if (g_ascii_strcasecmp(message, instance->path) == 0) {
+
+        result = TRUE;
+
+    } else if (g_ascii_strcasecmp(message, "/DEBUG") == 0) {
 
         result = TRUE;
 

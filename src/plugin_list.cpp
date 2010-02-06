@@ -292,7 +292,7 @@ GList *list_parse_qt(GList * list, ListItem * item)
                             || code == (unsigned int) -91 || code == (unsigned int) -89) {
                             printf("Skipped URL: %s\n", rdrf);
                         } else {
-                            if (list_find(list, url) == NULL) {
+                            if (list_find(list, url) == NULL && strlen(rdrf) > 0) {
                                 item->play = FALSE;
                                 newitem = g_new0(ListItem, 1);
                                 g_strlcpy(newitem->src, url, 1024);
@@ -356,7 +356,7 @@ GList *list_parse_qt2(GList * list, ListItem * item)
                 return list;
             } else {
                 while (p != NULL) {
-                    urlptr = (gchar *) memmem(p,datalen - (p - data), "url ", 4);
+                    urlptr = (gchar *) memmem_compat(p,datalen - (p - data), "url ", 4);
                     
 
                     if (urlptr == NULL) {
@@ -385,7 +385,7 @@ GList *list_parse_qt2(GList * list, ListItem * item)
                             item->id = -1;
                             list = g_list_append(list, newitem);
                         }
-                        p = (gchar *) memmem(urlptr,datalen - (urlptr - data),"mmdr",4);
+                        p = (gchar *) memmem_compat(urlptr,datalen - (urlptr - data),"mmdr",4);
                     }
 
                 }

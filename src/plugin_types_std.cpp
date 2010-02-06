@@ -75,6 +75,12 @@ gchar *GetMIMEDescription()
               "audio/ogg:ogg,oga:Ogg Vorbis Audio;"
               "video/x-ogg:ogg,ogm:Ogg Vorbis Video;"
               "video/ogg:ogg,ogm:Ogg Vorbis Video;", sizeof(MimeTypes));
+
+    // VLC
+    g_strlcat(MimeTypes,
+              "application/x-vlc-plugin:vlc:VLC plug-in;"
+              "application/x-google-vlc-plugin::Google VLC plug-in;", sizeof(MimeTypes));
+
     // FLAC
     g_strlcat(MimeTypes,
               "audio/flac:flac:FLAC Audio;" "audio/x-flac:flac:FLAC Audio;", sizeof(MimeTypes));
@@ -116,6 +122,9 @@ gchar *GetMIMEDescription()
     // Playlist
     g_strlcat(MimeTypes, "audio/x-scpls:pls:Shoutcast Playlist;", sizeof(MimeTypes));
 
+    // MNG
+    g_strlcat(MimeTypes, "video/x-mng:mng:Multiple-Image Network Graphics;", sizeof(MimeTypes));
+
     return g_strdup(MimeTypes);
 }
 
@@ -137,7 +146,7 @@ NPError PluginGetValue(NPPVariable variable, void *value)
     }
 
     if (variable == NPPVpluginNeedsXEmbed) {
-        *((PRBool *) value) = PR_TRUE;
+        *((bool *) value) = TRUE;
     }
 
     if ((variable != NPPVpluginNameString)

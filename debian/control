@@ -6,20 +6,20 @@ Build-Depends: debhelper (>= 7),
 	       autotools-dev,
 	       pkg-config (>= 0.20),
 	       libglib2.0-dev (>= 2.14),
-	       iceape-dev,
+	       xulrunner-dev,
 	       libdbus-1-dev (>= 0.95),
 	       libdbus-glib-1-dev (>= 0.70),
 	       libx11-dev,
 	       libidl0,
 	       libgconf2-dev (>= 2.20)
-Standards-Version: 3.8.3
+Standards-Version: 3.8.4
 Vcs-Browser: https://code.launchpad.net/~norsetto/gnome-mplayer/gecko-mediaplayer
 Vcs-Bzr: lp:~norsetto/gnome-mplayer/gecko-mediaplayer
 Homepage: http://kdekorte.googlepages.com/gecko-mediaplayer
 
 Package: gecko-mediaplayer
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, gnome-mplayer (>= 0.9.8), iceweasel | firefox-3.5 | firefox-3.0 | iceape-browser | epiphany-browser | galeon | midbrowser | xulrunner | xulrunner-1.9 | konqueror (>= 4:4)
+Depends: ${shlibs:Depends}, ${misc:Depends}, gnome-mplayer (>= 0.9.9), iceweasel | firefox | firefox-3.5 | iceape-browser | epiphany-browser | galeon | midbrowser | xulrunner | xulrunner-1.9 | konqueror (>= 4:4) | opera (>= 9.50)
 Xb-Npp-Applications: ec8030f7-c20a-464f-9b0e-13a3a9e97384, 92650c4d-4b8e-4d2a-b7eb-24ecf4f6b63a, aa5ca914-c309-495d-91cf-3141bbb04115
 Xb-Npp-Name: Gecko Media Player
 Xb-Npp-Description: Play media off the net using the gnome-mplayer

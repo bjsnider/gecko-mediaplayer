@@ -62,5 +62,17 @@
       </locale>
     </schema>
 
+	<schema>
+      <key>/schemas/apps/gecko-mediaplayer/preferences/player_backend</key>
+      <applyto>/apps/gecko-mediaplayer/preferences/player_backend</applyto>
+      <owner>gecko-mediaplayer</owner>
+      <type>string</type>
+      <default></default>
+      <locale name="C">
+        <short>Backend to use</short>
+        <long>Backend to use</long>
+      </locale>
+    </schema>
+    
   </schemalist>
 </gconfschemafile>

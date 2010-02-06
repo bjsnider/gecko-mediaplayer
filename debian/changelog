@@ -1,3 +1,17 @@
+gecko-mediaplayer (0.9.9-1) unstable; urgency=low
+
+  * New upstream release (LP: #86777, LP: #445767, Closes: #557761):
+    - apple.com fixes
+  * Replace Build-Depends on iceape-dev with xulrunner-dev (Closes: #555916)
+  * No change bump of Standards-Version
+  * Converted to source format 3.0
+  * Add opera (>= 9.50) as a compatible browser (LP: #230662)
+  * Add patch to allow compilation for xulrunner 1.9.1.6 and clear up
+    few warnings.
+    http://code.google.com/p/gecko-mediaplayer/source/detail?r=361
+
+ -- Cesare Tirabassi <norsetto@ubuntu.com>  Sat, 06 Feb 2010 14:36:38 +0000
+
 gecko-mediaplayer (0.9.8-1) unstable; urgency=low
 
   * New upstream bug-fix only release:
