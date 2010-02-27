@@ -644,12 +644,12 @@ GIO_DEFINES
 GIO_LIBS
 GIO_CFLAGS
 GCONF_DEFINES
-GCONF_SCHEMAS_INSTALL_FALSE
-GCONF_SCHEMAS_INSTALL_TRUE
 GCONF_SCHEMA_FILE_DIR
 GCONF_SCHEMA_CONFIG_SOURCE
 GCONF_LIBS
 GCONF_CFLAGS
+GCONF_SCHEMAS_INSTALL_FALSE
+GCONF_SCHEMAS_INSTALL_TRUE
 DBUS_LIBS
 DBUS_CFLAGS
 NSPR_LIBS
@@ -771,6 +771,7 @@ enable_option_checking
 enable_maintainer_mode
 enable_dependency_tracking
 with_xulrunner_sdk
+enable_new_libxul
 with_gconf
 with_gconf_source
 with_gconf_schema_file_dir
@@ -1432,6 +1433,7 @@ Optional Features:
 			  (and sometimes confusing) to the casual installer
   --disable-dependency-tracking  speeds up one-time build
   --enable-dependency-tracking   do not reject slow dependency extractors
+  --enable-new-libxul     libxul/xulrunner-sdk is 1.9.2 or higher
   --disable-schemas-install
                           Disable the schemas installation
   --disable-caching       Disable caching of remote media to local storage
@@ -2397,7 +2399,7 @@ fi
 
 # Define the identity of the package.
  PACKAGE=gecko-mediaplayer
- VERSION=0.9.9
+ VERSION=0.9.9.2
 
 
 cat >>confdefs.h <<_ACEOF
@@ -8710,301 +8712,25 @@ if test "${with_xulrunner_sdk+set}" = set; then
 	XULRUNNER_SDK_PREFIX=$with_xulrunner_sdk
 	GECKO_CFLAGS="-I$XULRUNNER_SDK_PREFIX/include -I$XULRUNNER_SDK_PREFIX/include/plugin -I$XULRUNNER_SDK_PREFIX/include/nspr -I$XULRUNNER_SDK_PREFIX/include/xpcom -I$XULRUNNER_SDK_PREFIX/include/string -I$XULRUNNER_SDK_PREFIX/include/java"
 	GECKO_LIBS="-L$XULRUNNER_SDK_PREFIX/lib -lxpcomglue_s -lxul -lxpcom -lplds4 -lplc4 -lnspr4 -lpthread -ldl"
-
-fi
-
-
-if test "$GECKO_CFLAGS" = ""; then
-
-pkg_failed=no
-{ $as_echo "$as_me:$LINENO: checking for GECKO" >&5
-$as_echo_n "checking for GECKO... " >&6; }
-
-if test -n "$GECKO_CFLAGS"; then
-    pkg_cv_GECKO_CFLAGS="$GECKO_CFLAGS"
- elif test -n "$PKG_CONFIG"; then
-    if test -n "$PKG_CONFIG" && \
-    { ($as_echo "$as_me:$LINENO: \$PKG_CONFIG --exists --print-errors \"mozilla-plugin mozilla-xpcom\"") >&5
-  ($PKG_CONFIG --exists --print-errors "mozilla-plugin mozilla-xpcom") 2>&5
-  ac_status=$?
-  $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; then
-  pkg_cv_GECKO_CFLAGS=`$PKG_CONFIG --cflags "mozilla-plugin mozilla-xpcom" 2>/dev/null`
+	# Check whether --enable-new-libxul was given.
+if test "${enable_new_libxul+set}" = set; then
+  enableval=$enable_new_libxul; usenewlibxul=$enableval
 else
-  pkg_failed=yes
-fi
- else
-    pkg_failed=untried
-fi
-if test -n "$GECKO_LIBS"; then
-    pkg_cv_GECKO_LIBS="$GECKO_LIBS"
- elif test -n "$PKG_CONFIG"; then
-    if test -n "$PKG_CONFIG" && \
-    { ($as_echo "$as_me:$LINENO: \$PKG_CONFIG --exists --print-errors \"mozilla-plugin mozilla-xpcom\"") >&5
-  ($PKG_CONFIG --exists --print-errors "mozilla-plugin mozilla-xpcom") 2>&5
-  ac_status=$?
-  $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; then
-  pkg_cv_GECKO_LIBS=`$PKG_CONFIG --libs "mozilla-plugin mozilla-xpcom" 2>/dev/null`
-else
-  pkg_failed=yes
-fi
- else
-    pkg_failed=untried
+  usenewlibxul=no
 fi
 
 
+	if test $usenewlibxul == yes; then
 
-if test $pkg_failed = yes; then
+cat >>confdefs.h <<\_ACEOF
+#define HAVE_NEW_XULRUNNER 1
+_ACEOF
 
-if $PKG_CONFIG --atleast-pkgconfig-version 0.20; then
-        _pkg_short_errors_supported=yes
-else
-        _pkg_short_errors_supported=no
-fi
-        if test $_pkg_short_errors_supported = yes; then
-	        GECKO_PKG_ERRORS=`$PKG_CONFIG --short-errors --print-errors "mozilla-plugin mozilla-xpcom" 2>&1`
-        else
-	        GECKO_PKG_ERRORS=`$PKG_CONFIG --print-errors "mozilla-plugin mozilla-xpcom" 2>&1`
-        fi
-	# Put the nasty error message in config.log where it belongs
-	echo "$GECKO_PKG_ERRORS" >&5
-
-	{ $as_echo "$as_me:$LINENO: result: no" >&5
-$as_echo "no" >&6; }
-                { $as_echo "$as_me:$LINENO: WARNING: mozilla-plugin not found, trying another" >&5
-$as_echo "$as_me: WARNING: mozilla-plugin not found, trying another" >&2;}
-elif test $pkg_failed = untried; then
-	{ $as_echo "$as_me:$LINENO: WARNING: mozilla-plugin not found, trying another" >&5
-$as_echo "$as_me: WARNING: mozilla-plugin not found, trying another" >&2;}
-else
-	GECKO_CFLAGS=$pkg_cv_GECKO_CFLAGS
-	GECKO_LIBS=$pkg_cv_GECKO_LIBS
-        { $as_echo "$as_me:$LINENO: result: yes" >&5
-$as_echo "yes" >&6; }
+	fi
 
 
 fi
-fi
 
-if test "$GECKO_CFLAGS" = ""; then
-
-pkg_failed=no
-{ $as_echo "$as_me:$LINENO: checking for GECKO" >&5
-$as_echo_n "checking for GECKO... " >&6; }
-
-if test -n "$GECKO_CFLAGS"; then
-    pkg_cv_GECKO_CFLAGS="$GECKO_CFLAGS"
- elif test -n "$PKG_CONFIG"; then
-    if test -n "$PKG_CONFIG" && \
-    { ($as_echo "$as_me:$LINENO: \$PKG_CONFIG --exists --print-errors \"firefox-plugin firefox-xpcom\"") >&5
-  ($PKG_CONFIG --exists --print-errors "firefox-plugin firefox-xpcom") 2>&5
-  ac_status=$?
-  $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; then
-  pkg_cv_GECKO_CFLAGS=`$PKG_CONFIG --cflags "firefox-plugin firefox-xpcom" 2>/dev/null`
-else
-  pkg_failed=yes
-fi
- else
-    pkg_failed=untried
-fi
-if test -n "$GECKO_LIBS"; then
-    pkg_cv_GECKO_LIBS="$GECKO_LIBS"
- elif test -n "$PKG_CONFIG"; then
-    if test -n "$PKG_CONFIG" && \
-    { ($as_echo "$as_me:$LINENO: \$PKG_CONFIG --exists --print-errors \"firefox-plugin firefox-xpcom\"") >&5
-  ($PKG_CONFIG --exists --print-errors "firefox-plugin firefox-xpcom") 2>&5
-  ac_status=$?
-  $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; then
-  pkg_cv_GECKO_LIBS=`$PKG_CONFIG --libs "firefox-plugin firefox-xpcom" 2>/dev/null`
-else
-  pkg_failed=yes
-fi
- else
-    pkg_failed=untried
-fi
-
-
-
-if test $pkg_failed = yes; then
-
-if $PKG_CONFIG --atleast-pkgconfig-version 0.20; then
-        _pkg_short_errors_supported=yes
-else
-        _pkg_short_errors_supported=no
-fi
-        if test $_pkg_short_errors_supported = yes; then
-	        GECKO_PKG_ERRORS=`$PKG_CONFIG --short-errors --print-errors "firefox-plugin firefox-xpcom" 2>&1`
-        else
-	        GECKO_PKG_ERRORS=`$PKG_CONFIG --print-errors "firefox-plugin firefox-xpcom" 2>&1`
-        fi
-	# Put the nasty error message in config.log where it belongs
-	echo "$GECKO_PKG_ERRORS" >&5
-
-	{ $as_echo "$as_me:$LINENO: result: no" >&5
-$as_echo "no" >&6; }
-                { $as_echo "$as_me:$LINENO: WARNING: firefox-plugin not found, trying another" >&5
-$as_echo "$as_me: WARNING: firefox-plugin not found, trying another" >&2;}
-elif test $pkg_failed = untried; then
-	{ $as_echo "$as_me:$LINENO: WARNING: firefox-plugin not found, trying another" >&5
-$as_echo "$as_me: WARNING: firefox-plugin not found, trying another" >&2;}
-else
-	GECKO_CFLAGS=$pkg_cv_GECKO_CFLAGS
-	GECKO_LIBS=$pkg_cv_GECKO_LIBS
-        { $as_echo "$as_me:$LINENO: result: yes" >&5
-$as_echo "yes" >&6; }
-
-
-fi
-fi
-
-if test "$GECKO_CFLAGS" = ""; then
-
-pkg_failed=no
-{ $as_echo "$as_me:$LINENO: checking for GECKO" >&5
-$as_echo_n "checking for GECKO... " >&6; }
-
-if test -n "$GECKO_CFLAGS"; then
-    pkg_cv_GECKO_CFLAGS="$GECKO_CFLAGS"
- elif test -n "$PKG_CONFIG"; then
-    if test -n "$PKG_CONFIG" && \
-    { ($as_echo "$as_me:$LINENO: \$PKG_CONFIG --exists --print-errors \"seamonkey-plugin seamonkey-xpcom\"") >&5
-  ($PKG_CONFIG --exists --print-errors "seamonkey-plugin seamonkey-xpcom") 2>&5
-  ac_status=$?
-  $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; then
-  pkg_cv_GECKO_CFLAGS=`$PKG_CONFIG --cflags "seamonkey-plugin seamonkey-xpcom" 2>/dev/null`
-else
-  pkg_failed=yes
-fi
- else
-    pkg_failed=untried
-fi
-if test -n "$GECKO_LIBS"; then
-    pkg_cv_GECKO_LIBS="$GECKO_LIBS"
- elif test -n "$PKG_CONFIG"; then
-    if test -n "$PKG_CONFIG" && \
-    { ($as_echo "$as_me:$LINENO: \$PKG_CONFIG --exists --print-errors \"seamonkey-plugin seamonkey-xpcom\"") >&5
-  ($PKG_CONFIG --exists --print-errors "seamonkey-plugin seamonkey-xpcom") 2>&5
-  ac_status=$?
-  $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; then
-  pkg_cv_GECKO_LIBS=`$PKG_CONFIG --libs "seamonkey-plugin seamonkey-xpcom" 2>/dev/null`
-else
-  pkg_failed=yes
-fi
- else
-    pkg_failed=untried
-fi
-
-
-
-if test $pkg_failed = yes; then
-
-if $PKG_CONFIG --atleast-pkgconfig-version 0.20; then
-        _pkg_short_errors_supported=yes
-else
-        _pkg_short_errors_supported=no
-fi
-        if test $_pkg_short_errors_supported = yes; then
-	        GECKO_PKG_ERRORS=`$PKG_CONFIG --short-errors --print-errors "seamonkey-plugin seamonkey-xpcom" 2>&1`
-        else
-	        GECKO_PKG_ERRORS=`$PKG_CONFIG --print-errors "seamonkey-plugin seamonkey-xpcom" 2>&1`
-        fi
-	# Put the nasty error message in config.log where it belongs
-	echo "$GECKO_PKG_ERRORS" >&5
-
-	{ $as_echo "$as_me:$LINENO: result: no" >&5
-$as_echo "no" >&6; }
-                { $as_echo "$as_me:$LINENO: WARNING: seamokey-plugin not found, trying another" >&5
-$as_echo "$as_me: WARNING: seamokey-plugin not found, trying another" >&2;}
-elif test $pkg_failed = untried; then
-	{ $as_echo "$as_me:$LINENO: WARNING: seamokey-plugin not found, trying another" >&5
-$as_echo "$as_me: WARNING: seamokey-plugin not found, trying another" >&2;}
-else
-	GECKO_CFLAGS=$pkg_cv_GECKO_CFLAGS
-	GECKO_LIBS=$pkg_cv_GECKO_LIBS
-        { $as_echo "$as_me:$LINENO: result: yes" >&5
-$as_echo "yes" >&6; }
-
-
-fi
-fi
-
-if test "$GECKO_CFLAGS" = ""; then
-
-pkg_failed=no
-{ $as_echo "$as_me:$LINENO: checking for GECKO" >&5
-$as_echo_n "checking for GECKO... " >&6; }
-
-if test -n "$GECKO_CFLAGS"; then
-    pkg_cv_GECKO_CFLAGS="$GECKO_CFLAGS"
- elif test -n "$PKG_CONFIG"; then
-    if test -n "$PKG_CONFIG" && \
-    { ($as_echo "$as_me:$LINENO: \$PKG_CONFIG --exists --print-errors \"xulrunner-plugin xulrunner-xpcom\"") >&5
-  ($PKG_CONFIG --exists --print-errors "xulrunner-plugin xulrunner-xpcom") 2>&5
-  ac_status=$?
-  $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; then
-  pkg_cv_GECKO_CFLAGS=`$PKG_CONFIG --cflags "xulrunner-plugin xulrunner-xpcom" 2>/dev/null`
-else
-  pkg_failed=yes
-fi
- else
-    pkg_failed=untried
-fi
-if test -n "$GECKO_LIBS"; then
-    pkg_cv_GECKO_LIBS="$GECKO_LIBS"
- elif test -n "$PKG_CONFIG"; then
-    if test -n "$PKG_CONFIG" && \
-    { ($as_echo "$as_me:$LINENO: \$PKG_CONFIG --exists --print-errors \"xulrunner-plugin xulrunner-xpcom\"") >&5
-  ($PKG_CONFIG --exists --print-errors "xulrunner-plugin xulrunner-xpcom") 2>&5
-  ac_status=$?
-  $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; then
-  pkg_cv_GECKO_LIBS=`$PKG_CONFIG --libs "xulrunner-plugin xulrunner-xpcom" 2>/dev/null`
-else
-  pkg_failed=yes
-fi
- else
-    pkg_failed=untried
-fi
-
-
-
-if test $pkg_failed = yes; then
-
-if $PKG_CONFIG --atleast-pkgconfig-version 0.20; then
-        _pkg_short_errors_supported=yes
-else
-        _pkg_short_errors_supported=no
-fi
-        if test $_pkg_short_errors_supported = yes; then
-	        GECKO_PKG_ERRORS=`$PKG_CONFIG --short-errors --print-errors "xulrunner-plugin xulrunner-xpcom" 2>&1`
-        else
-	        GECKO_PKG_ERRORS=`$PKG_CONFIG --print-errors "xulrunner-plugin xulrunner-xpcom" 2>&1`
-        fi
-	# Put the nasty error message in config.log where it belongs
-	echo "$GECKO_PKG_ERRORS" >&5
-
-	{ $as_echo "$as_me:$LINENO: result: no" >&5
-$as_echo "no" >&6; }
-                { $as_echo "$as_me:$LINENO: WARNING: xulrunner-plugin not found, trying another" >&5
-$as_echo "$as_me: WARNING: xulrunner-plugin not found, trying another" >&2;}
-elif test $pkg_failed = untried; then
-	{ $as_echo "$as_me:$LINENO: WARNING: xulrunner-plugin not found, trying another" >&5
-$as_echo "$as_me: WARNING: xulrunner-plugin not found, trying another" >&2;}
-else
-	GECKO_CFLAGS=$pkg_cv_GECKO_CFLAGS
-	GECKO_LIBS=$pkg_cv_GECKO_LIBS
-        { $as_echo "$as_me:$LINENO: result: yes" >&5
-$as_echo "yes" >&6; }
-
-
-fi
-fi
 
 if test "$GECKO_CFLAGS" = ""; then
 
@@ -9074,8 +8800,8 @@ else
 	GECKO_LIBS=$pkg_cv_GECKO_LIBS
         { $as_echo "$as_me:$LINENO: result: yes" >&5
 $as_echo "yes" >&6; }
-	 { $as_echo "$as_me:$LINENO: libxul < 1.9.2 found" >&5
-$as_echo "$as_me: libxul < 1.9.2 found" >&6;}
+	 { $as_echo "$as_me:$LINENO: Using libxul < 1.9.2" >&5
+$as_echo "$as_me: Using libxul < 1.9.2" >&6;}
 
 fi
 fi
@@ -9151,8 +8877,8 @@ $as_echo "yes" >&6; }
 cat >>confdefs.h <<\_ACEOF
 #define HAVE_NEW_XULRUNNER 1
 _ACEOF
- { $as_echo "$as_me:$LINENO: libxul >= 1.9.2 found" >&5
-$as_echo "$as_me: libxul >= 1.9.2 found" >&6;}
+ { $as_echo "$as_me:$LINENO: Using libxul >= 1.9.2" >&5
+$as_echo "$as_me: Using libxul >= 1.9.2" >&6;}
 
 fi
 fi
@@ -9225,11 +8951,307 @@ else
 	GECKO_LIBS=$pkg_cv_GECKO_LIBS
         { $as_echo "$as_me:$LINENO: result: yes" >&5
 $as_echo "yes" >&6; }
-
+	 { $as_echo "$as_me:$LINENO: Using libxul-unstable" >&5
+$as_echo "$as_me: Using libxul-unstable" >&6;}
 
 fi
 fi
 
+if test "$GECKO_CFLAGS" = ""; then
+
+pkg_failed=no
+{ $as_echo "$as_me:$LINENO: checking for GECKO" >&5
+$as_echo_n "checking for GECKO... " >&6; }
+
+if test -n "$GECKO_CFLAGS"; then
+    pkg_cv_GECKO_CFLAGS="$GECKO_CFLAGS"
+ elif test -n "$PKG_CONFIG"; then
+    if test -n "$PKG_CONFIG" && \
+    { ($as_echo "$as_me:$LINENO: \$PKG_CONFIG --exists --print-errors \"mozilla-plugin mozilla-xpcom\"") >&5
+  ($PKG_CONFIG --exists --print-errors "mozilla-plugin mozilla-xpcom") 2>&5
+  ac_status=$?
+  $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; then
+  pkg_cv_GECKO_CFLAGS=`$PKG_CONFIG --cflags "mozilla-plugin mozilla-xpcom" 2>/dev/null`
+else
+  pkg_failed=yes
+fi
+ else
+    pkg_failed=untried
+fi
+if test -n "$GECKO_LIBS"; then
+    pkg_cv_GECKO_LIBS="$GECKO_LIBS"
+ elif test -n "$PKG_CONFIG"; then
+    if test -n "$PKG_CONFIG" && \
+    { ($as_echo "$as_me:$LINENO: \$PKG_CONFIG --exists --print-errors \"mozilla-plugin mozilla-xpcom\"") >&5
+  ($PKG_CONFIG --exists --print-errors "mozilla-plugin mozilla-xpcom") 2>&5
+  ac_status=$?
+  $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; then
+  pkg_cv_GECKO_LIBS=`$PKG_CONFIG --libs "mozilla-plugin mozilla-xpcom" 2>/dev/null`
+else
+  pkg_failed=yes
+fi
+ else
+    pkg_failed=untried
+fi
+
+
+
+if test $pkg_failed = yes; then
+
+if $PKG_CONFIG --atleast-pkgconfig-version 0.20; then
+        _pkg_short_errors_supported=yes
+else
+        _pkg_short_errors_supported=no
+fi
+        if test $_pkg_short_errors_supported = yes; then
+	        GECKO_PKG_ERRORS=`$PKG_CONFIG --short-errors --print-errors "mozilla-plugin mozilla-xpcom" 2>&1`
+        else
+	        GECKO_PKG_ERRORS=`$PKG_CONFIG --print-errors "mozilla-plugin mozilla-xpcom" 2>&1`
+        fi
+	# Put the nasty error message in config.log where it belongs
+	echo "$GECKO_PKG_ERRORS" >&5
+
+	{ $as_echo "$as_me:$LINENO: result: no" >&5
+$as_echo "no" >&6; }
+                { $as_echo "$as_me:$LINENO: WARNING: mozilla-plugin not found, trying another" >&5
+$as_echo "$as_me: WARNING: mozilla-plugin not found, trying another" >&2;}
+elif test $pkg_failed = untried; then
+	{ $as_echo "$as_me:$LINENO: WARNING: mozilla-plugin not found, trying another" >&5
+$as_echo "$as_me: WARNING: mozilla-plugin not found, trying another" >&2;}
+else
+	GECKO_CFLAGS=$pkg_cv_GECKO_CFLAGS
+	GECKO_LIBS=$pkg_cv_GECKO_LIBS
+        { $as_echo "$as_me:$LINENO: result: yes" >&5
+$as_echo "yes" >&6; }
+	 { $as_echo "$as_me:$LINENO: Using mozilla" >&5
+$as_echo "$as_me: Using mozilla" >&6;}
+
+fi
+fi
+
+if test "$GECKO_CFLAGS" = ""; then
+
+pkg_failed=no
+{ $as_echo "$as_me:$LINENO: checking for GECKO" >&5
+$as_echo_n "checking for GECKO... " >&6; }
+
+if test -n "$GECKO_CFLAGS"; then
+    pkg_cv_GECKO_CFLAGS="$GECKO_CFLAGS"
+ elif test -n "$PKG_CONFIG"; then
+    if test -n "$PKG_CONFIG" && \
+    { ($as_echo "$as_me:$LINENO: \$PKG_CONFIG --exists --print-errors \"firefox-plugin firefox-xpcom\"") >&5
+  ($PKG_CONFIG --exists --print-errors "firefox-plugin firefox-xpcom") 2>&5
+  ac_status=$?
+  $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; then
+  pkg_cv_GECKO_CFLAGS=`$PKG_CONFIG --cflags "firefox-plugin firefox-xpcom" 2>/dev/null`
+else
+  pkg_failed=yes
+fi
+ else
+    pkg_failed=untried
+fi
+if test -n "$GECKO_LIBS"; then
+    pkg_cv_GECKO_LIBS="$GECKO_LIBS"
+ elif test -n "$PKG_CONFIG"; then
+    if test -n "$PKG_CONFIG" && \
+    { ($as_echo "$as_me:$LINENO: \$PKG_CONFIG --exists --print-errors \"firefox-plugin firefox-xpcom\"") >&5
+  ($PKG_CONFIG --exists --print-errors "firefox-plugin firefox-xpcom") 2>&5
+  ac_status=$?
+  $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; then
+  pkg_cv_GECKO_LIBS=`$PKG_CONFIG --libs "firefox-plugin firefox-xpcom" 2>/dev/null`
+else
+  pkg_failed=yes
+fi
+ else
+    pkg_failed=untried
+fi
+
+
+
+if test $pkg_failed = yes; then
+
+if $PKG_CONFIG --atleast-pkgconfig-version 0.20; then
+        _pkg_short_errors_supported=yes
+else
+        _pkg_short_errors_supported=no
+fi
+        if test $_pkg_short_errors_supported = yes; then
+	        GECKO_PKG_ERRORS=`$PKG_CONFIG --short-errors --print-errors "firefox-plugin firefox-xpcom" 2>&1`
+        else
+	        GECKO_PKG_ERRORS=`$PKG_CONFIG --print-errors "firefox-plugin firefox-xpcom" 2>&1`
+        fi
+	# Put the nasty error message in config.log where it belongs
+	echo "$GECKO_PKG_ERRORS" >&5
+
+	{ $as_echo "$as_me:$LINENO: result: no" >&5
+$as_echo "no" >&6; }
+                { $as_echo "$as_me:$LINENO: WARNING: firefox-plugin not found, trying another" >&5
+$as_echo "$as_me: WARNING: firefox-plugin not found, trying another" >&2;}
+elif test $pkg_failed = untried; then
+	{ $as_echo "$as_me:$LINENO: WARNING: firefox-plugin not found, trying another" >&5
+$as_echo "$as_me: WARNING: firefox-plugin not found, trying another" >&2;}
+else
+	GECKO_CFLAGS=$pkg_cv_GECKO_CFLAGS
+	GECKO_LIBS=$pkg_cv_GECKO_LIBS
+        { $as_echo "$as_me:$LINENO: result: yes" >&5
+$as_echo "yes" >&6; }
+	 { $as_echo "$as_me:$LINENO: Using firefox" >&5
+$as_echo "$as_me: Using firefox" >&6;}
+
+fi
+fi
+
+if test "$GECKO_CFLAGS" = ""; then
+
+pkg_failed=no
+{ $as_echo "$as_me:$LINENO: checking for GECKO" >&5
+$as_echo_n "checking for GECKO... " >&6; }
+
+if test -n "$GECKO_CFLAGS"; then
+    pkg_cv_GECKO_CFLAGS="$GECKO_CFLAGS"
+ elif test -n "$PKG_CONFIG"; then
+    if test -n "$PKG_CONFIG" && \
+    { ($as_echo "$as_me:$LINENO: \$PKG_CONFIG --exists --print-errors \"seamonkey-plugin seamonkey-xpcom\"") >&5
+  ($PKG_CONFIG --exists --print-errors "seamonkey-plugin seamonkey-xpcom") 2>&5
+  ac_status=$?
+  $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; then
+  pkg_cv_GECKO_CFLAGS=`$PKG_CONFIG --cflags "seamonkey-plugin seamonkey-xpcom" 2>/dev/null`
+else
+  pkg_failed=yes
+fi
+ else
+    pkg_failed=untried
+fi
+if test -n "$GECKO_LIBS"; then
+    pkg_cv_GECKO_LIBS="$GECKO_LIBS"
+ elif test -n "$PKG_CONFIG"; then
+    if test -n "$PKG_CONFIG" && \
+    { ($as_echo "$as_me:$LINENO: \$PKG_CONFIG --exists --print-errors \"seamonkey-plugin seamonkey-xpcom\"") >&5
+  ($PKG_CONFIG --exists --print-errors "seamonkey-plugin seamonkey-xpcom") 2>&5
+  ac_status=$?
+  $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; then
+  pkg_cv_GECKO_LIBS=`$PKG_CONFIG --libs "seamonkey-plugin seamonkey-xpcom" 2>/dev/null`
+else
+  pkg_failed=yes
+fi
+ else
+    pkg_failed=untried
+fi
+
+
+
+if test $pkg_failed = yes; then
+
+if $PKG_CONFIG --atleast-pkgconfig-version 0.20; then
+        _pkg_short_errors_supported=yes
+else
+        _pkg_short_errors_supported=no
+fi
+        if test $_pkg_short_errors_supported = yes; then
+	        GECKO_PKG_ERRORS=`$PKG_CONFIG --short-errors --print-errors "seamonkey-plugin seamonkey-xpcom" 2>&1`
+        else
+	        GECKO_PKG_ERRORS=`$PKG_CONFIG --print-errors "seamonkey-plugin seamonkey-xpcom" 2>&1`
+        fi
+	# Put the nasty error message in config.log where it belongs
+	echo "$GECKO_PKG_ERRORS" >&5
+
+	{ $as_echo "$as_me:$LINENO: result: no" >&5
+$as_echo "no" >&6; }
+                { $as_echo "$as_me:$LINENO: WARNING: seamokey-plugin not found, trying another" >&5
+$as_echo "$as_me: WARNING: seamokey-plugin not found, trying another" >&2;}
+elif test $pkg_failed = untried; then
+	{ $as_echo "$as_me:$LINENO: WARNING: seamokey-plugin not found, trying another" >&5
+$as_echo "$as_me: WARNING: seamokey-plugin not found, trying another" >&2;}
+else
+	GECKO_CFLAGS=$pkg_cv_GECKO_CFLAGS
+	GECKO_LIBS=$pkg_cv_GECKO_LIBS
+        { $as_echo "$as_me:$LINENO: result: yes" >&5
+$as_echo "yes" >&6; }
+	 { $as_echo "$as_me:$LINENO: Using seamonkey" >&5
+$as_echo "$as_me: Using seamonkey" >&6;}
+
+fi
+fi
+
+if test "$GECKO_CFLAGS" = ""; then
+
+pkg_failed=no
+{ $as_echo "$as_me:$LINENO: checking for GECKO" >&5
+$as_echo_n "checking for GECKO... " >&6; }
+
+if test -n "$GECKO_CFLAGS"; then
+    pkg_cv_GECKO_CFLAGS="$GECKO_CFLAGS"
+ elif test -n "$PKG_CONFIG"; then
+    if test -n "$PKG_CONFIG" && \
+    { ($as_echo "$as_me:$LINENO: \$PKG_CONFIG --exists --print-errors \"xulrunner-plugin xulrunner-xpcom\"") >&5
+  ($PKG_CONFIG --exists --print-errors "xulrunner-plugin xulrunner-xpcom") 2>&5
+  ac_status=$?
+  $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; then
+  pkg_cv_GECKO_CFLAGS=`$PKG_CONFIG --cflags "xulrunner-plugin xulrunner-xpcom" 2>/dev/null`
+else
+  pkg_failed=yes
+fi
+ else
+    pkg_failed=untried
+fi
+if test -n "$GECKO_LIBS"; then
+    pkg_cv_GECKO_LIBS="$GECKO_LIBS"
+ elif test -n "$PKG_CONFIG"; then
+    if test -n "$PKG_CONFIG" && \
+    { ($as_echo "$as_me:$LINENO: \$PKG_CONFIG --exists --print-errors \"xulrunner-plugin xulrunner-xpcom\"") >&5
+  ($PKG_CONFIG --exists --print-errors "xulrunner-plugin xulrunner-xpcom") 2>&5
+  ac_status=$?
+  $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; then
+  pkg_cv_GECKO_LIBS=`$PKG_CONFIG --libs "xulrunner-plugin xulrunner-xpcom" 2>/dev/null`
+else
+  pkg_failed=yes
+fi
+ else
+    pkg_failed=untried
+fi
+
+
+
+if test $pkg_failed = yes; then
+
+if $PKG_CONFIG --atleast-pkgconfig-version 0.20; then
+        _pkg_short_errors_supported=yes
+else
+        _pkg_short_errors_supported=no
+fi
+        if test $_pkg_short_errors_supported = yes; then
+	        GECKO_PKG_ERRORS=`$PKG_CONFIG --short-errors --print-errors "xulrunner-plugin xulrunner-xpcom" 2>&1`
+        else
+	        GECKO_PKG_ERRORS=`$PKG_CONFIG --print-errors "xulrunner-plugin xulrunner-xpcom" 2>&1`
+        fi
+	# Put the nasty error message in config.log where it belongs
+	echo "$GECKO_PKG_ERRORS" >&5
+
+	{ $as_echo "$as_me:$LINENO: result: no" >&5
+$as_echo "no" >&6; }
+                { $as_echo "$as_me:$LINENO: WARNING: xulrunner-plugin not found, trying another" >&5
+$as_echo "$as_me: WARNING: xulrunner-plugin not found, trying another" >&2;}
+elif test $pkg_failed = untried; then
+	{ $as_echo "$as_me:$LINENO: WARNING: xulrunner-plugin not found, trying another" >&5
+$as_echo "$as_me: WARNING: xulrunner-plugin not found, trying another" >&2;}
+else
+	GECKO_CFLAGS=$pkg_cv_GECKO_CFLAGS
+	GECKO_LIBS=$pkg_cv_GECKO_LIBS
+        { $as_echo "$as_me:$LINENO: result: yes" >&5
+$as_echo "yes" >&6; }
+	 { $as_echo "$as_me:$LINENO: Using xulrunner" >&5
+$as_echo "$as_me: Using xulrunner" >&6;}
+
+fi
+fi
 
 if test "$GECKO_CFLAGS" = ""; then
 
@@ -9299,7 +9321,8 @@ else
 	GECKO_LIBS=$pkg_cv_GECKO_LIBS
         { $as_echo "$as_me:$LINENO: result: yes" >&5
 $as_echo "yes" >&6; }
-
+	 { $as_echo "$as_me:$LINENO: Using iceape" >&5
+$as_echo "$as_me: Using iceape" >&6;}
 
 fi
 fi
@@ -9374,8 +9397,8 @@ $as_echo "yes" >&6; }
 
     libdir=`$PKG_CONFIG --variable=libdir nspr`
 
-fi
 
+fi
 
 
 
@@ -9496,7 +9519,14 @@ fi
 
 # Check whether --with-gconf was given.
 if test "${with_gconf+set}" = set; then
-  withval=$with_gconf;
+  withval=$with_gconf;  if false; then
+  GCONF_SCHEMAS_INSTALL_TRUE=
+  GCONF_SCHEMAS_INSTALL_FALSE='#'
+else
+  GCONF_SCHEMAS_INSTALL_TRUE='#'
+  GCONF_SCHEMAS_INSTALL_FALSE=
+fi
+
 else
   with_gconf=check
 fi
@@ -9559,10 +9589,24 @@ fi
 
 	{ $as_echo "$as_me:$LINENO: result: no" >&5
 $as_echo "no" >&6; }
-                { $as_echo "$as_me:$LINENO: Using keystore for preferences" >&5
+                 if false; then
+  GCONF_SCHEMAS_INSTALL_TRUE=
+  GCONF_SCHEMAS_INSTALL_FALSE='#'
+else
+  GCONF_SCHEMAS_INSTALL_TRUE='#'
+  GCONF_SCHEMAS_INSTALL_FALSE=
+fi
+ { $as_echo "$as_me:$LINENO: Using keystore for preferences" >&5
 $as_echo "$as_me: Using keystore for preferences" >&6;}
 elif test $pkg_failed = untried; then
-	{ $as_echo "$as_me:$LINENO: Using keystore for preferences" >&5
+	 if false; then
+  GCONF_SCHEMAS_INSTALL_TRUE=
+  GCONF_SCHEMAS_INSTALL_FALSE='#'
+else
+  GCONF_SCHEMAS_INSTALL_TRUE='#'
+  GCONF_SCHEMAS_INSTALL_FALSE=
+fi
+ { $as_echo "$as_me:$LINENO: Using keystore for preferences" >&5
 $as_echo "$as_me: Using keystore for preferences" >&6;}
 else
 	GCONF_CFLAGS=$pkg_cv_GCONF_CFLAGS
@@ -9893,6 +9937,27 @@ if test -z "${am__fastdepCXX_TRUE}" && test -z "${am__fastdepCXX_FALSE}"; then
   { { $as_echo "$as_me:$LINENO: error: conditional \"am__fastdepCXX\" was never defined.
 Usually this means the macro was only invoked conditionally." >&5
 $as_echo "$as_me: error: conditional \"am__fastdepCXX\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${GCONF_SCHEMAS_INSTALL_TRUE}" && test -z "${GCONF_SCHEMAS_INSTALL_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"GCONF_SCHEMAS_INSTALL\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"GCONF_SCHEMAS_INSTALL\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${GCONF_SCHEMAS_INSTALL_TRUE}" && test -z "${GCONF_SCHEMAS_INSTALL_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"GCONF_SCHEMAS_INSTALL\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"GCONF_SCHEMAS_INSTALL\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${GCONF_SCHEMAS_INSTALL_TRUE}" && test -z "${GCONF_SCHEMAS_INSTALL_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"GCONF_SCHEMAS_INSTALL\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"GCONF_SCHEMAS_INSTALL\" was never defined.
 Usually this means the macro was only invoked conditionally." >&2;}
    { (exit 1); exit 1; }; }
 fi

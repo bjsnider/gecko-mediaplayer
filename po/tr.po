@@ -2,31 +2,37 @@
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 #
-# Onur Küçük <onur@pardus.org.tr>, 2008.
+# Onur Küçük <onur@pardus.org.tr>, 2008, 2010.
 msgid ""
 msgstr ""
 "Project-Id-Version: tr\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-02-05 16:39-0700\n"
-"PO-Revision-Date: 2008-03-30 13:47+0300\n"
+"POT-Creation-Date: 2010-02-25 14:13-0700\n"
+"PO-Revision-Date: 2010-02-22 23:51+0200\n"
 "Last-Translator: Onur Küçük <onur@pardus.org.tr>\n"
-"Language-Team: Turkish <kde-i18n-tr@kde.org>\n"
+"Language-Team: Turkish <turkce@pardus.org.tr>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: KBabel 1.11.4\n"
+"X-Generator: Lokalize 1.0\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
 
-#: src/plugin.cpp:618
+#: src/plugin.cpp:650
 #, c-format
 msgid "Cache fill: %2.2f%%"
 msgstr "Önbellek: %2.2f%%"
 
-#: src/plugin.cpp:843
+#: src/plugin.cpp:913
 #, c-format
-msgid "Write unable to write because item is NULL"
-msgstr "NULL içerik yazılamıyor"
+msgid "Write unable to write because item is NULL\n"
+msgstr "NULL içerik yazılamıyor\n"
 
-#: src/plugin.cpp:898
+#: src/plugin.cpp:978
+#, fuzzy, c-format
+msgid "Caching %iK (%0.1f K/s)"
+msgstr "Önbellek: %2.2f%% (%0.1f K/s)"
+
+#: src/plugin.cpp:981
 #, c-format
 msgid "Cache fill: %2.2f%% (%0.1f K/s)"
 msgstr "Önbellek: %2.2f%% (%0.1f K/s)"

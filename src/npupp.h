@@ -129,8 +129,8 @@ typedef int32_t(*NP_LOADDS NPP_WriteReadyUPP) (NPP instance, NPStream * stream);
 		(*(FUNC))((NPParg), (NPStreamPtr))
 
 /* NPP_Write */
-typedef int32_t(*NP_LOADDS NPP_WriteUPP) (NPP instance, NPStream * stream, int32_t offset, int32_t len,
-                                        void *buffer);
+typedef int32_t(*NP_LOADDS NPP_WriteUPP) (NPP instance, NPStream * stream, int32_t offset,
+                                          int32_t len, void *buffer);
 #define NewNPP_WriteProc(FUNC)		\
 		((NPP_WriteUPP) (FUNC))
 #define CallNPP_WriteProc(FUNC,  NPParg, NPStreamPtr, offsetArg, lenArg, bufferPtr)		\
@@ -246,7 +246,8 @@ typedef NPError(*NP_LOADDS NPN_NewStreamUPP) (NPP instance, NPMIMEType type, con
 		(*(FUNC))((npp), (type), (window), (stream))
 
 /* NPN_Write */
-typedef int32_t(*NP_LOADDS NPN_WriteUPP) (NPP instance, NPStream * stream, int32_t len, void *buffer);
+typedef int32_t(*NP_LOADDS NPN_WriteUPP) (NPP instance, NPStream * stream, int32_t len,
+                                          void *buffer);
 #define NewNPN_WriteProc(FUNC)		\
 		((NPN_WriteUPP) (FUNC))
 #define CallNPN_WriteProc(FUNC, npp, stream, len, buffer)		\
@@ -360,7 +361,7 @@ typedef NPUTF8 *(*NP_LOADDS NPN_UTF8FromIdentifierUPP) (NPIdentifier identifier)
 		(*(FUNC))((ARG1))
 
 /* NPN_IntFromIdentifier */
-typedef int32_t (*NP_LOADDS NPN_IntFromIdentifierUPP) (NPIdentifier identifier);
+typedef int32_t(*NP_LOADDS NPN_IntFromIdentifierUPP) (NPIdentifier identifier);
 #define NewNPN_IntFromIdentifierProc(FUNC)		\
 		((NPN_IntFromIdentifierUPP) (FUNC))
 #define CallNPN_IntFromIdentifierProc(FUNC, ARG1)		\
@@ -609,7 +610,7 @@ enum {
 };
 
 typedef struct _BPSupportedMIMETypes {
-    Sint32_t structVersion;       /* struct version */
+    Sint32_t structVersion;     /* struct version */
     Handle typeStrings;         /* STR# formated handle, allocated by plug-in */
     Handle infoStrings;         /* STR# formated handle, allocated by plug-in */
 } BPSupportedMIMETypes;

@@ -1,4 +1,4 @@
-%define ver 0.9.9
+%define ver 0.9.9.2
 
 Name: gecko-mediaplayer
 Summary: Multimedia browser plugin for Gecko based browsers
@@ -37,11 +37,13 @@ rm -rf $buildroot
 %post
 update-desktop-database %{_datadir}/applications
 export GCONF_CONFIG_SOURCE=`gconftool-2 --get-default-source`
+if [ -e %{_sysconfdir}/gconf/schemas/gecko-mediaplayer.schemas ]; then
 gconftool-2 --makefile-install-rule %{_sysconfdir}/gconf/schemas/gecko-mediaplayer.schemas > /dev/null
+fi 
 
 %files
 %defattr(-,root,root,-)
 %{_docdir}/%{name}
 %{_libdir}/mozilla
 %{_datadir}/locale
-%config %{_sysconfdir}/gconf/schemas/gecko-mediaplayer.schemas
+%config %{_sysconfdir}

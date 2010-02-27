@@ -1,3 +1,15 @@
+gecko-mediaplayer (0.9.9.2-1) unstable; urgency=low
+
+  * Point fix release (LP: #523793):
+    - Use proper NPERR and NPRES codes in the URLNotify and DestroyStream
+    - Fix Apple HD Gallery site
+    - Improved handling of .m3u playlists
+    - Opera still has issues with apple.com/trailers sites,
+      due to user agent issues.
+  * Add chromium-browser (>> 4.0) as a compatible browser
+
+ -- Cesare Tirabassi <norsetto@ubuntu.com>  Sat, 27 Feb 2010 17:04:42 +0100
+
 gecko-mediaplayer (0.9.9-1) unstable; urgency=low
 
   * New upstream release (LP: #86777, LP: #445767, Closes: #557761):
