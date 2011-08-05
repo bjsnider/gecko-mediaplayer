@@ -1,3 +1,14 @@
+gecko-mediaplayer (0.9.9.2-1.1) unstable; urgency=low
+
+  * Non-maintainer upload.
+  * configure.in, configure: Add -DMOZ_NO_MOZALLOC to GECKO_CFLAGS and
+    use xpcomglue_s_nomozalloc instead of xpcomglue_s.
+  * src/plugin.cpp: Remove call to empty NPP_Initialize.
+  * debian/rules: Configure with --with-xulrunner-sdk and --enable-new-libxul.
+    (Closes: #631035)
+
+ -- Mike Hommey <glandium@debian.org>  Fri, 05 Aug 2011 09:23:12 +0200
+
 gecko-mediaplayer (0.9.9.2-1) unstable; urgency=low
 
   * Point fix release (LP: #523793):

@@ -1,0 +1,14 @@
+From: Mike Hommey <glandium@debian.org>
+Subject: Remove call to empty NPP_Initialize.
+
+--- gecko-mediaplayer-0.9.9.2.orig/src/np_entry.cpp
++++ gecko-mediaplayer-0.9.9.2/src/np_entry.cpp
+@@ -174,8 +174,6 @@ NPError OSCALL NP_Initialize(NPNetscapeF
+ #ifdef OJI
+     pluginFuncs->javaClass = NPP_GetJavaClass();
+ #endif
+-
+-    NPP_Initialize();
+ #endif
+ 
+     return NPERR_NO_ERROR;

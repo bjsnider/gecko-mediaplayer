@@ -27,6 +27,8 @@ configure-stamp:
 		--host=$(DEB_HOST_GNU_TYPE) --build=$(DEB_BUILD_GNU_TYPE) \
 		--prefix=/usr --sysconfdir=\$${prefix}/share \
 		--with-gconf --with-gio --disable-schemas-install \
+		--with-xulrunner-sdk=$(shell pkg-config --variable=sdkdir libxul) \
+		--enable-new-libxul \
 		CXXFLAGS="$(CXXFLAGS)" LDFLAGS="$(LDFLAGS)"
 
 	touch configure-stamp
