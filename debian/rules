@@ -7,13 +7,15 @@ DEB_HOST_GNU_TYPE   ?= $(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)
 DEB_BUILD_GNU_TYPE  ?= $(shell dpkg-architecture -qDEB_BUILD_GNU_TYPE)
 
 CXXFLAGS = -Wall -g
-LDFLAGS  = -Wl,-z,defs
+LDFLAGS  = -Wl,-z,defs -Wl,--as-needed
 
 ifneq (,$(findstring noopt,$(DEB_BUILD_OPTIONS)))
 	CXXFLAGS += -O0
 else
 	CXXFLAGS += -O2
 endif
+
+CXXFLAGS += -DMOZ_NO_MOZALLOC
 
 configure: configure-stamp
 configure-stamp:
@@ -26,9 +28,9 @@ configure-stamp:
 	./configure \
 		--host=$(DEB_HOST_GNU_TYPE) --build=$(DEB_BUILD_GNU_TYPE) \
 		--prefix=/usr --sysconfdir=\$${prefix}/share \
-		--with-gconf --with-gio --disable-schemas-install \
-		--with-xulrunner-sdk=$(shell pkg-config --variable=sdkdir libxul) \
-		--enable-new-libxul \
+		--without-gconf --with-gio --disable-schemas-install \
+                --with-xulrunner-sdk=$(shell pkg-config --variable=sdkdir libxul) \
+                --enable-new-libxul \
 		CXXFLAGS="$(CXXFLAGS)" LDFLAGS="$(LDFLAGS)"
 
 	touch configure-stamp
@@ -63,6 +65,9 @@ install: build
 	# remove docs installed by upstream
 	rm -rf $(CURDIR)/debian/gecko-mediaplayer/usr/share/doc/gecko-mediaplayer
 
+build-indep:
+build-arch:
+
 binary-indep: build install
 
 binary-arch: build install
@@ -72,7 +77,6 @@ binary-arch: build install
 	dh_installdocs
 	dh_install
 	dh_gconf
-	dh_link
 	dh_strip
 	dh_compress
 	dh_fixperms

@@ -1,13 +1,128 @@
-gecko-mediaplayer (0.9.9.2-1.1) unstable; urgency=low
+gecko-mediaplayer (1.0.4-1) unstable; urgency=low
 
-  * Non-maintainer upload.
-  * configure.in, configure: Add -DMOZ_NO_MOZALLOC to GECKO_CFLAGS and
-    use xpcomglue_s_nomozalloc instead of xpcomglue_s.
-  * src/plugin.cpp: Remove call to empty NPP_Initialize.
-  * debian/rules: Configure with --with-xulrunner-sdk and --enable-new-libxul.
-    (Closes: #631035)
+  * QA upload.
+  * Pick most works from Ubuntu, thanks to Ubuntu developers.
+    - Close #634402, #627348, #575483. 
+    - Please help triage bugs fixed but not closed.
+  * debian/control:
+    - Std-ver: 3.9.2.
+    - Updated homepage.
+    - Removed Vcs-*.
+    - Set Debian QA Group to Maintainer.
+    - Add xulrunner-dev to build-dep, since Debian does not have firefox-dev.
+    - Add libcurl-dev to enable curl support.
+  * debian/compat: 5 -> 7.
+  * debian/rules: 
+    - Use DSO linking.
+    - Add build-indep and build-arch empty target, to make lintian happy.
+  * debian/patches/force-no-gsettings.patch: updated header.
+  * Merge changes from 0.9.9.2-1.1 by Mike Hommey <glandium>:
+    - configure.in, configure: use xpcomglue_s_nomozalloc instead of xpcomglue_s
+      (Adding -DMOZ_NO_MOZALLOC to GECKO_CFLAGS is no longer needed, enabling
+      --enable-new-libxul will automatically do that. 
+      Updated 0001-nomozalloc.patch)
+    - debian/rules: Configure with --with-xulrunner-sdk and --enable-new-libxul.
+    - src/plugin.cpp no longer needs changes, upstream has done that.
+      (0002-Remove-call-to-empty-NPP_Initialize.patch dropped)
 
- -- Mike Hommey <glandium@debian.org>  Fri, 05 Aug 2011 09:23:12 +0200
+ -- Aron Xu <aron@debian.org>  Fri, 05 Aug 2011 22:21:18 +0800
+
+gecko-mediaplayer (1.0.4-0ubuntu2) oneiric; urgency=low
+
+  * Add patch to not automatically enable gsettings support when glib is
+    new enough and gconf is disabled. This needs a schema file installing to
+    make everything loading it not crash on startup (which doesn't seem to be
+    provided). Works around startup crash affecting every browser and
+    Thunderbird (LP: #812053). Note, this is a sledgehammer approach to stop
+    everything from crashing. Someone needs to create a schema file if they
+    want gsettings support enabled
+    - add debian/patches/force-no-gsettings.patch
+    - add debian/patches/series
+
+ -- Chris Coulson <chris.coulson@canonical.com>  Mon, 18 Jul 2011 13:12:46 +0100
+
+gecko-mediaplayer (1.0.4-0ubuntu1) oneiric; urgency=low
+
+  * New upstream release.
+  * debian/patches:
+   - 90_svn420_fix_null.patch: Remove, merged upstream.
+   - 91_svn421_disable_npp_initialize.patch: Remove, merged upstream.
+   - dont_use_libxul.patch: Remove, fixed upstream.
+   - autotools.patch: Remove, not needed now.
+
+ -- Julien Lavergne <gilir@ubuntu.com>  Sun, 17 Jul 2011 22:24:37 +0200
+
+gecko-mediaplayer (1.0.0-0ubuntu3) oneiric; urgency=low
+
+  * Don't use any Mozilla interfaces at all. The only interfaces used
+    previously were nsIPrefBranch and nsIPrefService to change a preference
+    which configured the UA string to "QuickTime/7.6.4". This functionality
+    is Firefox specific anyway, and so doesn't work in any Webkit based browser
+    (Chromium, Epiphany, Midori etc). It also doesn't work in Firefox 4
+    and later since the plugin is running in a separate process, where setting
+    prefs in the plugin process has no effect on the browser process at all
+    - add debian/patches/dont_use_libxul.patch
+    - add debian/patches/autotools.patch
+    - update debian/patches/series
+    - update debian/control to build-depend on firefox-dev
+    - see https://blueprints.launchpad.net/ubuntu/+spec/
+            desktop-o-mozilla-rapid-release-maintenance and
+      https://lists.ubuntu.com/archives/ubuntu-devel/2011-May/033229.html
+
+ -- Chris Coulson <chris.coulson@canonical.com>  Fri, 27 May 2011 15:19:19 +0100
+
+gecko-mediaplayer (1.0.0-0ubuntu2) natty; urgency=low
+
+  * debian/control:
+   - Build-depends on xulrunner-1.9.2-dev until bug #724070 is fixed.
+
+ -- Julien Lavergne <gilir@ubuntu.com>  Sun, 06 Mar 2011 23:05:08 +0100
+
+gecko-mediaplayer (1.0.0-0ubuntu1) natty; urgency=low
+
+  [ Cesare Tirabassi ]
+  * Update dependencies list (xulrunner, midbrowser and firefox-3.5)
+  * Add konqueror, opera and chromium in long description
+  * Removed all symlinks, lookup is now implemented upstream by all
+    compatible packages (Closes: #581807).
+    This may (and likely will) break backports.
+  * Updated watch file in line with new google code standard
+    (thanks D. Leidert)
+
+  [ Julien Lavergne ]
+  * New upstream release (LP: #693867)
+   - Fix crash when loading iTunes store (LP: #569682) 
+  * debian/rules:
+   - Build without gconf support, which should fix the hang with chromium
+    (LP: #545209).
+  * debian/patches/90_svn420_fix_null.patch:
+   - From upstream, fix NULL pointer errors (LP: #709277)
+  * debian/patches/91_svn421_disable_npp_initialize.patch:
+   - From upstream, fix FTBFS with new xulrunner.
+  * debian/control:
+   - Drop build-depends on quilt, handle by format 3.0.
+  * debian/patches/01_xulrunner-20.patch:
+   - Drop, replace by upstream patch 91_svn421_disable_npp_initialize.patch.
+
+ -- Julien Lavergne <gilir@ubuntu.com>  Mon, 14 Feb 2011 23:17:54 +0100
+
+gecko-mediaplayer (0.9.9.2-1ubuntu1) natty; urgency=low
+
+  * Drop unneeded symlinks in /usr/lib/xulrunner, /usr/lib/xulrunner-addons,
+    /usr/lib/firefox, /usr/lib/iceweasel and /usr/lib/midbrowser
+    - update debian/links
+  * Drop midbrowser dependency. This disappeared from Ubuntu a while ago
+    - update debian/control
+  * Enable quilt and add patch to enable building with the latest NPAPI
+    headers
+    - update debian/control
+    - update debian/rules
+    - add debian/patches/01_xulrunner-20.patch
+    - add debian/patches/series
+  * Don't use the Mozilla allocator by adding -DMOZ_NO_MOZALLOC to CXXFLAGS
+    - update debian/rules
+
+ -- Chris Coulson <chris.coulson@canonical.com>  Mon, 14 Feb 2011 21:31:56 +0000
 
 gecko-mediaplayer (0.9.9.2-1) unstable; urgency=low
 

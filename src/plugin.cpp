@@ -45,10 +45,9 @@
 #include <nsIPrefBranch.h>
 #include <nsIPrefService.h>
 #include <nsIServiceManager.h>
+#include <nsISupportsPrimitives.h>
 #include <dlfcn.h>
 
-nsIPrefBranch *prefBranch = NULL;
-nsIPrefService *prefService = NULL;
 static NPObject *sWindowObj;
 
 //#include "nsIServiceManager.h"
@@ -93,6 +92,7 @@ static NPIdentifier GetMIMEType_id;
 static NPIdentifier getTime_id;
 static NPIdentifier getDuration_id;
 static NPIdentifier getPercent_id;
+static NPIdentifier getBitrate_id;
 static NPIdentifier isplaying_id;
 static NPIdentifier playlistAppend_id;
 static NPIdentifier playlistClear_id;
@@ -111,6 +111,8 @@ static NPIdentifier controls_fastForward_id;
 static NPIdentifier controls_fastReverse_id;
 static NPIdentifier controls_step_id;
 
+static NPIdentifier media_getItemInfo_id;
+
 
 // properties
 static NPIdentifier filename_id;
@@ -120,8 +122,18 @@ static NPIdentifier fullscreen_id;
 static NPIdentifier showlogo_id;
 static NPIdentifier playState_id;
 static NPIdentifier controls_id;
+static NPIdentifier media_id;
+static NPIdentifier settings_id;
+static NPIdentifier error_id;
 
+static NPIdentifier status_id;
+static NPIdentifier URL_id;
+static NPIdentifier versionInfo_id;
 static NPIdentifier controls_currentPosition_id;
+static NPIdentifier controls_currentItem_id;
+static NPIdentifier media_duration_id;
+static NPIdentifier settings_volume_id;
+static NPIdentifier error_errorCount_id;
 //////////////////////////////////////
 //
 // general initialization and shutdown
@@ -138,35 +150,9 @@ void NS_PluginShutdown()
 // get values per plugin
 NPError NS_PluginGetValue(NPPVariable aVariable, void *aValue)
 {
-
     return PluginGetValue(aVariable, aValue);
 }
 
-
-/////////////////////////////////////////////////////////////
-//
-// construction and destruction of our plugin instance object
-//
-/*
-CPlugin *NS_NewPluginInstance(nsPluginCreateData * aCreateDataStruct)
-{
-    if (!aCreateDataStruct)
-        return NULL;
-
-    CPlugin *plugin = new CPlugin(aCreateDataStruct->instance);
-
-    new_instance(plugin, aCreateDataStruct);
-    return plugin;
-}
-
-void NS_DestroyPluginInstance(CPlugin * aPlugin)
-{
-    if (aPlugin)
-        delete(CPlugin *) aPlugin;
-}
-
-
-*/
 void postDOMEvent(NPP mInstance, const gchar * id, const gchar * event)
 {
     gchar *jscript;
@@ -179,81 +165,15 @@ void postDOMEvent(NPP mInstance, const gchar * id, const gchar * event)
     g_free(jscript);
 }
 
-void setPreference(CPlugin * instance, const gchar * name, const gchar * value)
+// disabled for now due to problems with certain sites
+void postPlayStateChange(NPP mInstance, const gint state)
 {
-    nsIServiceManager *sm = NULL;
-    nsIServiceManager *ServiceManager = NULL;
-    PRBool v;
-    void (*get_sm)(nsIServiceManager**);
+    gchar *jscript;
 
-    get_sm = (void (*)(nsIServiceManager**))dlsym(RTLD_DEFAULT,"NS_GetServiceManager");
-    if (get_sm) {
-        (*get_sm)(&sm);
-    } else {
-        NPN_GetValue(NULL, NPNVserviceManager, &sm);
-    }
-
-    if (sm) {
-        sm->QueryInterface(NS_GET_IID(nsIServiceManager), (void **) (&ServiceManager));
-        NS_RELEASE(sm);
-    }
-
-    if (ServiceManager) {
-        ServiceManager->GetServiceByContractID(NS_PREFSERVICE_CONTRACTID, NS_GET_IID(nsIPrefBranch),
-                                               (void **) &prefBranch);
-        if (prefBranch) {
-            instance->user_agent = g_new0(gchar, 1024);
-            prefBranch->PrefHasUserValue(name, &v);
-            if (v) {
-                prefBranch->GetCharPref(name, &(instance->user_agent));
-                prefBranch->ClearUserPref(name);
-            }
-            prefBranch->SetCharPref(name, value);
-            printf("Set preference %s to %s, old value was '%s'\n", name, value,
-                   instance->user_agent);
-        }
-        NS_RELEASE(ServiceManager);
-    }
-
-}
-
-void clearPreference(CPlugin * instance, const gchar * name)
-{
-    nsIServiceManager *sm = NULL;
-    nsIServiceManager *ServiceManager = NULL;
-    PRBool v;
-    void (*get_sm)(nsIServiceManager**);
-
-    get_sm = (void (*)(nsIServiceManager**))dlsym(RTLD_DEFAULT,"NS_GetServiceManager");
-    if (get_sm) {
-        (*get_sm)(&sm);
-    } else {
-        NPN_GetValue(NULL, NPNVserviceManager, &sm);
-    }
-
-    if (sm) {
-        sm->QueryInterface(NS_GET_IID(nsIServiceManager), (void **) (&ServiceManager));
-        NS_RELEASE(sm);
-    }
-
-    if (ServiceManager) {
-        ServiceManager->GetServiceByContractID(NS_PREFSERVICE_CONTRACTID, NS_GET_IID(nsIPrefBranch),
-                                               (void **) &prefBranch);
-        if (prefBranch) {
-            if (instance->user_agent == NULL || strlen(instance->user_agent) == 0) {
-                prefBranch->ClearUserPref(name);
-            } else {
-                if (g_strrstr(instance->user_agent, "QuickTime/7.6.4")) {
-                    prefBranch->ClearUserPref(name);
-                } else {
-                    prefBranch->ClearUserPref(name);
-                    prefBranch->SetCharPref(name, instance->user_agent);
-                }
-            }
-            g_free(instance->user_agent);
-        }
-        NS_RELEASE(ServiceManager);
-    }
+    jscript = g_strdup_printf("javascript:if (typeof OnDSPlayStateChangeEvt == 'function') {"
+                              "OnDSPlayStateChangeEvt(%i);}", state);
+    //NPN_GetURL(mInstance, jscript, NULL);
+    g_free(jscript);
 }
 
 ////////////////////////////////////////
@@ -266,6 +186,9 @@ m_pNPStream(NULL),
 mInitialized(FALSE),
 m_pScriptableObject(NULL),
 m_pScriptableObjectControls(NULL),
+m_pScriptableObjectMedia(NULL),
+m_pScriptableObjectSettings(NULL),
+m_pScriptableObjectError(NULL),
 mWindow(0),
 windowless(FALSE),
 playlist(NULL),
@@ -287,7 +210,9 @@ id(NULL),
 console(NULL),
 controls(NULL),
 user_agent(NULL),
+page_url(NULL),
 player_backend(NULL),
+quicktime_emulation(FALSE),
 disable_context_menu(FALSE),
 disable_fullscreen(FALSE),
 post_dom_events(FALSE),
@@ -300,8 +225,28 @@ tv_driver(NULL), tv_device(NULL), tv_input(NULL), tv_width(0), tv_height(0)
 {
     GRand *rand;
     GmPrefStore *store;
+    gboolean b;
 
     NPN_GetValue(mInstance, NPNVWindowNPObject, &sWindowObj);
+
+    // get the page plugin was called from 
+    // found at https://developer.mozilla.org/en/Getting_the_page_URL_in_NPAPI_plugin
+    NPIdentifier identifier = NPN_GetStringIdentifier("location");
+    // Declare a local variant value.
+    NPVariant variantValue;
+    // Get the location property from the window object (which is another object).
+    b = NPN_GetProperty(mInstance, sWindowObj, identifier, &variantValue);
+    // Get a pointer to the "location" object.
+    NPObject *locationObj = variantValue.value.objectValue;
+    // Create a "href" identifier.
+    identifier = NPN_GetStringIdentifier("href");
+    // Get the location property from the location object.
+    b = NPN_GetProperty(mInstance, locationObj, identifier, &variantValue);
+#ifdef HAVE_NEW_XULRUNNER
+    page_url = g_strdup_printf("%s", NPVARIANT_TO_STRING(variantValue).UTF8Characters);
+#else
+    page_url = g_strdup_printf("%s", NPVARIANT_TO_STRING(variantValue).utf8characters);
+#endif
 
     // register methods
     Play_id = NPN_GetStringIdentifier("Play");
@@ -335,6 +280,7 @@ tv_driver(NULL), tv_device(NULL), tv_input(NULL), tv_width(0), tv_height(0)
     getTime_id = NPN_GetStringIdentifier("getTime");
     getDuration_id = NPN_GetStringIdentifier("getDuration");
     getPercent_id = NPN_GetStringIdentifier("getPercent");
+    getBitrate_id = NPN_GetStringIdentifier("getBitrate");
     isplaying_id = NPN_GetStringIdentifier("isplaying");
     playlistAppend_id = NPN_GetStringIdentifier("playlistAppend");
     playlistClear_id = NPN_GetStringIdentifier("playlistClear");
@@ -353,6 +299,8 @@ tv_driver(NULL), tv_device(NULL), tv_input(NULL), tv_width(0), tv_height(0)
     controls_fastReverse_id = NPN_GetStringIdentifier("fastReverse");
     controls_step_id = NPN_GetStringIdentifier("step");
 
+    media_getItemInfo_id = NPN_GetStringIdentifier("getItemInfo");
+
     // register properties
     filename_id = NPN_GetStringIdentifier("filename");
     src_id = NPN_GetStringIdentifier("src");
@@ -361,8 +309,18 @@ tv_driver(NULL), tv_device(NULL), tv_input(NULL), tv_width(0), tv_height(0)
     showlogo_id = NPN_GetStringIdentifier("showlogo");
     playState_id = NPN_GetStringIdentifier("playState");
     controls_id = NPN_GetStringIdentifier("controls");
+    controls_currentItem_id = NPN_GetStringIdentifier("currentItem");
+    media_id = NPN_GetStringIdentifier("media");
+    settings_id = NPN_GetStringIdentifier("settings");
+    error_id = NPN_GetStringIdentifier("error");
 
+    status_id = NPN_GetStringIdentifier("status");
+    URL_id = NPN_GetStringIdentifier("URL");
+    versionInfo_id = NPN_GetStringIdentifier("versionInfo");
     controls_currentPosition_id = NPN_GetStringIdentifier("currentPosition");
+    media_duration_id = NPN_GetStringIdentifier("duration");
+    settings_volume_id = NPN_GetStringIdentifier("volume");
+    error_errorCount_id = NPN_GetStringIdentifier("errorCount");
 
     // generate a random controlid
     rand = g_rand_new();
@@ -378,6 +336,7 @@ tv_driver(NULL), tv_device(NULL), tv_input(NULL), tv_width(0), tv_height(0)
     bind_textdomain_codeset(GETTEXT_PACKAGE, "UTF-8");
     textdomain(GETTEXT_PACKAGE);
 #endif
+    printf(_("gecko mediaplayer v%s\n"), VERSION);
 
     g_type_init();
     store = gm_pref_store_new("gecko-mediaplayer");
@@ -419,7 +378,7 @@ CPlugin::~CPlugin()
         NS_IF_RELEASE(mControlsScriptablePeer);
     }
 */
-    clearPreference(this, "general.useragent.override");
+    // clearPreference(this, "general.useragent.override");
 
     if (m_pScriptableObjectControls) {
         NPN_ReleaseObject(m_pScriptableObjectControls);
@@ -552,19 +511,23 @@ NPError CPlugin::SetWindow(NPWindow * aWindow)
         if (post_dom_events && id != NULL) {
             postDOMEvent(mInstance, id, "qt_begin");
         }
+        //postPlayStateChange(mInstance, STATE_READY);
     }
 
     if (playlist != NULL) {
         item = (ListItem *) playlist->data;
-        if (!item->requested) {
+        if (item && !item->play)
+            item = list_find_next_playable(playlist);
+        if (item && !item->requested) {
             item->cancelled = FALSE;
             if (item->streaming) {
+                printf("Calling open_location with item = %p src = %s\n", item, item->src);
                 open_location(this, item, FALSE);
                 item->requested = 1;
             } else {
                 item->requested = 1;
                 printf("Calling GetURLNotify with item = %p src = %s\n", item, item->src);
-                NPN_GetURLNotify(mInstance, item->src, NULL, item);
+                this->GetURLNotify(mInstance, item->src, NULL, item);
             }
         }
     }
@@ -584,6 +547,7 @@ void CPlugin::shut()
         for (iter = playlist; iter != NULL; iter = g_list_next(iter)) {
             item = (ListItem *) iter->data;
             if (item != NULL) {
+                item->cancelled = TRUE;
                 if (item->controlid != 0) {
                     send_signal_when_ready(this, item, "Terminate");
                 }
@@ -650,9 +614,6 @@ NPError CPlugin::DestroyStream(NPStream * stream, NPError reason)
             text = g_strdup_printf(_("Cache fill: %2.2f%%"), 100.0);
             send_signal_with_string(this, item, "SetProgressText", text);
             g_free(text);
-            if (post_dom_events && this->id != NULL) {
-                postDOMEvent(mInstance, this->id, "qt_progress");
-            }
         }
 
         if (!item->opened && item->play) {
@@ -660,7 +621,8 @@ NPError CPlugin::DestroyStream(NPStream * stream, NPError reason)
             path = g_strdup(item->path);
             ready = item->playerready;
             newwindow = item->newwindow;
-            item->streaming = streaming(item->src);
+            if (!item->streaming)
+                item->streaming = streaming(item->src);
             if (!item->streaming) {
                 printf("in Destroy Stream\n");
                 playlist = list_parse_qt(playlist, item);
@@ -693,7 +655,7 @@ NPError CPlugin::DestroyStream(NPStream * stream, NPError reason)
                         item->cancelled = FALSE;
                         item->requested = TRUE;
                         if (item != NULL)
-                            NPN_GetURLNotify(mInstance, item->src, NULL, item);
+                            this->GetURLNotify(mInstance, item->src, NULL, item);
                     } else {
                         open_location(this, item, FALSE);
                         item->requested = TRUE;
@@ -727,6 +689,7 @@ NPError CPlugin::DestroyStream(NPStream * stream, NPError reason)
             if (post_dom_events && this->id != NULL) {
                 postDOMEvent(mInstance, this->id, "qt_load");
             }
+            postPlayStateChange(mInstance, STATE_TRANSITIONING);
         }
 
         if (item->localfp) {
@@ -775,7 +738,7 @@ void CPlugin::URLNotify(const char *url, NPReason reason, void *notifyData)
                         open_location(this, item, TRUE);
                         item->requested = TRUE;
                     } else {
-                        NPN_GetURLNotify(mInstance, item->src, NULL, item);
+                        this->GetURLNotify(mInstance, item->src, NULL, item);
                         item->requested = TRUE;
                     }
                 }
@@ -787,7 +750,7 @@ void CPlugin::URLNotify(const char *url, NPReason reason, void *notifyData)
                     open_location(this, item, TRUE);
                     item->requested = TRUE;
                 } else {
-                    NPN_GetURLNotify(mInstance, item->src, NULL, item);
+                    this->GetURLNotify(mInstance, item->src, NULL, item);
                     item->requested = TRUE;
                 }
             }
@@ -824,13 +787,17 @@ int32 CPlugin::WriteReady(NPStream * stream)
 
         if (mode == NP_FULL) {
             // printf("adding new item %s\n",stream->url);
-            item = g_new0(ListItem, 1);
-            g_strlcpy(item->src, stream->url, 1024);
-            item->requested = TRUE;
-            item->play = TRUE;
-            item->streaming = streaming(item->src);
-            playlist = g_list_append(playlist, item);
-            stream->notifyData = item;
+            /*
+               item = g_new0(ListItem, 1);
+               g_strlcpy(item->src, stream->url, 1024);
+               item->requested = TRUE;
+               item->play = TRUE;
+               if (!item->streaming)
+               item->streaming = streaming(item->src);
+               playlist = g_list_append(playlist, item);
+               stream->notifyData = item;
+             */
+            return -1;
         } else {
             printf("item is null\nstream url %s\n", stream->url);
             NPN_DestroyStream(mInstance, stream, NPERR_NO_ERROR);
@@ -874,7 +841,6 @@ int32 CPlugin::WriteReady(NPStream * stream)
         if (strstr(mimetype, "flac") != NULL) {
             g_strlcat(item->local, ".flac", 1024);
         }
-
     }
 
     if (item->retrieved) {
@@ -929,6 +895,7 @@ int32 CPlugin::Write(NPStream * stream, int32 offset, int32 len, void *buffer)
 
         // printf("item->streaming = %i\n", item->streaming);
         // printf("stream->lastmodified = %i\n", stream->lastmodified);
+        // printf("stream->end = %i\n", stream->end);
 
         item->streaming = TRUE;
         open_location(this, item, FALSE);
@@ -988,6 +955,7 @@ int32 CPlugin::Write(NPStream * stream, int32 offset, int32 len, void *buffer)
                     postDOMEvent(mInstance, this->id, "qt_progress");
                     postDOMEvent(mInstance, this->id, "qt_durationchange");
                 }
+                postPlayStateChange(mInstance, STATE_BUFFERING);
 
                 time(&lastupdate);
                 item->lastsize = item->localsize;
@@ -1029,9 +997,9 @@ int32 CPlugin::Write(NPStream * stream, int32 offset, int32 len, void *buffer)
             path = g_strdup(item->path);
             ready = item->playerready;
             newwindow = item->newwindow;
-            item->streaming = streaming(item->src);
+            if (!item->streaming)
+                item->streaming = streaming(item->src);
             if (!item->streaming) {
-                printf("in Write\n");
                 playlist = list_parse_qt(playlist, item);
                 playlist = list_parse_asx(playlist, item);
                 playlist = list_parse_qml(playlist, item);
@@ -1062,7 +1030,7 @@ int32 CPlugin::Write(NPStream * stream, int32 offset, int32 len, void *buffer)
                         open_location(this, item, FALSE);
                         item->requested = TRUE;
                     } else {
-                        NPN_GetURLNotify(mInstance, item->src, NULL, item);
+                        this->GetURLNotify(mInstance, item->src, NULL, item);
                         item->requested = TRUE;
                     }
                 }
@@ -1100,11 +1068,13 @@ void CPlugin::Stop()
 void CPlugin::FastForward()
 {
     send_signal(this, this->lastopened, "FastForward");
+    postPlayStateChange(mInstance, STATE_SCANFORWARD);
 }
 
 void CPlugin::FastReverse()
 {
     send_signal(this, this->lastopened, "FastReverse");
+    postPlayStateChange(mInstance, STATE_SCANREVERSE);
 }
 
 void CPlugin::Seek(double counter)
@@ -1160,6 +1130,12 @@ void CPlugin::GetPercent(double *_retval)
     *_retval = request_double_value(this, this->lastopened, "GetPercent");
 }
 
+void CPlugin::GetBitrate(int *_retval)
+{
+    *_retval = request_int_value(this, this->lastopened, "GetBitrate");
+}
+
+
 void CPlugin::SetFilename(const char *filename)
 {
     ListItem *item;
@@ -1181,17 +1157,19 @@ void CPlugin::SetFilename(const char *filename)
         item->requested = 1;
     } else {
         item->requested = 1;
-        NPN_GetURLNotify(mInstance, item->src, NULL, item);
+        this->GetURLNotify(mInstance, item->src, NULL, item);
     }
 }
 
 void CPlugin::GetFilename(char **filename)
 {
-    ListItem *item;
+    ListItem *item = NULL;
+
     if (this->lastopened != NULL) {
         *filename = g_strdup(this->lastopened->src);
     } else {
-        item = (ListItem *) playlist->data;
+        if (playlist != NULL)
+            item = (ListItem *) playlist->data;
         if (item != NULL) {
             *filename = g_strdup(item->src);
         } else {
@@ -1267,6 +1245,7 @@ void CPlugin::SetOnMediaComplete(const char *event)
     } else {
         event_mediacomplete = g_strdup_printf("javascript:%s", event);
     }
+
 }
 
 void CPlugin::SetOnMouseUp(const char *event)
@@ -1334,6 +1313,322 @@ void CPlugin::SetOnDestroy(const char *event)
     }
 }
 
+#ifdef HAVE_CURL
+
+int progress_callback(void *clientp, double dltotal, double dlnow, double ultotal, double ulnow)
+{
+    ListItem *item = (ListItem *) clientp;
+    gdouble percent, rate;
+    gchar *text;
+    gboolean ok_to_play;
+    gint id;
+    gboolean ready;
+    gboolean newwindow;
+    CPlugin *plugin = (CPlugin *) item->plugin;
+    gchar *path;
+
+    // skip divide by zero issues
+    if (dltotal == 0)
+        return 0;               // keeps downloading
+
+    if (item->cancelled) {
+        printf("cancelling download at %f for %s\n", dlnow, item->src);
+        return -1;              // cancels download
+    }
+    //printf("item ready = %i,player ready = %i,%f,%f,%f\n", item->playerready, plugin->playerready,
+    //       dlnow, dltotal, dlnow / dltotal);
+
+    item->localsize = dlnow;
+
+    if (item->mediasize != dltotal)
+        item->mediasize = dltotal;
+
+    if (plugin->playerready) {
+        percent = 0.0;
+        if (item->mediasize > 0) {
+
+            percent = (gdouble) item->localsize / (gdouble) item->mediasize;
+            if (difftime(time(NULL), plugin->lastupdate) > 0.5) {
+                printf("updating display id = %i\n", item->id);
+                send_signal_with_double(plugin, item, "SetCachePercent", percent);
+                rate =
+                    (gdouble) ((item->localsize -
+                                item->lastsize) / 1024.0) / (gdouble) difftime(time(NULL),
+                                                                               plugin->lastupdate);
+                if (percent > 0.99) {
+                    text =
+                        g_strdup_printf(_("Caching %iK (%0.1f K/s)"), item->mediasize / 1024, rate);
+                } else {
+                    text =
+                        g_strdup_printf(_("Cache fill: %2.2f%% (%0.1f K/s)"), percent * 100.0,
+                                        rate);
+                }
+                send_signal_with_string(plugin, item, "SetProgressText", text);
+                if (!item->opened)
+                    send_signal_with_string(plugin, item, "SetURL", item->src);
+                if (plugin->post_dom_events && plugin->id != NULL) {
+                    postDOMEvent(plugin->mInstance, plugin->id, "qt_progress");
+                    postDOMEvent(plugin->mInstance, plugin->id, "qt_durationchange");
+                }
+                postPlayStateChange(plugin->mInstance, STATE_BUFFERING);
+
+                time(&(plugin->lastupdate));
+                item->lastsize = item->localsize;
+            }
+        }
+        if (!item->opened) {
+            if ((item->localsize >= (plugin->cache_size * 1024)) && (percent >= 0.2)) {
+                printf("Setting to play because %i > %i\n", item->localsize,
+                       plugin->cache_size * 1024);
+                ok_to_play = TRUE;
+            }
+            if (ok_to_play == FALSE && (item->localsize > (plugin->cache_size * 2 * 1024))
+                && (plugin->cache_size >= 512)) {
+                printf("Setting to play because %i > %i (double cache)\n", item->localsize,
+                       plugin->cache_size * 2 * 1024);
+                ok_to_play = TRUE;
+            }
+            if (ok_to_play == FALSE) {
+                if (item->bitrate == 0 && item->bitrate_requests < 5
+                    && ((gint) (percent * 100) > item->bitrate_requests)) {
+                    item->bitrate = request_bitrate(plugin, item, item->local);
+                    item->bitrate_requests++;
+                }
+                if (item->bitrate > 0) {
+                    if (item->localsize / item->bitrate >= 10 && (percent >= 0.2)) {
+                        printf("Setting to play becuase %i >= 10\n",
+                               item->localsize / item->bitrate);
+                        ok_to_play = TRUE;
+                        if (plugin->post_dom_events && plugin->id != NULL) {
+                            postDOMEvent(plugin->mInstance, plugin->id, "qt_canplay");
+                        }
+                    }
+                }
+            }
+
+        }
+        // if not opened, over cache level and not an href target then try and open it
+        if ((!item->opened) && ok_to_play == TRUE) {
+            id = item->controlid;
+            path = g_strdup(item->path);
+            ready = item->playerready;
+            newwindow = item->newwindow;
+            if (!item->streaming)
+                item->streaming = streaming(item->src);
+            if (!item->streaming) {
+                printf("in progress_callback\n");
+                plugin->playlist = list_parse_qt(plugin->playlist, item);
+                plugin->playlist = list_parse_asx(plugin->playlist, item);
+                plugin->playlist = list_parse_qml(plugin->playlist, item);
+                plugin->playlist = list_parse_ram(plugin->playlist, item);
+            }
+            printf("item->play = %i\n", item->play);
+            printf("item->src = %s\n", item->src);
+            printf("calling open_location from progress_callback\n");
+            if (item->play) {
+                send_signal_with_integer(plugin, item, "SetGUIState", PLAYING);
+                open_location(plugin, item, TRUE);
+                item->requested = TRUE;
+                if (plugin->post_dom_events && plugin->id != NULL) {
+                    postDOMEvent(plugin->mInstance, plugin->id, "qt_loadedfirstframe");
+                    postDOMEvent(plugin->mInstance, plugin->id, "qt_canplay");
+                    postDOMEvent(plugin->mInstance, plugin->id, "qt_play");
+                }
+            } else {
+                item = list_find_next_playable(plugin->playlist);
+                if (item != NULL) {
+                    item->controlid = id;
+                    g_strlcpy(item->path, path, 1024);
+                    item->playerready = ready;
+                    item->newwindow = newwindow;
+                    item->cancelled = FALSE;
+                    // printf("opening next playable items on the playlist\n");
+                    if (item->streaming) {
+                        open_location(plugin, item, FALSE);
+                        item->requested = TRUE;
+                    } else {
+                        if (!item->requested) {
+                            plugin->GetURLNotify(plugin->mInstance, item->src, NULL, item);
+                            item->requested = TRUE;
+                        }
+                    }
+                }
+            }
+            g_free(path);
+        }
+
+    }
+
+    return 0;
+}
+
+gpointer CURLGetURLNotify(gpointer data)
+{
+    ListItem *item = (ListItem *) data;
+    CPlugin *plugin = (CPlugin *) item->plugin;
+    gchar *path;
+    FILE *local;
+    CURL *curl;
+    gint id;
+    gboolean ready;
+    gboolean newwindow;
+
+    if (item) {
+        local = fopen(item->local, "wb");
+        if (local) {
+            curl = curl_easy_init();
+            if (curl) {
+
+                curl_easy_setopt(curl, CURLOPT_URL, item->src);
+                curl_easy_setopt(curl, CURLOPT_WRITEDATA, local);
+                curl_easy_setopt(curl, CURLOPT_USERAGENT, "QuickTime/7.6.9");
+                curl_easy_setopt(curl, CURLOPT_PROGRESSFUNCTION, progress_callback);
+                curl_easy_setopt(curl, CURLOPT_PROGRESSDATA, item);
+                curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0);
+
+                curl_easy_perform(curl);
+                curl_easy_cleanup(curl);
+                printf("item retrieved using CURL\n");
+                //plugin->URLNotify(item->src, NPRES_DONE, item);
+
+            }
+            fclose(local);
+            printf("fetched %s to %s\n", item->src, item->local);
+            send_signal_with_double(plugin, item, "SetCachePercent", 0.0);
+            item->retrieved = TRUE;
+        }
+
+
+        if ((!item->opened)) {
+            id = item->controlid;
+            path = g_strdup(item->path);
+            ready = item->playerready;
+            newwindow = item->newwindow;
+            if (!item->streaming)
+                item->streaming = streaming(item->src);
+            if (!item->streaming) {
+                printf("in CURLGetURLNotify\n");
+                plugin->playlist = list_parse_qt(plugin->playlist, item);
+                plugin->playlist = list_parse_asx(plugin->playlist, item);
+                plugin->playlist = list_parse_qml(plugin->playlist, item);
+                plugin->playlist = list_parse_ram(plugin->playlist, item);
+            }
+            // printf("item->play = %i\n", item->play);
+            // printf("item->src = %i\n", item->src);
+            // printf("calling open_location from Write\n");
+            if (item->play) {
+                send_signal_with_integer(plugin, item, "SetGUIState", PLAYING);
+                open_location(plugin, item, TRUE);
+                item->requested = TRUE;
+                if (plugin->post_dom_events && plugin->id != NULL) {
+                    postDOMEvent(plugin->mInstance, plugin->id, "qt_loadedfirstframe");
+                    postDOMEvent(plugin->mInstance, plugin->id, "qt_canplay");
+                    postDOMEvent(plugin->mInstance, plugin->id, "qt_play");
+                }
+            } else {
+                item = list_find_next_playable(plugin->playlist);
+                if (item != NULL) {
+                    item->controlid = id;
+                    g_strlcpy(item->path, path, 1024);
+                    item->playerready = ready;
+                    item->newwindow = newwindow;
+                    item->cancelled = FALSE;
+                    // printf("opening next playable items on the playlist\n");
+                    if (item->streaming) {
+                        open_location(plugin, item, FALSE);
+                        item->requested = TRUE;
+                    } else {
+                        if (!item->requested) {
+                            plugin->GetURLNotify(plugin->mInstance, item->src, NULL, item);
+                            item->requested = TRUE;
+                        }
+                    }
+                }
+            }
+            g_free(path);
+
+        }
+    }
+}
+
+
+#endif
+
+
+NPError CPlugin::GetURLNotify(NPP instance, const char *url, const char *target, void *notifyData)
+{
+#ifdef HAVE_CURL
+    ListItem *item;
+    gchar *path;
+    gchar *tmp;
+#endif
+
+    if (g_strrstr(url, "apple.com") == NULL /* && this->quicktime_emulation == 0 */ ) {
+        return NPN_GetURLNotify(instance, url, target, notifyData);
+    } else {
+#ifdef HAVE_CURL
+        printf("using curl to retrieve data from apple.com site\n");
+        printf("quicktime_emulation = %i\n", quicktime_emulation);
+
+        item = (ListItem *) notifyData;
+        // item = list_find(playlist, (gchar*)stream->url);
+        if (item == NULL) {
+
+            if (this->mode == NP_FULL) {
+                // printf("adding new item %s\n",stream->url);
+                item = g_new0(ListItem, 1);
+                g_strlcpy(item->src, url, 1024);
+                item->requested = TRUE;
+                item->play = TRUE;
+                if (!item->streaming)
+                    item->streaming = streaming(item->src);
+                playlist = g_list_append(playlist, item);
+                notifyData = item;
+            } else {
+                printf("item is null\nstream url %s\n", url);
+                return -1;
+            }
+        } else {
+            if (g_ascii_strcasecmp(item->src, url) != 0) {
+                g_strlcpy(item->src, url, 4096);
+            }
+        }
+
+        if (item->cancelled) {
+            printf("item has been cancelled\n");
+            return -1;
+        }
+
+        if (strlen(item->local) == 0) {
+            path = g_strdup_printf("%s/gnome-mplayer/plugin", g_get_user_cache_dir());
+            if (!g_file_test(path, G_FILE_TEST_IS_DIR)) {
+                g_mkdir_with_parents(path, 0775);
+            }
+            tmp = gm_tempname(path, "gecko-mediaplayerXXXXXX");
+            g_snprintf(item->local, 1024, "%s", tmp);
+            g_free(tmp);
+            g_free(path);
+        }
+
+        if (item->retrieved) {
+            printf("item is already retrieved\n");
+            return -1;
+        }
+
+        item->plugin = (void *) this;
+
+        g_thread_create(CURLGetURLNotify, item, FALSE, NULL);
+
+        return NPERR_NO_ERROR;
+#else
+        printf
+            ("Unable to set user agent for pulling data from apple.com, request will probably fail\n");
+        return NPN_GetURLNotify(instance, url, target, notifyData);
+#endif
+    }
+}
+
+
 // ==============================
 // ! Scriptability related code !
 // ==============================
@@ -1347,7 +1642,8 @@ class ScriptablePluginObjectBase:public NPObject {
   public:
     ScriptablePluginObjectBase(NPP npp)
     :mNpp(npp) {
-    } virtual ~ ScriptablePluginObjectBase() {
+    }
+    virtual ~ ScriptablePluginObjectBase() {
     }
 
     // Virtual NPObject hooks called through this base class. Override
@@ -1507,7 +1803,8 @@ class ScriptablePluginObjectControls:public ScriptablePluginObjectBase {
   public:
     ScriptablePluginObjectControls(NPP npp)
     :ScriptablePluginObjectBase(npp) {
-    } virtual bool HasMethod(NPIdentifier name);
+    }
+    virtual bool HasMethod(NPIdentifier name);
     virtual bool Invoke(NPIdentifier name, const NPVariant * args,
                         uint32_t argCount, NPVariant * result);
     virtual bool InvokeDefault(const NPVariant * args, uint32_t argCount, NPVariant * result);
@@ -1577,7 +1874,7 @@ bool ScriptablePluginObjectControls::InvokeDefault(const NPVariant * args, uint3
 
 bool ScriptablePluginObjectControls::HasProperty(NPIdentifier name)
 {
-    if (name == controls_currentPosition_id) {
+    if (name == controls_currentPosition_id || name == controls_currentItem_id) {
         return true;
     } else {
         return false;
@@ -1601,6 +1898,11 @@ bool ScriptablePluginObjectControls::GetProperty(NPIdentifier name, NPVariant * 
         return true;
     }
 
+    if (name == controls_currentItem_id) {
+        OBJECT_TO_NPVARIANT(pPlugin->GetScriptableObjectMedia(), *result);
+        return true;
+    }
+
     VOID_TO_NPVARIANT(*result);
     return false;
 }
@@ -1621,12 +1923,335 @@ bool ScriptablePluginObjectControls::SetProperty(NPIdentifier name, const NPVari
     return false;
 }
 
+class ScriptablePluginObjectMedia:public ScriptablePluginObjectBase {
+  public:
+    ScriptablePluginObjectMedia(NPP npp)
+    :ScriptablePluginObjectBase(npp) {
+    }
+    virtual bool HasMethod(NPIdentifier name);
+    virtual bool Invoke(NPIdentifier name, const NPVariant * args,
+                        uint32_t argCount, NPVariant * result);
+    virtual bool InvokeDefault(const NPVariant * args, uint32_t argCount, NPVariant * result);
+    virtual bool HasProperty(NPIdentifier name);
+    virtual bool GetProperty(NPIdentifier name, NPVariant * result);
+    virtual bool SetProperty(NPIdentifier name, const NPVariant * value);
+
+};
+
+static NPObject *AllocateScriptablePluginObjectMedia(NPP npp, NPClass * aClass)
+{
+    return new ScriptablePluginObjectMedia(npp);
+}
+
+DECLARE_NPOBJECT_CLASS_WITH_BASE(ScriptablePluginObjectMedia, AllocateScriptablePluginObjectMedia);
+
+bool ScriptablePluginObjectMedia::HasMethod(NPIdentifier name)
+{
+    if (name == media_getItemInfo_id) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+bool ScriptablePluginObjectMedia::Invoke(NPIdentifier name, const NPVariant * args,
+                                         uint32_t argCount, NPVariant * result)
+{
+    CPlugin *pPlugin = (CPlugin *) mNpp->pdata;
+    gchar *arg;
+    int i;
+
+    if (pPlugin == NULL) {
+        printf("Can't find plugin pointer\n");
+        return PR_FALSE;
+    }
+
+    if (name == media_getItemInfo_id) {
+#ifdef HAVE_NEW_XULRUNNER
+        arg = g_strdup(NPVARIANT_TO_STRING(args[0]).UTF8Characters);
+#else
+        arg = g_strdup(NPVARIANT_TO_STRING(args[0]).utf8characters);
+#endif
+
+        if (g_strcasecmp(arg, "title") == 0) {
+            STRINGZ_TO_NPVARIANT(strdup
+                                 (request_string_value(pPlugin, pPlugin->lastopened, "GetTitle")),
+                                 *result);
+        } else if (g_strcasecmp(arg, "uri") == 0) {
+            STRINGZ_TO_NPVARIANT(strdup
+                                 (request_string_value(pPlugin, pPlugin->lastopened, "GetURI")),
+                                 *result);
+        } else if (g_strcasecmp(arg, "bitrate") == 0) {
+            pPlugin->GetBitrate(&i);
+            INT32_TO_NPVARIANT(i, *result);
+        } else {
+            STRINGZ_TO_NPVARIANT(strdup("Unknown"), *result);
+        }
+
+        return true;
+    }
+
+    return false;
+}
+
+bool ScriptablePluginObjectMedia::InvokeDefault(const NPVariant * args, uint32_t argCount,
+                                                NPVariant * result)
+{
+    printf("ScriptablePluginObject default method called!\n");
+
+    STRINGZ_TO_NPVARIANT(strdup("default method return val"), *result);
+
+    return PR_TRUE;
+}
+
+bool ScriptablePluginObjectMedia::HasProperty(NPIdentifier name)
+{
+    if (name == media_duration_id) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+bool ScriptablePluginObjectMedia::GetProperty(NPIdentifier name, NPVariant * result)
+{
+    double d;
+
+    CPlugin *pPlugin = (CPlugin *) mNpp->pdata;
+    if (pPlugin == NULL) {
+        printf("Can't find plugin pointer\n");
+        VOID_TO_NPVARIANT(*result);
+        return false;
+    }
+
+    if (name == media_duration_id) {
+        pPlugin->GetDuration(&d);
+        DOUBLE_TO_NPVARIANT(d, *result);
+        return true;
+    }
+
+    VOID_TO_NPVARIANT(*result);
+    return false;
+}
+
+bool ScriptablePluginObjectMedia::SetProperty(NPIdentifier name, const NPVariant * value)
+{
+    CPlugin *pPlugin = (CPlugin *) mNpp->pdata;
+    if (pPlugin == NULL) {
+        printf("Can't find plugin pointer\n");
+        return false;
+    }
+
+    if (name == media_duration_id) {
+        return true;
+    }
+
+    return false;
+}
+
+class ScriptablePluginObjectSettings:public ScriptablePluginObjectBase {
+  public:
+    ScriptablePluginObjectSettings(NPP npp)
+    :ScriptablePluginObjectBase(npp) {
+    }
+    virtual bool HasMethod(NPIdentifier name);
+    virtual bool Invoke(NPIdentifier name, const NPVariant * args,
+                        uint32_t argCount, NPVariant * result);
+    virtual bool InvokeDefault(const NPVariant * args, uint32_t argCount, NPVariant * result);
+    virtual bool HasProperty(NPIdentifier name);
+    virtual bool GetProperty(NPIdentifier name, NPVariant * result);
+    virtual bool SetProperty(NPIdentifier name, const NPVariant * value);
+
+};
+
+static NPObject *AllocateScriptablePluginObjectSettings(NPP npp, NPClass * aClass)
+{
+    return new ScriptablePluginObjectSettings(npp);
+}
+
+DECLARE_NPOBJECT_CLASS_WITH_BASE(ScriptablePluginObjectSettings,
+                                 AllocateScriptablePluginObjectSettings);
+
+bool ScriptablePluginObjectSettings::HasMethod(NPIdentifier name)
+{
+    return false;
+}
+
+bool ScriptablePluginObjectSettings::Invoke(NPIdentifier name, const NPVariant * args,
+                                            uint32_t argCount, NPVariant * result)
+{
+    CPlugin *pPlugin = (CPlugin *) mNpp->pdata;
+    if (pPlugin == NULL) {
+        printf("Can't find plugin pointer\n");
+        return PR_FALSE;
+    }
+
+    return false;
+}
+
+bool ScriptablePluginObjectSettings::InvokeDefault(const NPVariant * args, uint32_t argCount,
+                                                   NPVariant * result)
+{
+    printf("ScriptablePluginObject default method called!\n");
+
+    STRINGZ_TO_NPVARIANT(strdup("default method return val"), *result);
+
+    return PR_TRUE;
+}
+
+bool ScriptablePluginObjectSettings::HasProperty(NPIdentifier name)
+{
+    if (name == settings_volume_id) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+bool ScriptablePluginObjectSettings::GetProperty(NPIdentifier name, NPVariant * result)
+{
+    double d;
+
+    CPlugin *pPlugin = (CPlugin *) mNpp->pdata;
+    if (pPlugin == NULL) {
+        printf("Can't find plugin pointer\n");
+        VOID_TO_NPVARIANT(*result);
+        return false;
+    }
+
+    if (name == settings_volume_id) {
+        pPlugin->GetVolume(&d);
+        DOUBLE_TO_NPVARIANT(d, *result);
+        return true;
+    }
+
+    VOID_TO_NPVARIANT(*result);
+    return false;
+}
+
+bool ScriptablePluginObjectSettings::SetProperty(NPIdentifier name, const NPVariant * value)
+{
+    CPlugin *pPlugin = (CPlugin *) mNpp->pdata;
+    if (pPlugin == NULL) {
+        printf("Can't find plugin pointer\n");
+        return false;
+    }
+
+    if (name == settings_volume_id) {
+        if ((int) NPVARIANT_TO_DOUBLE(*value) == 0 && NPVARIANT_TO_INT32(*value) > 0) {
+            pPlugin->SetVolume((double) NPVARIANT_TO_INT32(*value));
+        } else {
+            pPlugin->SetVolume(NPVARIANT_TO_DOUBLE(*value));
+        }
+        return true;
+    }
+
+    return false;
+}
+
+class ScriptablePluginObjectError:public ScriptablePluginObjectBase {
+  public:
+    ScriptablePluginObjectError(NPP npp)
+    :ScriptablePluginObjectBase(npp) {
+    }
+    virtual bool HasMethod(NPIdentifier name);
+    virtual bool Invoke(NPIdentifier name, const NPVariant * args,
+                        uint32_t argCount, NPVariant * result);
+    virtual bool InvokeDefault(const NPVariant * args, uint32_t argCount, NPVariant * result);
+    virtual bool HasProperty(NPIdentifier name);
+    virtual bool GetProperty(NPIdentifier name, NPVariant * result);
+    virtual bool SetProperty(NPIdentifier name, const NPVariant * value);
+
+};
+
+static NPObject *AllocateScriptablePluginObjectError(NPP npp, NPClass * aClass)
+{
+    return new ScriptablePluginObjectError(npp);
+}
+
+DECLARE_NPOBJECT_CLASS_WITH_BASE(ScriptablePluginObjectError, AllocateScriptablePluginObjectError);
+
+bool ScriptablePluginObjectError::HasMethod(NPIdentifier name)
+{
+    return false;
+}
+
+bool ScriptablePluginObjectError::Invoke(NPIdentifier name, const NPVariant * args,
+                                         uint32_t argCount, NPVariant * result)
+{
+    CPlugin *pPlugin = (CPlugin *) mNpp->pdata;
+    if (pPlugin == NULL) {
+        printf("Can't find plugin pointer\n");
+        return PR_FALSE;
+    }
+
+    return false;
+}
+
+bool ScriptablePluginObjectError::InvokeDefault(const NPVariant * args, uint32_t argCount,
+                                                NPVariant * result)
+{
+    printf("ScriptablePluginObject default method called!\n");
+
+    STRINGZ_TO_NPVARIANT(strdup("default method return val"), *result);
+
+    return PR_TRUE;
+}
+
+bool ScriptablePluginObjectError::HasProperty(NPIdentifier name)
+{
+    if (name == error_errorCount_id) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+bool ScriptablePluginObjectError::GetProperty(NPIdentifier name, NPVariant * result)
+{
+    CPlugin *pPlugin = (CPlugin *) mNpp->pdata;
+    if (pPlugin == NULL) {
+        printf("Can't find plugin pointer\n");
+        VOID_TO_NPVARIANT(*result);
+        return false;
+    }
+
+    if (name == error_errorCount_id) {
+        INT32_TO_NPVARIANT(0, *result);
+        return true;
+    }
+
+    VOID_TO_NPVARIANT(*result);
+    return false;
+}
+
+bool ScriptablePluginObjectError::SetProperty(NPIdentifier name, const NPVariant * value)
+{
+    CPlugin *pPlugin = (CPlugin *) mNpp->pdata;
+    if (pPlugin == NULL) {
+        printf("Can't find plugin pointer\n");
+        return false;
+    }
+
+    if (name == settings_volume_id) {
+        if ((int) NPVARIANT_TO_DOUBLE(*value) == 0 && NPVARIANT_TO_INT32(*value) > 0) {
+            pPlugin->SetVolume((double) NPVARIANT_TO_INT32(*value));
+        } else {
+            pPlugin->SetVolume(NPVARIANT_TO_DOUBLE(*value));
+        }
+        return true;
+    }
+
+    return false;
+}
+
 
 class ScriptablePluginObject:public ScriptablePluginObjectBase {
   public:
     ScriptablePluginObject(NPP npp)
     :ScriptablePluginObjectBase(npp) {
-    } virtual bool HasMethod(NPIdentifier name);
+    }
+    virtual bool HasMethod(NPIdentifier name);
     virtual bool Invoke(NPIdentifier name, const NPVariant * args,
                         uint32_t argCount, NPVariant * result);
     virtual bool InvokeDefault(const NPVariant * args, uint32_t argCount, NPVariant * result);
@@ -1677,6 +2302,7 @@ bool ScriptablePluginObject::HasMethod(NPIdentifier name)
         name == getTime_id ||
         name == getDuration_id ||
         name == getPercent_id ||
+        name == getBitrate_id ||
         name == isplaying_id ||
         name == playlistAppend_id ||
         name == playlistClear_id ||
@@ -1697,6 +2323,7 @@ bool ScriptablePluginObject::Invoke(NPIdentifier name, const NPVariant * args,
     double d;
     char *s;
     bool b;
+    int i;
 
     CPlugin *pPlugin = (CPlugin *) mNpp->pdata;
     if (pPlugin == NULL) {
@@ -1711,7 +2338,11 @@ bool ScriptablePluginObject::Invoke(NPIdentifier name, const NPVariant * args,
 
     if (name == PlayAt_id) {
         pPlugin->Play();
-        pPlugin->Seek(NPVARIANT_TO_DOUBLE(args[0]));
+        if ((int) NPVARIANT_TO_DOUBLE(args[0]) == 0 && NPVARIANT_TO_INT32(args[0]) > 0) {
+            pPlugin->Seek((double) NPVARIANT_TO_INT32(args[0]));
+        } else {
+            pPlugin->Seek(NPVARIANT_TO_DOUBLE(args[0]));
+        }
         return PR_TRUE;
     }
 
@@ -1741,7 +2372,12 @@ bool ScriptablePluginObject::Invoke(NPIdentifier name, const NPVariant * args,
     }
 
     if (name == Seek_id) {
-        pPlugin->Seek(NPVARIANT_TO_DOUBLE(args[0]));
+
+        if ((int) NPVARIANT_TO_DOUBLE(args[0]) == 0 && NPVARIANT_TO_INT32(args[0]) > 0) {
+            pPlugin->Seek((double) NPVARIANT_TO_INT32(args[0]));
+        } else {
+            pPlugin->Seek(NPVARIANT_TO_DOUBLE(args[0]));
+        }
         return PR_TRUE;
     }
 
@@ -1762,7 +2398,11 @@ bool ScriptablePluginObject::Invoke(NPIdentifier name, const NPVariant * args,
     }
 
     if (name == SetVolume_id) {
-        pPlugin->SetVolume(NPVARIANT_TO_DOUBLE(args[0]));
+        if ((int) NPVARIANT_TO_DOUBLE(args[0]) == 0 && NPVARIANT_TO_INT32(args[0]) > 0) {
+            pPlugin->SetVolume((double) NPVARIANT_TO_INT32(args[0]));
+        } else {
+            pPlugin->SetVolume(NPVARIANT_TO_DOUBLE(args[0]));
+        }
         return PR_TRUE;
     }
 
@@ -1815,6 +2455,12 @@ bool ScriptablePluginObject::Invoke(NPIdentifier name, const NPVariant * args,
     if (name == getPercent_id) {
         pPlugin->GetPercent(&d);
         DOUBLE_TO_NPVARIANT(d, *result);
+        return PR_TRUE;
+    }
+
+    if (name == getBitrate_id) {
+        pPlugin->GetBitrate(&i);
+        INT32_TO_NPVARIANT(i, *result);
         return PR_TRUE;
     }
 
@@ -1900,11 +2546,16 @@ bool ScriptablePluginObject::InvokeDefault(const NPVariant * args, uint32_t argC
 
 bool ScriptablePluginObject::HasProperty(NPIdentifier name)
 {
-    if (name == filename_id ||
-        name == src_id ||
-        name == ShowControls_id ||
-        name == fullscreen_id ||
-        name == showlogo_id || name == playState_id || name == controls_id) {
+    if (name == filename_id
+        || name == src_id
+        || name == ShowControls_id
+        || name == fullscreen_id
+        || name == showlogo_id
+        || name == playState_id
+        || name == URL_id
+        || name == versionInfo_id
+        || name == status_id
+        || name == controls_id || name == media_id || name == settings_id || name == error_id) {
         return true;
     } else {
         return false;
@@ -1914,6 +2565,8 @@ bool ScriptablePluginObject::HasProperty(NPIdentifier name)
 bool ScriptablePluginObject::GetProperty(NPIdentifier name, NPVariant * result)
 {
     char *filename;
+    char *version;
+    char *status;
     bool setting;
     PRInt32 state;
 
@@ -1924,9 +2577,16 @@ bool ScriptablePluginObject::GetProperty(NPIdentifier name, NPVariant * result)
         return false;
     }
 
-    if (name == filename_id || name == src_id) {
+    if (name == filename_id || name == src_id || name == URL_id) {
         pPlugin->GetFilename(&filename);
-        STRINGZ_TO_NPVARIANT(filename, *result);
+        if (filename != NULL)
+            STRINGZ_TO_NPVARIANT(filename, *result);
+        return true;
+    }
+
+    if (name == versionInfo_id) {
+        version = g_strdup("7.0.0.7777");
+        STRINGZ_TO_NPVARIANT(version, *result);
         return true;
     }
 
@@ -1954,8 +2614,46 @@ bool ScriptablePluginObject::GetProperty(NPIdentifier name, NPVariant * result)
         return true;
     }
 
+    if (name == status_id) {
+        pPlugin->GetPlayState(&state);
+        switch(state) {
+            case STATE_PLAYING:
+                status = g_strdup(_("Playing"));
+                break;
+            case STATE_PAUSED:
+                status = g_strdup(_("Paused"));
+                break;
+            case STATE_STOPPED:
+                status = g_strdup(_("Stopped"));
+                break;
+            case STATE_BUFFERING:
+                status = g_strdup_printf(_("Buffering %2.1lf%%"), request_double_value(pPlugin, pPlugin->lastopened, "GetCachePercent") * 100.0);
+                break;
+            default:
+                status = g_strdup(_("Unknown Status"));
+        }
+        // printf("Status = %s\n", status);
+        STRINGZ_TO_NPVARIANT(status, *result);
+        return true;
+    }
+
     if (name == controls_id) {
         OBJECT_TO_NPVARIANT(pPlugin->GetScriptableObjectControls(), *result);
+        return true;
+    }
+
+    if (name == media_id) {
+        OBJECT_TO_NPVARIANT(pPlugin->GetScriptableObjectMedia(), *result);
+        return true;
+    }
+
+    if (name == settings_id) {
+        OBJECT_TO_NPVARIANT(pPlugin->GetScriptableObjectSettings(), *result);
+        return true;
+    }
+
+    if (name == error_id) {
+        OBJECT_TO_NPVARIANT(pPlugin->GetScriptableObjectError(), *result);
         return true;
     }
 
@@ -1971,7 +2669,7 @@ bool ScriptablePluginObject::SetProperty(NPIdentifier name, const NPVariant * va
         return false;
     }
 
-    if (name == filename_id || name == src_id) {
+    if (name == filename_id || name == src_id || name == URL_id) {
 #ifdef HAVE_NEW_XULRUNNER
         pPlugin->SetFilename(NPVARIANT_TO_STRING(*value).UTF8Characters);
 #else
@@ -2028,4 +2726,46 @@ NPObject *CPlugin::GetScriptableObjectControls()
     }
 
     return m_pScriptableObjectControls;
+}
+
+NPObject *CPlugin::GetScriptableObjectMedia()
+{
+    if (!m_pScriptableObjectMedia) {
+        m_pScriptableObjectMedia =
+            NPN_CreateObject(mInstance, GET_NPOBJECT_CLASS(ScriptablePluginObjectMedia));
+    }
+
+    if (m_pScriptableObjectMedia) {
+        NPN_RetainObject(m_pScriptableObjectMedia);
+    }
+
+    return m_pScriptableObjectMedia;
+}
+
+NPObject *CPlugin::GetScriptableObjectSettings()
+{
+    if (!m_pScriptableObjectSettings) {
+        m_pScriptableObjectSettings =
+            NPN_CreateObject(mInstance, GET_NPOBJECT_CLASS(ScriptablePluginObjectSettings));
+    }
+
+    if (m_pScriptableObjectSettings) {
+        NPN_RetainObject(m_pScriptableObjectSettings);
+    }
+
+    return m_pScriptableObjectSettings;
+}
+
+NPObject *CPlugin::GetScriptableObjectError()
+{
+    if (!m_pScriptableObjectError) {
+        m_pScriptableObjectError =
+            NPN_CreateObject(mInstance, GET_NPOBJECT_CLASS(ScriptablePluginObjectError));
+    }
+
+    if (m_pScriptableObjectError) {
+        NPN_RetainObject(m_pScriptableObjectError);
+    }
+
+    return m_pScriptableObjectError;
 }

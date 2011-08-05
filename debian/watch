@@ -1,3 +1,3 @@
 version=3
-http://code.google.com/p/gecko-mediaplayer/downloads/list \
-http://gecko-mediaplayer.googlecode.com/files/gecko-mediaplayer-(.*)\.tar\.gz
+opts=downloadurlmangle=s#.*(gecko-mediaplayer-([\d.]+)\.tar\.gz).*#http://gecko-mediaplayer.googlecode.com/files/$1#,filenamemangle=s#.*(gecko-mediaplayer-([\d.]+)\.tar\.gz).*#$1# \
+    http://code.google.com/p/gecko-mediaplayer/downloads/list ^.*detail\?name=gecko-mediaplayer-([\d.]+)\.tar\.gz.*

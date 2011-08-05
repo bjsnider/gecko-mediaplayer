@@ -73,7 +73,7 @@ NPError PluginGetValue(NPPVariable variable, void *value)
     // description matches the features
 
     if (variable == NPPVpluginNameString) {
-        *((const char **) value) = "QuickTime Plug-in 7.6.4";
+        *((const char **) value) = "QuickTime Plug-in 7.6.9";
     }
     if (variable == NPPVpluginDescriptionString) {
         *((const char **) value) =
@@ -101,5 +101,7 @@ NPError PluginGetValue(NPPVariable variable, void *value)
 void pluginSpecific(CPlugin * instance)
 {
     //printf("calling pluginSpecific for qt plugin\n");
-    setPreference(instance, "general.useragent.override", "QuickTime/7.6.4");
+    //setPreference(instance, "general.useragent.override", "QuickTime/7.6.9");
+    printf("Loading QuickTime compatibility\n");
+    instance->quicktime_emulation = TRUE;
 }

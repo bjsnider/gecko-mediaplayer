@@ -1,25 +1,24 @@
 Source: gecko-mediaplayer
 Section: video
 Priority: optional
-Maintainer: Cesare Tirabassi <norsetto@ubuntu.com>
+Maintainer: Debian QA Group <packages@qa.debian.org>
 Build-Depends: debhelper (>= 7),
 	       autotools-dev,
 	       pkg-config (>= 0.20),
 	       libglib2.0-dev (>= 2.14),
-	       xulrunner-dev,
+	       xulrunner-dev | firefox-dev,
 	       libdbus-1-dev (>= 0.95),
 	       libdbus-glib-1-dev (>= 0.70),
 	       libx11-dev,
 	       libidl0,
-	       libgconf2-dev (>= 2.20)
-Standards-Version: 3.8.4
-Vcs-Browser: https://code.launchpad.net/~norsetto/gnome-mplayer/gecko-mediaplayer
-Vcs-Bzr: lp:~norsetto/gnome-mplayer/gecko-mediaplayer
-Homepage: http://kdekorte.googlepages.com/gecko-mediaplayer
+	       libgconf2-dev (>= 2.20),
+               libcurl4-gnutls-dev | libcurl-dev
+Standards-Version: 3.9.2
+Homepage: http://code.google.com/p/gecko-mediaplayer/
 
 Package: gecko-mediaplayer
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, gnome-mplayer (>= 0.9.9.2), iceweasel | firefox | firefox-3.5 | iceape-browser | epiphany-browser | galeon | midbrowser | xulrunner | xulrunner-1.9 | konqueror (>= 4:4) | opera (>= 9.50) | chromium-browser (>> 4.0)
+Depends: ${shlibs:Depends}, ${misc:Depends}, gnome-mplayer (>= 1.0.4), iceweasel | firefox | iceape-browser | epiphany-browser | galeon | xulrunner-1.9.1 | xulrunner-1.9.2 | konqueror (>= 4:4) | opera (>= 9.50) | chromium-browser (>> 4.0)
 Xb-Npp-Applications: ec8030f7-c20a-464f-9b0e-13a3a9e97384, 92650c4d-4b8e-4d2a-b7eb-24ecf4f6b63a, aa5ca914-c309-495d-91cf-3141bbb04115
 Xb-Npp-Name: Gecko Media Player
 Xb-Npp-Description: Play media off the net using the gnome-mplayer
@@ -29,6 +28,7 @@ Description: Multimedia plug-in for Gecko browsers
  Gecko Media Player is a browser plug-in that uses GNOME MPlayer
  and Mplayer to play media in a browser.
  It uses the NS4 API and is therefore compatible with all NS4 derived browsers:
- Iceweasel, Firefox, Iceape, Epiphany, Galeon, Midbrowser, Xulrunner, etc.
+ Iceweasel, Firefox, Iceape, Epiphany, Galeon, Midbrowser, Xulrunner as well as
+ with Konqueror, Opera and Google Chromium.
  .
  It is the modern replacement for mplayerplug-in (from the same author).

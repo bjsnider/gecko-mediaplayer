@@ -24,324 +24,394 @@
 
 #include "gm_pref_store.h"
 
+#if GIO_ENABLED && GLIB2_26_ENABLED
+#include <gio/gio.h>
+#else
 #ifdef HAVE_GCONF
 #include <gconf/gconf.h>
 #include <gconf/gconf-client.h>
 #include <gconf/gconf-value.h>
 #endif
+#endif
 #include <stdio.h>
 
 struct _GmPrefStore {
-#ifdef HAVE_GCONF
-	GConfClient *gconf;
+#if GIO_ENABLED && GLIB2_26_ENABLED
+    GSettings *settings;
 #else
-	GKeyFile *keyfile;
+#ifdef HAVE_GCONF
+    GConfClient *gconf;
+#else
+    GKeyFile *keyfile;
 #endif
-	gchar *context;
+#endif
+    gchar *context;
 };
 
-GmPrefStore *gm_pref_store_new(const gchar * context) {
+GmPrefStore *gm_pref_store_new(const gchar * context)
+{
 
-	GmPrefStore *store = (GmPrefStore *)g_new0(GmPrefStore,1);
+    GmPrefStore *store = (GmPrefStore *) g_new0(GmPrefStore, 1);
 
-	store->context = g_strdup(context);
-#ifdef HAVE_GCONF
-	store->gconf = gconf_client_get_default();
+#if GIO_ENABLED && GLIB2_26_ENABLED
+    store->context = g_strdup_printf("apps.%s.preferences", context);
+    store->settings = g_settings_new(store->context);
 #else
-	gchar *filename;
+    store->context = g_strdup(context);
+#ifdef HAVE_GCONF
+    store->gconf = gconf_client_get_default();
+#else
+    gchar *filename;
 
-    filename = g_strdup_printf("%s/%s", g_get_user_config_dir(),context);
+    filename = g_strdup_printf("%s/%s", g_get_user_config_dir(), context);
     if (!g_file_test(filename, G_FILE_TEST_IS_DIR)) {
         g_mkdir_with_parents(filename, 0775);
     }
     g_free(filename);
 
     store->keyfile = g_key_file_new();
-    filename = g_strdup_printf("%s/%s/%s.conf", g_get_user_config_dir(),context,context);
-    g_key_file_load_from_file(store->keyfile,
-                              filename,
-                              G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, NULL);
+    filename = g_strdup_printf("%s/%s/%s.conf", g_get_user_config_dir(), context, context);
+    g_key_file_load_from_file(store->keyfile, filename, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, NULL);
 
 #endif
-	return store;
+#endif
+    return store;
 }
 
-void gm_pref_store_free(GmPrefStore *store) {
+void gm_pref_store_free(GmPrefStore * store)
+{
 
+#if GIO_ENABLED && GLIB2_26_ENABLED
+    g_object_unref(store->settings);
+    store->settings = NULL;
+#else
 #ifdef HAVE_GCONF
     if (G_IS_OBJECT(store->gconf))
         g_object_unref(G_OBJECT(store->gconf));
-	store->gconf = NULL;
+    store->gconf = NULL;
 #else
     gchar *filename;
     gchar *data;
 
     if (store->keyfile != NULL) {
-        filename = g_strdup_printf("%s/%s/%s.conf", g_get_user_config_dir(),store->context,store->context);
+        filename = g_strdup_printf("%s/%s/%s.conf", g_get_user_config_dir(), store->context, store->context);
         data = g_key_file_to_data(store->keyfile, NULL, NULL);
-		if (data != NULL) {
-		    g_file_set_contents(filename, data, -1, NULL);
-		    g_free(data);
-		}
+        if (data != NULL) {
+            g_file_set_contents(filename, data, -1, NULL);
+            g_free(data);
+        }
         g_free(filename);
         g_key_file_free(store->keyfile);
         store->keyfile = NULL;
     }
 #endif
-	g_free(store->context);
-	store->context = NULL;
+#endif
+    g_free(store->context);
+    store->context = NULL;
 
-	g_free(store);
-	store = NULL;
+    g_free(store);
+    store = NULL;
 
 }
 
-gboolean gm_pref_store_get_boolean(GmPrefStore *store, const gchar *key) {
+gboolean gm_pref_store_get_boolean(GmPrefStore * store, const gchar * key)
+{
 
-	gboolean value = FALSE;
-	
-	if (store == NULL)
-		return FALSE;
-		
+    gboolean value = FALSE;
+
+    if (store == NULL)
+        return FALSE;
+
+#if GIO_ENABLED && GLIB2_26_ENABLED
+    value = g_settings_get_boolean(store->settings, key);
+#else
 #ifdef HAVE_GCONF
-	gchar *full_key;
-	
-	full_key = g_strdup_printf("/apps/%s/preferences/%s",store->context,key);
-	value = gconf_client_get_bool(store->gconf, full_key, NULL);
+    gchar *full_key;
+
+    full_key = g_strdup_printf("/apps/%s/preferences/%s", store->context, key);
+    value = gconf_client_get_bool(store->gconf, full_key, NULL);
     g_free(full_key);
 #else
-	if (g_key_file_has_key(store->keyfile,store->context,key,NULL))
-		value = g_key_file_get_boolean(store->keyfile,store->context,key,NULL);
-#endif	
-	return value;
+    if (g_key_file_has_key(store->keyfile, store->context, key, NULL))
+        value = g_key_file_get_boolean(store->keyfile, store->context, key, NULL);
+#endif
+#endif
+    return value;
 }
 
-gboolean gm_pref_store_get_boolean_with_default(GmPrefStore *store, const gchar *key, gboolean default_value) {
+gboolean gm_pref_store_get_boolean_with_default(GmPrefStore * store, const gchar * key, gboolean default_value)
+{
 
-	gboolean value = FALSE;
+    gboolean value = FALSE;
 
-	if (store == NULL)
-		return default_value;
-		
-#ifdef HAVE_GCONF
-	
-	gchar *full_key;
-	GConfValue *gcvalue;
+    if (store == NULL)
+        return default_value;
 
-	full_key = g_strdup_printf("/apps/%s/preferences/%s",store->context,key);
-
-	gcvalue = gconf_client_get_without_default(store->gconf,full_key,NULL);
-	if (gcvalue) {
-		value = gconf_client_get_bool(store->gconf, full_key, NULL);
-		gconf_value_free(gcvalue);
-	} else {
-		value = default_value;
-	}
-    g_free(full_key);
-	
+#if GIO_ENABLED && GLIB2_26_ENABLED
+    value = g_settings_get_boolean(store->settings, key);
 #else
-	
-	if (g_key_file_has_key(store->keyfile,store->context,key,NULL)) {
-		value = g_key_file_get_boolean(store->keyfile,store->context,key,NULL);
-	} else {
-		value = default_value;
-	}
-#endif	
-	return value;
-}
-
-void gm_pref_store_set_boolean(GmPrefStore *store, const gchar *key, gboolean value) {
-
-	if (store == NULL)
-		return;
-
-#ifdef HAVE_GCONF
-	gchar *full_key;
-	
-	full_key = g_strdup_printf("/apps/%s/preferences/%s",store->context,key);
-	gconf_client_set_bool(store->gconf, full_key, value, NULL);
-    g_free(full_key);
-#else
-	
-	g_key_file_set_boolean(store->keyfile,store->context,key,value);
-
-#endif	
-}
-
-gint gm_pref_store_get_int(GmPrefStore *store, const gchar *key) {
-
-	gint value = 0;
-	
-	if (store == NULL)
-		return value;
-	
-#ifdef HAVE_GCONF
-	gchar *full_key;
-	
-	full_key = g_strdup_printf("/apps/%s/preferences/%s",store->context,key);
-	value = gconf_client_get_int(store->gconf, full_key, NULL);
-    g_free(full_key);
-#else
-	
-	if (g_key_file_has_key(store->keyfile,store->context,key,NULL))
-		value = g_key_file_get_integer(store->keyfile,store->context,key,NULL);
-
-#endif	
-	return value;
-}
-
-gint gm_pref_store_get_int_with_default(GmPrefStore *store, const gchar *key, gint default_value) {
-
-	gint value = 0;
-
-	if (store == NULL)
-		return default_value;
-	
 #ifdef HAVE_GCONF
 
-	gchar *full_key;
-	GConfValue *gcvalue;
+    gchar *full_key;
+    GConfValue *gcvalue;
 
-	full_key = g_strdup_printf("/apps/%s/preferences/%s",store->context,key);
+    full_key = g_strdup_printf("/apps/%s/preferences/%s", store->context, key);
 
-	gcvalue = gconf_client_get_without_default(store->gconf,full_key,NULL);
-	if (gcvalue) {
-		value = gconf_client_get_int(store->gconf, full_key, NULL);
-		gconf_value_free(gcvalue);
-	} else {
-		value = default_value;
-	}
+    gcvalue = gconf_client_get_without_default(store->gconf, full_key, NULL);
+    if (gcvalue) {
+        value = gconf_client_get_bool(store->gconf, full_key, NULL);
+        gconf_value_free(gcvalue);
+    } else {
+        value = default_value;
+    }
     g_free(full_key);
 
 #else
-	
-	if (g_key_file_has_key(store->keyfile,store->context,key,NULL)) {
-		value = g_key_file_get_integer(store->keyfile,store->context,key,NULL);
-	} else {
-		value = default_value;
-	}
 
-#endif	
-	return value;
+    if (g_key_file_has_key(store->keyfile, store->context, key, NULL)) {
+        value = g_key_file_get_boolean(store->keyfile, store->context, key, NULL);
+    } else {
+        value = default_value;
+    }
+#endif
+#endif
+    return value;
 }
 
+void gm_pref_store_set_boolean(GmPrefStore * store, const gchar * key, gboolean value)
+{
 
-void gm_pref_store_set_int(GmPrefStore *store, const gchar *key, gint value) {
-
-	if (store == NULL)
-		return;
-
+    if (store == NULL)
+        return;
+#if GIO_ENABLED && GLIB2_26_ENABLED
+    g_settings_set_boolean(store->settings, key, value);
+#else
 #ifdef HAVE_GCONF
-	gchar *full_key;
-	
-	full_key = g_strdup_printf("/apps/%s/preferences/%s",store->context,key);
-	gconf_client_set_int(store->gconf, full_key, value, NULL);
+    gchar *full_key;
+
+    full_key = g_strdup_printf("/apps/%s/preferences/%s", store->context, key);
+    gconf_client_set_bool(store->gconf, full_key, value, NULL);
     g_free(full_key);
 #else
-	
-	g_key_file_set_integer(store->keyfile,store->context,key,value);
 
-#endif	
+    g_key_file_set_boolean(store->keyfile, store->context, key, value);
+
+#endif
+#endif
 }
 
-gfloat gm_pref_store_get_float(GmPrefStore *store, const gchar *key) {
+gint gm_pref_store_get_int(GmPrefStore * store, const gchar * key)
+{
 
-	gfloat value = 0.0;
+    gint value = 0;
 
-	if (store == NULL)
-		return value;
-	
+    if (store == NULL)
+        return value;
+#if GIO_ENABLED && GLIB2_26_ENABLED
+    value = g_settings_get_int(store->settings, key);
+#else
 #ifdef HAVE_GCONF
-	gchar *full_key;
-	
-	full_key = g_strdup_printf("/apps/%s/preferences/%s",store->context,key);
-	value = gconf_client_get_float(store->gconf, full_key, NULL);
+    gchar *full_key;
+
+    full_key = g_strdup_printf("/apps/%s/preferences/%s", store->context, key);
+    value = gconf_client_get_int(store->gconf, full_key, NULL);
     g_free(full_key);
 #else
-	
-	if (g_key_file_has_key(store->keyfile,store->context,key,NULL))
-		value = g_key_file_get_double(store->keyfile,store->context,key,NULL);
 
-#endif	
-	return value;
+    if (g_key_file_has_key(store->keyfile, store->context, key, NULL))
+        value = g_key_file_get_integer(store->keyfile, store->context, key, NULL);
+
+#endif
+#endif
+    return value;
 }
 
-void gm_pref_store_set_float(GmPrefStore *store, const gchar *key, gfloat value) {
+gint gm_pref_store_get_int_with_default(GmPrefStore * store, const gchar * key, gint default_value)
+{
 
-	if (store == NULL)
-		return ;
+    gint value = 0;
 
+    if (store == NULL)
+        return default_value;
+
+#if GIO_ENABLED && GLIB2_26_ENABLED
+    value = g_settings_get_int(store->settings, key);
+#else
 #ifdef HAVE_GCONF
-	gchar *full_key;
-	
-	full_key = g_strdup_printf("/apps/%s/preferences/%s",store->context,key);
-	gconf_client_set_float(store->gconf, full_key, value, NULL);
+
+    gchar *full_key;
+    GConfValue *gcvalue;
+
+    full_key = g_strdup_printf("/apps/%s/preferences/%s", store->context, key);
+
+    gcvalue = gconf_client_get_without_default(store->gconf, full_key, NULL);
+    if (gcvalue) {
+        value = gconf_client_get_int(store->gconf, full_key, NULL);
+        gconf_value_free(gcvalue);
+    } else {
+        value = default_value;
+    }
+    g_free(full_key);
+
+#else
+
+    if (g_key_file_has_key(store->keyfile, store->context, key, NULL)) {
+        value = g_key_file_get_integer(store->keyfile, store->context, key, NULL);
+    } else {
+        value = default_value;
+    }
+
+#endif
+#endif
+    return value;
+}
+
+
+void gm_pref_store_set_int(GmPrefStore * store, const gchar * key, gint value)
+{
+
+    if (store == NULL)
+        return;
+
+#if GIO_ENABLED && GLIB2_26_ENABLED
+    g_settings_set_int(store->settings, key, value);
+#else
+#ifdef HAVE_GCONF
+    gchar *full_key;
+
+    full_key = g_strdup_printf("/apps/%s/preferences/%s", store->context, key);
+    gconf_client_set_int(store->gconf, full_key, value, NULL);
     g_free(full_key);
 #else
-	
-	g_key_file_set_double(store->keyfile,store->context,key,value);
 
-#endif	
+    g_key_file_set_integer(store->keyfile, store->context, key, value);
+
+#endif
+#endif
 }
 
-gchar * gm_pref_store_get_string(GmPrefStore *store, const gchar *key) {
+gfloat gm_pref_store_get_float(GmPrefStore * store, const gchar * key)
+{
 
-	gchar * value = NULL;
+    gfloat value = 0.0;
 
-	if (store == NULL)
-		return value;
-	
+    if (store == NULL)
+        return value;
+
+#if GIO_ENABLED && GLIB2_26_ENABLED
+    value = g_settings_get_double(store->settings, key);
+#else
 #ifdef HAVE_GCONF
-	gchar *full_key;
-	
-	full_key = g_strdup_printf("/apps/%s/preferences/%s",store->context,key);
-	value = gconf_client_get_string(store->gconf, full_key, NULL);
+    gchar *full_key;
+
+    full_key = g_strdup_printf("/apps/%s/preferences/%s", store->context, key);
+    value = gconf_client_get_float(store->gconf, full_key, NULL);
     g_free(full_key);
 #else
-	
-	if (g_key_file_has_key(store->keyfile,store->context,key,NULL))
-		value = g_key_file_get_string(store->keyfile,store->context,key,NULL);
 
-#endif	
-	return value;
+    if (g_key_file_has_key(store->keyfile, store->context, key, NULL))
+        value = g_key_file_get_double(store->keyfile, store->context, key, NULL);
+
+#endif
+#endif
+    return value;
 }
 
-void gm_pref_store_set_string(GmPrefStore *store, const gchar *key, gchar * value) {
+void gm_pref_store_set_float(GmPrefStore * store, const gchar * key, gfloat value)
+{
 
-	if (store == NULL)
-		return;
-
+    if (store == NULL)
+        return;
+#if GIO_ENABLED && GLIB2_26_ENABLED
+    g_settings_set_double(store->settings, key, value);
+#else
 #ifdef HAVE_GCONF
-	gchar *full_key;
-	
-	full_key = g_strdup_printf("/apps/%s/preferences/%s",store->context,key);
-	gconf_client_unset(store->gconf, full_key, NULL);
-	if (value != NULL && strlen(g_strstrip(value)) > 0)
-		gconf_client_set_string(store->gconf, full_key, value, NULL);
+    gchar *full_key;
+
+    full_key = g_strdup_printf("/apps/%s/preferences/%s", store->context, key);
+    gconf_client_set_float(store->gconf, full_key, value, NULL);
+    g_free(full_key);
+#else
+
+    g_key_file_set_double(store->keyfile, store->context, key, value);
+
+#endif
+#endif
+}
+
+gchar *gm_pref_store_get_string(GmPrefStore * store, const gchar * key)
+{
+
+    gchar *value = NULL;
+
+    if (store == NULL)
+        return value;
+
+#if GIO_ENABLED && GLIB2_26_ENABLED
+    value = g_settings_get_string(store->settings, key);
+#else
+#ifdef HAVE_GCONF
+    gchar *full_key;
+
+    full_key = g_strdup_printf("/apps/%s/preferences/%s", store->context, key);
+    value = gconf_client_get_string(store->gconf, full_key, NULL);
+    g_free(full_key);
+#else
+
+    if (g_key_file_has_key(store->keyfile, store->context, key, NULL))
+        value = g_key_file_get_string(store->keyfile, store->context, key, NULL);
+
+#endif
+#endif
+    return value;
+}
+
+void gm_pref_store_set_string(GmPrefStore * store, const gchar * key, gchar * value)
+{
+
+    if (store == NULL)
+        return;
+#if GIO_ENABLED && GLIB2_26_ENABLED
+    if (value == NULL) {
+        g_settings_reset(store->settings, key);
+    } else {
+        g_settings_set_string(store->settings, key, value);
+    }
+#else
+#ifdef HAVE_GCONF
+    gchar *full_key;
+
+    full_key = g_strdup_printf("/apps/%s/preferences/%s", store->context, key);
+    gconf_client_unset(store->gconf, full_key, NULL);
+    if (value != NULL && strlen(g_strstrip(value)) > 0)
+        gconf_client_set_string(store->gconf, full_key, value, NULL);
     g_free(full_key);
 #else
     if (value != NULL && strlen(g_strstrip(value)) > 0) {
         g_key_file_set_string(store->keyfile, store->context, key, value);
     } else {
         g_key_file_remove_key(store->keyfile, store->context, key, NULL);
-    }	
-#endif	
+    }
+#endif
+#endif
 }
 
-void gm_pref_store_unset(GmPrefStore *store, const gchar *key) {
+void gm_pref_store_unset(GmPrefStore * store, const gchar * key)
+{
 
-	if (store == NULL)
-		return;
-
+    if (store == NULL)
+        return;
+#if GIO_ENABLED && GLIB2_26_ENABLED
+    g_settings_reset(store->settings, key);
+#else
 #ifdef HAVE_GCONF
-	gchar *full_key;
-	
-	full_key = g_strdup_printf("/apps/%s/preferences/%s",store->context,key);
-	gconf_client_unset(store->gconf, full_key, NULL);
+    gchar *full_key;
+
+    full_key = g_strdup_printf("/apps/%s/preferences/%s", store->context, key);
+    gconf_client_unset(store->gconf, full_key, NULL);
     g_free(full_key);
 #else
     g_key_file_remove_key(store->keyfile, store->context, key, NULL);
-#endif	
-
+#endif
+#endif
 }
-

@@ -2,8 +2,8 @@
   <schemalist>
 
     <schema>
-      <key>/schemas/apps/gecko-mediaplayer/preferences/disable_qt</key>
-      <applyto>/apps/gecko-mediaplayer/preferences/disable_qt</applyto>
+      <key>/schemas/apps/gecko-mediaplayer/preferences/disable-qt</key>
+      <applyto>/apps/gecko-mediaplayer/preferences/disable-qt</applyto>
       <owner>gecko-mediaplayer</owner>
       <type>bool</type>
       <default>false</default>
@@ -14,8 +14,8 @@
     </schema>
 
     <schema>
-      <key>/schemas/apps/gecko-mediaplayer/preferences/disable_real</key>
-      <applyto>/apps/gecko-mediaplayer/preferences/disable_real</applyto>
+      <key>/schemas/apps/gecko-mediaplayer/preferences/disable-real</key>
+      <applyto>/apps/gecko-mediaplayer/preferences/disable-real</applyto>
       <owner>gecko-mediaplayer</owner>
       <type>bool</type>
       <default>false</default>
@@ -26,8 +26,8 @@
     </schema>
 
     <schema>
-      <key>/schemas/apps/gecko-mediaplayer/preferences/disable_wmp</key>
-      <applyto>/apps/gecko-mediaplayer/preferences/disable_wmp</applyto>
+      <key>/schemas/apps/gecko-mediaplayer/preferences/disable-wmp</key>
+      <applyto>/apps/gecko-mediaplayer/preferences/disable-wmp</applyto>
       <owner>gecko-mediaplayer</owner>
       <type>bool</type>
       <default>false</default>
@@ -38,8 +38,8 @@
     </schema>
 
     <schema>
-      <key>/schemas/apps/gecko-mediaplayer/preferences/disable_dvx</key>
-      <applyto>/apps/gecko-mediaplayer/preferences/disable_dvx</applyto>
+      <key>/schemas/apps/gecko-mediaplayer/preferences/disable-dvx</key>
+      <applyto>/apps/gecko-mediaplayer/preferences/disable-dvx</applyto>
       <owner>gecko-mediaplayer</owner>
       <type>bool</type>
       <default>false</default>
@@ -51,8 +51,8 @@
 
 
     <schema>
-      <key>/schemas/apps/gecko-mediaplayer/preferences/debug_level</key>
-      <applyto>/apps/gecko-mediaplayer/preferences/debug_level</applyto>
+      <key>/schemas/apps/gecko-mediaplayer/preferences/debug-level</key>
+      <applyto>/apps/gecko-mediaplayer/preferences/debug-level</applyto>
       <owner>gecko-mediaplayer</owner>
       <type>int</type>
       <default>0</default>
@@ -63,8 +63,8 @@
     </schema>
 
 	<schema>
-      <key>/schemas/apps/gecko-mediaplayer/preferences/player_backend</key>
-      <applyto>/apps/gecko-mediaplayer/preferences/player_backend</applyto>
+      <key>/schemas/apps/gecko-mediaplayer/preferences/player-backend</key>
+      <applyto>/apps/gecko-mediaplayer/preferences/player-backend</applyto>
       <owner>gecko-mediaplayer</owner>
       <type>string</type>
       <default></default>

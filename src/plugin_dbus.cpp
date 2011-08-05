@@ -89,8 +89,16 @@ static DBusHandlerResult filter_func(DBusConnection * connection,
                 }
 
                 instance->playerready = TRUE;
-                instance->cache_size = request_int_value(instance, item, "GetCacheSize");
-                //printf("cache size = %i\n",instance->cache_size);
+                // disable this as WMP doesn't do this
+                // postPlayStateChange(instance->mInstance, STATE_READY);
+
+                if (g_strrstr(instance->mimetype, "audio") != NULL) {
+                    instance->cache_size =
+                        request_int_value(instance, item, "GetPluginAudioCacheSize");
+                } else {
+                    instance->cache_size =
+                        request_int_value(instance, item, "GetPluginVideoCacheSize");
+                }
                 if (instance->cache_size == 0) {
                     item->streaming = 1;
                 }
@@ -134,7 +142,7 @@ static DBusHandlerResult filter_func(DBusConnection * connection,
                             if (item->streaming) {
                                 send_signal_with_string(instance, item, "Open", item->src);
                             } else {
-                                NPN_GetURLNotify(instance->mInstance, item->src, NULL, item);
+                                instance->GetURLNotify(instance->mInstance, item->src, NULL, item);
                             }
                         } else {
                             i = 0;
@@ -170,7 +178,7 @@ static DBusHandlerResult filter_func(DBusConnection * connection,
                             }
                             g_free(app_name);
                             printf("requesting %s \n", item->src);
-                            NPN_GetURLNotify(instance->mInstance, item->src, NULL, item);
+                            instance->GetURLNotify(instance->mInstance, item->src, NULL, item);
                         }
                         instance->lastopened->played = TRUE;
                         item->requested = TRUE;
@@ -184,6 +192,8 @@ static DBusHandlerResult filter_func(DBusConnection * connection,
             }
 
             if (g_ascii_strcasecmp(dbus_message_get_member(message), "Next") == 0) {
+
+                postPlayStateChange(instance->mInstance, STATE_TRANSITIONING);
 
                 if (instance->lastopened != NULL && instance->lastopened->loop == FALSE) {
                     list_mark_id_played(instance->playlist, instance->lastopened->id);
@@ -240,7 +250,7 @@ static DBusHandlerResult filter_func(DBusConnection * connection,
                         if (item->retrieved) {
                             open_location(instance, item, TRUE);
                         } else {
-                            NPN_GetURLNotify(instance->mInstance, item->src, NULL, item);
+                            instance->GetURLNotify(instance->mInstance, item->src, NULL, item);
                         }
                     } else {
                         open_location(instance, item, FALSE);
@@ -260,6 +270,7 @@ static DBusHandlerResult filter_func(DBusConnection * connection,
                         if (instance->event_mediacomplete != NULL) {
                             NPN_GetURL(instance->mInstance, instance->event_mediacomplete, NULL);
                         }
+                        postPlayStateChange(instance->mInstance, STATE_MEDIAENDED);
                     }
                     if (g_ascii_strcasecmp(s, "MouseClicked") == 0) {
                         if (instance->event_mouseclicked != NULL) {
@@ -299,6 +310,24 @@ static DBusHandlerResult filter_func(DBusConnection * connection,
                         if (instance->post_dom_events && instance->id != NULL) {
                             postDOMEvent(instance->mInstance, instance->id, "qt_ended");
                         }
+                    }
+                    if (g_ascii_strcasecmp(s, "MediaStopped") == 0) {
+                        if (instance->post_dom_events && instance->id != NULL) {
+                            postDOMEvent(instance->mInstance, instance->id, "qt_ended");
+                        }
+                        postPlayStateChange(instance->mInstance, STATE_STOPPED);
+                    }
+                    if (g_ascii_strcasecmp(s, "MediaPlaying") == 0) {
+                        if (instance->post_dom_events && instance->id != NULL) {
+                            postDOMEvent(instance->mInstance, instance->id, "qt_play");
+                        }
+                        postPlayStateChange(instance->mInstance, STATE_PLAYING);
+                    }
+                    if (g_ascii_strcasecmp(s, "MediaPaused") == 0) {
+                        if (instance->post_dom_events && instance->id != NULL) {
+                            postDOMEvent(instance->mInstance, instance->id, "qt_pause");
+                        }
+                        postPlayStateChange(instance->mInstance, STATE_PAUSED);
                     }
                 }
             }
@@ -354,6 +383,10 @@ void open_location(CPlugin * instance, ListItem * item, gboolean uselocal)
 
     //list_dump(instance->playlist);
     //printf("Opening %s to connection %p\n",file, instance->connection);
+    if (item == NULL || instance == NULL)
+        return;
+
+    postPlayStateChange(instance->mInstance, STATE_PLAYING);
 
     if (!(instance->player_launched)) {
         if (!item->opened) {
@@ -403,7 +436,7 @@ void open_location(CPlugin * instance, ListItem * item, gboolean uselocal)
         }
         //printf("got player, waiting for controlid %i\n",item->controlid);
         if (item->controlid != 0) {
-            while (!(item->playerready)) {
+            while (!(item->playerready) && !item->cancelled) {
                 g_main_context_iteration(NULL, FALSE);
             }
         }
@@ -438,6 +471,9 @@ void open_location(CPlugin * instance, ListItem * item, gboolean uselocal)
             dbus_message_append_args(message, DBUS_TYPE_STRING, &file, DBUS_TYPE_INVALID);
             dbus_connection_send(instance->connection, message, NULL);
             dbus_message_unref(message);
+            if (item->retrieved == TRUE)
+                send_signal_with_double(instance, item, "SetCachePercent", 1.0);
+
         } else {
             // ok, not done here yet, may need a new window for Apple HD video
             id = g_strdup_printf("%i", item->hrefid);
@@ -552,7 +588,7 @@ void send_signal_with_string(CPlugin * instance, ListItem * item, const gchar * 
     const char *localstr;
     gchar *path;
 
-    //printf("Sending %s to connection %p\n", signal, instance->connection);
+    printf("Sending %s to connection %p\n", signal, instance->connection);
     if (instance == NULL)
         return;
 
@@ -802,6 +838,50 @@ gint request_int_value(CPlugin * instance, ListItem * item, const gchar * member
 
     return result;
 }
+
+gchar *request_string_value(CPlugin * instance, ListItem * item, const gchar * member)
+{
+    DBusMessage *message;
+    DBusMessage *replymessage;
+    const gchar *localmember;
+    DBusError error;
+    gchar *result = NULL;
+    gchar *path;
+    gchar *dest;
+    gint controlid;
+
+    //printf("Requesting %s to connection %p\n", member, instance->connection);
+    if (instance == NULL)
+        return result;
+
+    if (item != NULL && strlen(item->path) > 0) {
+        path = item->path;
+        controlid = item->controlid;
+    } else {
+        path = instance->path;
+        controlid = instance->controlid;
+    }
+
+    dest = g_strdup_printf("com.gnome.mplayer.cid%i", controlid);
+
+    if (instance->playerready && instance->connection != NULL) {
+        localmember = g_strdup(member);
+        message = dbus_message_new_method_call(dest, path, "com.gnome.mplayer", localmember);
+        dbus_error_init(&error);
+        replymessage =
+            dbus_connection_send_with_reply_and_block(instance->connection, message, -1, &error);
+        if (dbus_error_is_set(&error)) {
+            printf("Error message = %s\n", error.message);
+        }
+        dbus_message_get_args(replymessage, &error, DBUS_TYPE_STRING, &result, DBUS_TYPE_INVALID);
+        dbus_message_unref(message);
+        dbus_message_unref(replymessage);
+    }
+    g_free(dest);
+
+    return result;
+}
+
 
 gboolean is_valid_path(CPlugin * instance, const char *message)
 {
