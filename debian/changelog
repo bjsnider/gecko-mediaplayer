@@ -1,3 +1,11 @@
+gecko-mediaplayer (1.0.4-2) unstable; urgency=high
+
+  * QA upload.
+  * Pass --with-plugin-dir=/usr/lib/mozilla/plugins to configure.
+    (Closes: #636800)
+
+ -- Aron Xu <aron@debian.org>  Sun, 07 Aug 2011 19:53:15 +0800
+
 gecko-mediaplayer (1.0.4-1) unstable; urgency=low
 
   * QA upload.
