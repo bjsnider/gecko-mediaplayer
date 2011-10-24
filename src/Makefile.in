@@ -60,6 +60,7 @@ gecko_mediaplayer_dvx_so_OBJECTS =  \
 am__DEPENDENCIES_1 =
 gecko_mediaplayer_dvx_so_DEPENDENCIES = libgmlib/libgmlib.a \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1)
 gecko_mediaplayer_dvx_so_LINK = $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) \
 	$(gecko_mediaplayer_dvx_so_LDFLAGS) $(LDFLAGS) -o $@
@@ -68,6 +69,7 @@ am_gecko_mediaplayer_qt_so_OBJECTS = plugin_types_qt.$(OBJEXT) \
 gecko_mediaplayer_qt_so_OBJECTS =  \
 	$(am_gecko_mediaplayer_qt_so_OBJECTS)
 gecko_mediaplayer_qt_so_DEPENDENCIES = libgmlib/libgmlib.a \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1)
 gecko_mediaplayer_qt_so_LINK = $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) \
@@ -78,6 +80,7 @@ gecko_mediaplayer_rm_so_OBJECTS =  \
 	$(am_gecko_mediaplayer_rm_so_OBJECTS)
 gecko_mediaplayer_rm_so_DEPENDENCIES = libgmlib/libgmlib.a \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1)
 gecko_mediaplayer_rm_so_LINK = $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) \
 	$(gecko_mediaplayer_rm_so_LDFLAGS) $(LDFLAGS) -o $@
@@ -87,6 +90,7 @@ gecko_mediaplayer_wmp_so_OBJECTS =  \
 	$(am_gecko_mediaplayer_wmp_so_OBJECTS)
 gecko_mediaplayer_wmp_so_DEPENDENCIES = libgmlib/libgmlib.a \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1)
 gecko_mediaplayer_wmp_so_LINK = $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) \
 	$(gecko_mediaplayer_wmp_so_LDFLAGS) $(LDFLAGS) -o $@
@@ -94,6 +98,7 @@ am_gecko_mediaplayer_so_OBJECTS = plugin_types_std.$(OBJEXT) \
 	$(am__objects_1)
 gecko_mediaplayer_so_OBJECTS = $(am_gecko_mediaplayer_so_OBJECTS)
 gecko_mediaplayer_so_DEPENDENCIES = libgmlib/libgmlib.a \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1)
 gecko_mediaplayer_so_LINK = $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) \
@@ -104,13 +109,31 @@ am__depfiles_maybe = depfiles
 am__mv = mv -f
 CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
+AM_V_CXX = $(am__v_CXX_$(V))
+am__v_CXX_ = $(am__v_CXX_$(AM_DEFAULT_VERBOSITY))
+am__v_CXX_0 = @echo "  CXX   " $@;
+AM_V_at = $(am__v_at_$(V))
+am__v_at_ = $(am__v_at_$(AM_DEFAULT_VERBOSITY))
+am__v_at_0 = @
 CXXLD = $(CXX)
 CXXLINK = $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) \
 	-o $@
+AM_V_CXXLD = $(am__v_CXXLD_$(V))
+am__v_CXXLD_ = $(am__v_CXXLD_$(AM_DEFAULT_VERBOSITY))
+am__v_CXXLD_0 = @echo "  CXXLD " $@;
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
+AM_V_CC = $(am__v_CC_$(V))
+am__v_CC_ = $(am__v_CC_$(AM_DEFAULT_VERBOSITY))
+am__v_CC_0 = @echo "  CC    " $@;
 CCLD = $(CC)
 LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
+AM_V_CCLD = $(am__v_CCLD_$(V))
+am__v_CCLD_ = $(am__v_CCLD_$(AM_DEFAULT_VERBOSITY))
+am__v_CCLD_0 = @echo "  CCLD  " $@;
+AM_V_GEN = $(am__v_GEN_$(V))
+am__v_GEN_ = $(am__v_GEN_$(AM_DEFAULT_VERBOSITY))
+am__v_GEN_0 = @echo "  GEN   " $@;
 SOURCES = $(gecko_mediaplayer_dvx_so_SOURCES) \
 	$(gecko_mediaplayer_qt_so_SOURCES) \
 	$(gecko_mediaplayer_rm_so_SOURCES) \
@@ -163,7 +186,9 @@ am__relativize = \
   done; \
   reldir="$$dir2"
 ACLOCAL = @ACLOCAL@
+ALSA_CFLAGS = @ALSA_CFLAGS@
 AMTAR = @AMTAR@
+AM_DEFAULT_VERBOSITY = @AM_DEFAULT_VERBOSITY@
 AUTOCONF = @AUTOCONF@
 AUTOHEADER = @AUTOHEADER@
 AUTOMAKE = @AUTOMAKE@
@@ -175,6 +200,9 @@ CCDEPMODE = @CCDEPMODE@
 CFLAGS = @CFLAGS@
 CPP = @CPP@
 CPPFLAGS = @CPPFLAGS@
+CURL_CFLAGS = @CURL_CFLAGS@
+CURL_DEFINES = @CURL_DEFINES@
+CURL_LIBS = @CURL_LIBS@
 CXX = @CXX@
 CXXDEPMODE = @CXXDEPMODE@
 CXXFLAGS = @CXXFLAGS@
@@ -200,6 +228,9 @@ GETTEXT_PACKAGE = @GETTEXT_PACKAGE@
 GIO_CFLAGS = @GIO_CFLAGS@
 GIO_DEFINES = @GIO_DEFINES@
 GIO_LIBS = @GIO_LIBS@
+GLIB2_26_CFLAGS = @GLIB2_26_CFLAGS@
+GLIB2_26_DEFINES = @GLIB2_26_DEFINES@
+GLIB2_26_LIBS = @GLIB2_26_LIBS@
 GLIB_CFLAGS = @GLIB_CFLAGS@
 GLIB_LIBS = @GLIB_LIBS@
 GMOFILES = @GMOFILES@
@@ -230,17 +261,22 @@ PACKAGE_BUGREPORT = @PACKAGE_BUGREPORT@
 PACKAGE_NAME = @PACKAGE_NAME@
 PACKAGE_STRING = @PACKAGE_STRING@
 PACKAGE_TARNAME = @PACKAGE_TARNAME@
+PACKAGE_URL = @PACKAGE_URL@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
 PKG_CONFIG = @PKG_CONFIG@
+PKG_CONFIG_LIBDIR = @PKG_CONFIG_LIBDIR@
+PKG_CONFIG_PATH = @PKG_CONFIG_PATH@
 POFILES = @POFILES@
 POSUB = @POSUB@
 PO_IN_DATADIR_FALSE = @PO_IN_DATADIR_FALSE@
 PO_IN_DATADIR_TRUE = @PO_IN_DATADIR_TRUE@
+PULSE_CFLAGS = @PULSE_CFLAGS@
 RANLIB = @RANLIB@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
+USE_GCONF = @USE_GCONF@
 USE_NLS = @USE_NLS@
 VERSION = @VERSION@
 XGETTEXT = @XGETTEXT@
@@ -297,10 +333,13 @@ INCLUDES = \
 	-DPACKAGE_DATA_DIR=\""$(datadir)"\" \
 	$(GECKO_CFLAGS) \
 	$(GLIB_CFLAGS) \
+	$(GIO_CFLAGS) \
 	$(DBUS_CFLAGS) \
 	$(GCONF_CFLAGS) \
 	$(GCONF_DEFINES) \
-	$(DEFINES)
+	$(DEFINES) \
+	$(CURL_DEFINES) \
+	$(CURL_CFLAGS) 
 
 AM_CFLAGS = \
 	 -Wall \
@@ -331,35 +370,35 @@ gecko_mediaplayer_so_SOURCES = \
 
 gecko_mediaplayer_so_CFLAGS = -fPIC 
 gecko_mediaplayer_so_LDFLAGS = -shared -fPIC
-gecko_mediaplayer_so_LDADD = -ldl libgmlib/libgmlib.a $(GLIB_LIBS) $(DBUS_LIBS) $(GCONF_LIBS)
+gecko_mediaplayer_so_LDADD = -ldl libgmlib/libgmlib.a $(GLIB_LIBS) $(DBUS_LIBS) $(GCONF_LIBS) $(CURL_LIBS) $(GIO_LIBS)
 gecko_mediaplayer_qt_so_SOURCES = \
 	plugin_types_qt.cpp \
 	$(COMMONCODE)
 
 gecko_mediaplayer_qt_so_CFLAGS = -fPIC 
 gecko_mediaplayer_qt_so_LDFLAGS = -shared -fPIC
-gecko_mediaplayer_qt_so_LDADD = -ldl libgmlib/libgmlib.a $(GLIB_LIBS) $(DBUS_LIBS) $(GCONF_LIBS)
+gecko_mediaplayer_qt_so_LDADD = -ldl libgmlib/libgmlib.a $(GLIB_LIBS) $(DBUS_LIBS) $(GCONF_LIBS) $(CURL_LIBS) $(GIO_LIBS)
 gecko_mediaplayer_wmp_so_SOURCES = \
 	plugin_types_wmp.cpp \
 	$(COMMONCODE)
 
 gecko_mediaplayer_wmp_so_CFLAGS = -fPIC 
 gecko_mediaplayer_wmp_so_LDFLAGS = -shared -fPIC 
-gecko_mediaplayer_wmp_so_LDADD = -ldl libgmlib/libgmlib.a $(GLIB_LIBS) $(DBUS_LIBS) $(GCONF_LIBS)
+gecko_mediaplayer_wmp_so_LDADD = -ldl libgmlib/libgmlib.a $(GLIB_LIBS) $(DBUS_LIBS) $(GCONF_LIBS) $(CURL_LIBS) $(GIO_LIBS)
 gecko_mediaplayer_dvx_so_SOURCES = \
 	plugin_types_dvx.cpp \
 	$(COMMONCODE)
 
 gecko_mediaplayer_dvx_so_CFLAGS = -fPIC 
 gecko_mediaplayer_dvx_so_LDFLAGS = -shared -fPIC
-gecko_mediaplayer_dvx_so_LDADD = -ldl libgmlib/libgmlib.a $(GLIB_LIBS) $(DBUS_LIBS) $(GCONF_LIBS)
+gecko_mediaplayer_dvx_so_LDADD = -ldl libgmlib/libgmlib.a $(GLIB_LIBS) $(DBUS_LIBS) $(GCONF_LIBS) $(CURL_LIBS) $(GIO_LIBS)
 gecko_mediaplayer_rm_so_SOURCES = \
 	plugin_types_rm.cpp \
 	$(COMMONCODE)
 
 gecko_mediaplayer_rm_so_CFLAGS = -fPIC 
 gecko_mediaplayer_rm_so_LDFLAGS = -shared -fPIC
-gecko_mediaplayer_rm_so_LDADD = -ldl libgmlib/libgmlib.a $(GLIB_LIBS) $(DBUS_LIBS) $(GCONF_LIBS)
+gecko_mediaplayer_rm_so_LDADD = -ldl libgmlib/libgmlib.a $(GLIB_LIBS) $(DBUS_LIBS) $(GCONF_LIBS) $(CURL_LIBS) $(GIO_LIBS)
 all: all-recursive
 
 .SUFFIXES:
@@ -433,19 +472,19 @@ clean-install_libexecPROGRAMS:
 	-test -z "$(install_libexec_PROGRAMS)" || rm -f $(install_libexec_PROGRAMS)
 gecko-mediaplayer-dvx.so$(EXEEXT): $(gecko_mediaplayer_dvx_so_OBJECTS) $(gecko_mediaplayer_dvx_so_DEPENDENCIES) 
 	@rm -f gecko-mediaplayer-dvx.so$(EXEEXT)
-	$(gecko_mediaplayer_dvx_so_LINK) $(gecko_mediaplayer_dvx_so_OBJECTS) $(gecko_mediaplayer_dvx_so_LDADD) $(LIBS)
+	$(AM_V_CXXLD)$(gecko_mediaplayer_dvx_so_LINK) $(gecko_mediaplayer_dvx_so_OBJECTS) $(gecko_mediaplayer_dvx_so_LDADD) $(LIBS)
 gecko-mediaplayer-qt.so$(EXEEXT): $(gecko_mediaplayer_qt_so_OBJECTS) $(gecko_mediaplayer_qt_so_DEPENDENCIES) 
 	@rm -f gecko-mediaplayer-qt.so$(EXEEXT)
-	$(gecko_mediaplayer_qt_so_LINK) $(gecko_mediaplayer_qt_so_OBJECTS) $(gecko_mediaplayer_qt_so_LDADD) $(LIBS)
+	$(AM_V_CXXLD)$(gecko_mediaplayer_qt_so_LINK) $(gecko_mediaplayer_qt_so_OBJECTS) $(gecko_mediaplayer_qt_so_LDADD) $(LIBS)
 gecko-mediaplayer-rm.so$(EXEEXT): $(gecko_mediaplayer_rm_so_OBJECTS) $(gecko_mediaplayer_rm_so_DEPENDENCIES) 
 	@rm -f gecko-mediaplayer-rm.so$(EXEEXT)
-	$(gecko_mediaplayer_rm_so_LINK) $(gecko_mediaplayer_rm_so_OBJECTS) $(gecko_mediaplayer_rm_so_LDADD) $(LIBS)
+	$(AM_V_CXXLD)$(gecko_mediaplayer_rm_so_LINK) $(gecko_mediaplayer_rm_so_OBJECTS) $(gecko_mediaplayer_rm_so_LDADD) $(LIBS)
 gecko-mediaplayer-wmp.so$(EXEEXT): $(gecko_mediaplayer_wmp_so_OBJECTS) $(gecko_mediaplayer_wmp_so_DEPENDENCIES) 
 	@rm -f gecko-mediaplayer-wmp.so$(EXEEXT)
-	$(gecko_mediaplayer_wmp_so_LINK) $(gecko_mediaplayer_wmp_so_OBJECTS) $(gecko_mediaplayer_wmp_so_LDADD) $(LIBS)
+	$(AM_V_CXXLD)$(gecko_mediaplayer_wmp_so_LINK) $(gecko_mediaplayer_wmp_so_OBJECTS) $(gecko_mediaplayer_wmp_so_LDADD) $(LIBS)
 gecko-mediaplayer.so$(EXEEXT): $(gecko_mediaplayer_so_OBJECTS) $(gecko_mediaplayer_so_DEPENDENCIES) 
 	@rm -f gecko-mediaplayer.so$(EXEEXT)
-	$(gecko_mediaplayer_so_LINK) $(gecko_mediaplayer_so_OBJECTS) $(gecko_mediaplayer_so_LDADD) $(LIBS)
+	$(AM_V_CXXLD)$(gecko_mediaplayer_so_LINK) $(gecko_mediaplayer_so_OBJECTS) $(gecko_mediaplayer_so_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -468,15 +507,17 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/plugin_types_wmp.Po@am__quote@
 
 .cpp.o:
-@am__fastdepCXX_TRUE@	$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
+@am__fastdepCXX_FALSE@	$(AM_V_CXX) @AM_BACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXXCOMPILE) -c -o $@ $<
 
 .cpp.obj:
-@am__fastdepCXX_TRUE@	$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ `$(CYGPATH_W) '$<'`
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ `$(CYGPATH_W) '$<'`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
+@am__fastdepCXX_FALSE@	$(AM_V_CXX) @AM_BACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXXCOMPILE) -c -o $@ `$(CYGPATH_W) '$<'`

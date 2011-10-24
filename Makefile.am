@@ -18,7 +18,7 @@ schemadir   = @GCONF_SCHEMA_FILE_DIR@
 schema_DATA = gecko-mediaplayer.schemas
 endif
 
-EXTRA_DIST = $(gecko_mediaplayerdoc_DATA) $(schema_DATA) gecko-mediaplayer.spec.in
+EXTRA_DIST = $(gecko_mediaplayerdoc_DATA) $(schema_DATA) gecko-mediaplayer.spec.in gecko-mediaplayer.schemas
 
 # Copy all the spec files. Of cource, only one is actually used.
 dist-hook:

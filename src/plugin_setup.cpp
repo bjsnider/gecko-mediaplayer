@@ -52,9 +52,11 @@ void new_instance(CPlugin * instance, int16_t argc, char *argn[], char *argv[])
     ListItem *item = NULL;
     ListItem *src = NULL;
     ListItem *href = NULL;
+    ListItem *qtsrc = NULL;
     gchar *arg[10];
     GRand *rand;
     gchar *tmp;
+    //gchar *url;
     gchar **parse;
     gint width = 0, height = 0;
     GError *error;
@@ -80,9 +82,11 @@ void new_instance(CPlugin * instance, int16_t argc, char *argn[], char *argv[])
 
             if (g_ascii_strcasecmp(argn[i], "console") == 0) {
                 instance->console = g_strdup(argv[i]);
-                for (j = 0; j < strlen(instance->console); j++) {
-                    if (!g_ascii_isalnum(instance->console[j])) {
-                        instance->console[j] = 'a';
+                if (instance->console != NULL) {
+                    for (j = 0; j < strlen(instance->console); j++) {
+                        if (!g_ascii_isalnum(instance->console[j])) {
+                            instance->console[j] = 'a';
+                        }
                     }
                 }
             }
@@ -92,9 +96,9 @@ void new_instance(CPlugin * instance, int16_t argc, char *argn[], char *argv[])
             }
 
             if (g_ascii_strcasecmp(argn[i], "showcontrols") == 0) {
-                if (strstr(argv[i], "true")
-                    || strstr(argv[i], "yes")
-                    || strstr(argv[i], "1")) {
+                if (g_ascii_strcasecmp(argv[i], "true") == 0
+                    || g_ascii_strcasecmp(argv[i], "yes") == 0
+                    || g_ascii_strcasecmp(argv[i], "1") == 0) {
                     instance->show_controls = 1;
                 } else {
                     instance->show_controls = 0;
@@ -108,6 +112,14 @@ void new_instance(CPlugin * instance, int16_t argc, char *argn[], char *argv[])
             if (g_ascii_strcasecmp(argn[i], "height") == 0) {
                 sscanf(argv[i], "%i", &height);
             }
+
+            if (g_ascii_strcasecmp(argn[i], "style") == 0) {
+                tmp = g_strrstr(argv[i], "width:");
+                sscanf(tmp + strlen("width:"), "%i", &width);
+                tmp = g_strrstr(argv[i], "height:");
+                sscanf(tmp + strlen("height:"), "%i", &height);
+            }
+
 
             if (g_ascii_strcasecmp(argn[i], "src") == 0 || g_ascii_strcasecmp(argn[i], "url") == 0) {
                 item = g_new0(ListItem, 1);
@@ -164,19 +176,12 @@ void new_instance(CPlugin * instance, int16_t argc, char *argn[], char *argv[])
 
             if (g_ascii_strcasecmp(argn[i], "qtsrc") == 0) {
                 item = g_new0(ListItem, 1);
-                tmp = g_strrstr(src->src, "/");
-                if (tmp) {
-                    g_strlcpy(item->src, src->src, 1024);
-                    tmp = g_strrstr(item->src, "/");
-                    tmp[1] = '\0';
-                    g_strlcat(item->src, argv[i], 4096);
-                } else {
-                    g_strlcpy(item->src, argv[i], 4096);
-                }
+                g_strlcpy(item->src, argv[i], 4096);
                 item->streaming = streaming(item->src);
                 item->play = TRUE;
                 item->id = instance->nextid++;
                 instance->playlist = g_list_append(instance->playlist, item);
+                qtsrc = item;
             }
 
             if (g_ascii_strcasecmp(argn[i], "file") == 0) {
@@ -208,9 +213,9 @@ void new_instance(CPlugin * instance, int16_t argc, char *argn[], char *argv[])
             }
 
             if (g_ascii_strcasecmp(argn[i], "hidden") == 0) {
-                if (strstr(argv[i], "true")
-                    || strstr(argv[i], "yes")
-                    || strstr(argv[i], "1")) {
+                if (g_ascii_strcasecmp(argv[i], "true") == 0
+                    || g_ascii_strcasecmp(argv[i], "yes") == 0
+                    || g_ascii_strcasecmp(argv[i], "1") == 0) {
                     instance->hidden = TRUE;
                 } else {
                     instance->hidden = FALSE;
@@ -238,10 +243,10 @@ void new_instance(CPlugin * instance, int16_t argc, char *argn[], char *argv[])
             }
 
             if (g_ascii_strcasecmp(argn[i], "autohref") == 0) {
-                if (strstr(argv[i], "true")
-                    || strstr(argv[i], "yes")
-                    || strstr(argv[i], "autohref")
-                    || strstr(argv[i], "1")) {
+                if (g_ascii_strcasecmp(argv[i], "true") == 0
+                    || g_ascii_strcasecmp(argv[i], "yes") == 0
+                    || g_ascii_strcasecmp(argv[i], "autohref") == 0
+                    || g_ascii_strcasecmp(argv[i], "1") == 0) {
                     autohref = TRUE;
                 } else {
                     autohref = FALSE;
@@ -299,10 +304,12 @@ void new_instance(CPlugin * instance, int16_t argc, char *argn[], char *argv[])
                 }
             }
 
-            if (g_ascii_strcasecmp(argn[i], "nocache") == 0) {
-                if (strstr(argv[i], "true")
-                    || strstr(argv[i], "yes")
-                    || strstr(argv[i], "1")) {
+            if (g_ascii_strcasecmp(argn[i], "nocache") == 0
+                || g_ascii_strcasecmp(argn[i], "qtsrcdontusebrowser") == 0) {
+                if (g_ascii_strcasecmp(argv[i], "true") == 0
+                    || g_ascii_strcasecmp(argv[i], "yes") == 0
+                    || g_ascii_strcasecmp(argv[i], "1") == 0
+                    || g_ascii_strcasecmp(argv[i], "") == 0 || argv[i] == NULL) {
                     force_streaming = TRUE;
                 } else {
                     force_streaming = FALSE;
@@ -310,9 +317,9 @@ void new_instance(CPlugin * instance, int16_t argc, char *argn[], char *argv[])
             }
 
             if (g_ascii_strcasecmp(argn[i], "postdomevents") == 0) {
-                if (strstr(argv[i], "true")
-                    || strstr(argv[i], "yes")
-                    || strstr(argv[i], "1")) {
+                if (g_ascii_strcasecmp(argv[i], "true") == 0
+                    || g_ascii_strcasecmp(argv[i], "yes") == 0
+                    || g_ascii_strcasecmp(argv[i], "1") == 0) {
                     instance->post_dom_events = TRUE;
                 } else {
                     instance->post_dom_events = FALSE;
@@ -423,7 +430,36 @@ void new_instance(CPlugin * instance, int16_t argc, char *argn[], char *argv[])
 
         };
     } else {
+        // printf("Non-Embed Mode\n");
+        for (i = 0; i < argc; i++) {
 
+            if (argn[i] == NULL)
+                continue;
+
+            printf("ARG: %s = %s\n", argn[i], argv[i]);
+
+            if (g_ascii_strcasecmp(argn[i], "src") == 0) {
+                item = g_new0(ListItem, 1);
+                if (g_strrstr(argv[i], "XXmovies.apple.com")) { // tmp disabled, to reenable remove XX
+                    tmp = g_strrstr(argv[i], "movies.");
+                    if (tmp != NULL && strlen(tmp) > strlen("movies.")) {
+                        tmp = tmp + strlen("movies.");
+                        g_snprintf(item->src, 4096, "http://www.%s", tmp);
+                    } else {
+                        g_strlcpy(item->src, argv[i], 4096);
+                    }
+                } else {
+                    g_strlcpy(item->src, argv[i], 4096);
+                }
+                item->streaming = streaming(item->src);
+                printf("this should match %s\n", item->src);
+                item->play = TRUE;
+                item->id = instance->nextid++;
+                instance->playlist = g_list_append(instance->playlist, item);
+                src = item;
+            }
+
+        }
     }
 
     nperror = NPN_GetValue(instance->mInstance, (NPNVariable) 17 /* NPNVSupportsWindowless */ ,
@@ -438,6 +474,10 @@ void new_instance(CPlugin * instance, int16_t argc, char *argn[], char *argv[])
         }
     }
 
+    if (qtsrc != NULL) {
+        src->play = FALSE;
+    }
+
     if (src != NULL) {
         if (loop != 0) {
             src->loop = TRUE;
@@ -445,7 +485,11 @@ void new_instance(CPlugin * instance, int16_t argc, char *argn[], char *argv[])
         } else {
             loop = FALSE;
         }
+    } else {
+        // Having this event fire creates several instances of gmp at some websites
+        // postPlayStateChange(instance->mInstance, STATE_TRANSITIONING);
     }
+
     // link up src to href objects by id
     if (href != NULL && src != NULL) {
         src->hrefid = href->id;
@@ -466,7 +510,14 @@ void new_instance(CPlugin * instance, int16_t argc, char *argn[], char *argv[])
 #else
     if (force_streaming) {
         item->streaming = TRUE;
+        src->streaming = TRUE;
+        if (qtsrc)
+            qtsrc->streaming = TRUE;
     }
+
+    list_qualify_url(instance->playlist, instance->page_url);
+
+
 //    if (g_ascii_strcasecmp(instance->mimetype,"video/x-flv") == 0) {
 //      item->streaming = TRUE;
 //    }
@@ -474,13 +525,12 @@ void new_instance(CPlugin * instance, int16_t argc, char *argn[], char *argv[])
     // list_dump(instance->playlist);
 
     if (instance->hidden == TRUE || ((width == 0 || height == 0) && instance->mode != NP_FULL)) {
-
         if (item->streaming) {
             open_location(instance, item, FALSE);
             item->requested = 1;
         } else {
             item->requested = 1;
-            NPN_GetURLNotify(instance->mInstance, item->src, NULL, item);
+            instance->GetURLNotify(instance->mInstance, item->src, NULL, item);
         }
     }
 
@@ -517,45 +567,56 @@ void new_instance(CPlugin * instance, int16_t argc, char *argn[], char *argv[])
             g_error_free(error);
             error = NULL;
         }
-        NPN_GetURLNotify(instance->mInstance, href->src, NULL, href);
+        instance->GetURLNotify(instance->mInstance, href->src, NULL, href);
         g_free(app_name);
     }
 
 
 }
 
-gint streaming(gchar * url)
+gboolean streaming(gchar * url)
 {
-    gint ret = 0;
+    gboolean ret = FALSE;
     char *p;
 
     if (g_ascii_strncasecmp(url, "mms://", 6) == 0)
-        ret = 1;
+        ret = TRUE;
 
     if (g_ascii_strncasecmp(url, "mmst://", 7) == 0)
-        ret = 1;
+        ret = TRUE;
 
     if (g_ascii_strncasecmp(url, "mmsu://", 7) == 0)
-        ret = 1;
+        ret = TRUE;
 
     if (g_ascii_strncasecmp(url, "rtsp://", 7) == 0)
-        ret = 1;
+        ret = TRUE;
 
     if (g_ascii_strncasecmp(url, "tv://", 5) == 0)
-        ret = 1;
+        ret = TRUE;
 
     if (g_ascii_strncasecmp(url, "dvd://", 6) == 0)
-        ret = 1;
+        ret = TRUE;
+
+    if (g_ascii_strncasecmp(url, "udp://", 6) == 0)
+        ret = TRUE;
 
     if (g_strrstr(url, ".m3u") != NULL)
-        ret = 1;
+        ret = TRUE;
 
-    if (g_ascii_strncasecmp(url, "file://", 7) == 0) {
+    if (g_strrstr(url, "stream") != NULL) {
+        if (g_strrstr(url, "http://") == NULL)
+            ret = TRUE;
+    }
+
+    if (g_strrstr(url, "MSWMExt=.asf") != NULL)
+        ret = TRUE;
+
+    if (ret == FALSE && g_ascii_strncasecmp(url, "file://", 7) == 0) {
         p = g_filename_from_uri(url, NULL, NULL);
         if (p != NULL) {
             if (g_file_test(p, G_FILE_TEST_EXISTS)) {
                 g_strlcpy(url, p, 1024);
-                ret = 1;
+                ret = TRUE;
             }
             g_free(p);
         }

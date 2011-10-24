@@ -44,7 +44,7 @@
 #include <dbus/dbus.h>
 #include <dbus/dbus-glib-lowlevel.h>
 #ifdef HAVE_CONFIG_H
-#  include <config.h>
+#include <config.h>
 #endif
 #ifdef HAVE_GCONF
 #include <gconf/gconf.h>
@@ -58,6 +58,10 @@
 #include "plugin_list.h"
 #ifdef ENABLE_NLS
 #include <libintl.h>
+#endif
+
+#ifdef HAVE_CURL
+#include <curl/curl.h>
 #endif
 
 #include "libgmlib/gmlib.h"
@@ -77,14 +81,13 @@
 #define STATE_RECONNECTING  11
 
 // config settings stored in gconf
-#define CACHE_SIZE		"cache_size"
-#define DISABLE_QT		"disable_qt"
-#define DISABLE_REAL	"disable_real"
-#define DISABLE_WMP		"disable_wmp"
-#define DISABLE_DVX		"disable_dvx"
-#define DEBUG_LEVEL		"debug_level"
-#define DISABLE_MIDI    "disable_midi"
-#define PLAYER_BACKEND  "player_backend"
+#define DISABLE_QT		"disable-qt"
+#define DISABLE_REAL	"disable-real"
+#define DISABLE_WMP		"disable-wmp"
+#define DISABLE_DVX		"disable-dvx"
+#define DEBUG_LEVEL		"debug-level"
+#define DISABLE_MIDI    "disable-midi"
+#define PLAYER_BACKEND  "player-backend"
 
 typedef enum {
     PLAYING,
@@ -94,6 +97,7 @@ typedef enum {
 } PLAYSTATE;
 
 void postDOMEvent(NPP mInstance, const gchar * id, const gchar * event);
+void postPlayStateChange(NPP mInstance, const gint state);
 
 class CPlugin {
   private:
@@ -102,6 +106,9 @@ class CPlugin {
     NPBool mInitialized;
     NPObject *m_pScriptableObject;
     NPObject *m_pScriptableObjectControls;
+    NPObject *m_pScriptableObjectSettings;
+    NPObject *m_pScriptableObjectMedia;
+    NPObject *m_pScriptableObjectError;
 
   public:
      CPlugin(NPP pNPInstance);
@@ -114,6 +121,9 @@ class CPlugin {
 
     NPObject *GetScriptableObject();
     NPObject *GetScriptableObjectControls();
+    NPObject *GetScriptableObjectSettings();
+    NPObject *GetScriptableObjectMedia();
+    NPObject *GetScriptableObjectError();
 
     NPError GetValue(NPPVariable variable, void *value);
     NPError SetWindow(NPWindow * aWindow);
@@ -122,6 +132,7 @@ class CPlugin {
     void URLNotify(const char *url, NPReason reason, void *notifyData);
     int32_t WriteReady(NPStream * stream);
     int32_t Write(NPStream * stream, int32_t offset, int32_t len, void *buffer);
+    NPError GetURLNotify(NPP instance, const char *url, const char *target, void *notifyData);
 
 
 
@@ -141,6 +152,7 @@ class CPlugin {
     void GetTime(double *_retval);
     void GetDuration(double *_retval);
     void GetPercent(double *_retval);
+    void GetBitrate(int *_retval);
     void GetPlayState(int32_t * playstate);
     void SetFilename(const char *filename);
     void GetFilename(char **filename);
@@ -163,6 +175,7 @@ class CPlugin {
   public:
      Window mWindow;
     NPP mInstance;
+    gchar *page_url;
     gboolean windowless;
     gint nextid;
     uint16_t mode;
@@ -191,6 +204,7 @@ class CPlugin {
     gchar *controls;
     gchar *user_agent;
     gchar *player_backend;
+    gboolean quicktime_emulation;
 
     // events
     gboolean post_dom_events;

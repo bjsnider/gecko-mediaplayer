@@ -61,6 +61,7 @@ gchar *GetMIMEDescription()
                   "video/x-msvideo:avi,*:AVI;"
                   "video/msvideo:avi,*:AVI;"
                   "application/x-mplayer2:*:Media Files;"
+                  "video/x-mplayer2:*:Media Files;"
                   "application/x-ms-wmv:wmv,*:Microsoft WMV video;"
                   "video/x-ms-asf:asf,asx,*:Media Files;"
                   "video/x-ms-asx:asx,*:Media Files;"

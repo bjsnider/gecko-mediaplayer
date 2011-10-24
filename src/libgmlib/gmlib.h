@@ -22,6 +22,7 @@
  * 	Boston, MA  02110-1301, USA.
  */
 
+#include "gm_audio.h"
 #include "gm_file.h"
 #include "gm_parse.h"
 #include "gm_pref_store.h"

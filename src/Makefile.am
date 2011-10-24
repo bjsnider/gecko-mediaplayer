@@ -11,10 +11,13 @@ INCLUDES = \
 	-DPACKAGE_DATA_DIR=\""$(datadir)"\" \
 	$(GECKO_CFLAGS) \
 	$(GLIB_CFLAGS) \
+	$(GIO_CFLAGS) \
 	$(DBUS_CFLAGS) \
 	$(GCONF_CFLAGS) \
 	$(GCONF_DEFINES) \
-	$(DEFINES)
+	$(DEFINES) \
+	$(CURL_DEFINES) \
+	$(CURL_CFLAGS) 
 
 AM_CFLAGS =\
 	 -Wall \
@@ -52,7 +55,7 @@ gecko_mediaplayer_so_SOURCES = \
 		
 gecko_mediaplayer_so_CFLAGS = -fPIC 
 gecko_mediaplayer_so_LDFLAGS = -shared -fPIC
-gecko_mediaplayer_so_LDADD = -ldl libgmlib/libgmlib.a $(GLIB_LIBS) $(DBUS_LIBS) $(GCONF_LIBS)
+gecko_mediaplayer_so_LDADD = -ldl libgmlib/libgmlib.a $(GLIB_LIBS) $(DBUS_LIBS) $(GCONF_LIBS) $(CURL_LIBS) $(GIO_LIBS)
 
 gecko_mediaplayer_qt_so_SOURCES = \
 	plugin_types_qt.cpp \
@@ -60,7 +63,7 @@ gecko_mediaplayer_qt_so_SOURCES = \
 	
 gecko_mediaplayer_qt_so_CFLAGS = -fPIC 
 gecko_mediaplayer_qt_so_LDFLAGS = -shared -fPIC
-gecko_mediaplayer_qt_so_LDADD = -ldl libgmlib/libgmlib.a $(GLIB_LIBS) $(DBUS_LIBS) $(GCONF_LIBS)
+gecko_mediaplayer_qt_so_LDADD = -ldl libgmlib/libgmlib.a $(GLIB_LIBS) $(DBUS_LIBS) $(GCONF_LIBS) $(CURL_LIBS) $(GIO_LIBS)
 
 gecko_mediaplayer_wmp_so_SOURCES = \
 	plugin_types_wmp.cpp \
@@ -68,7 +71,7 @@ gecko_mediaplayer_wmp_so_SOURCES = \
 	
 gecko_mediaplayer_wmp_so_CFLAGS = -fPIC 
 gecko_mediaplayer_wmp_so_LDFLAGS = -shared -fPIC 
-gecko_mediaplayer_wmp_so_LDADD = -ldl libgmlib/libgmlib.a $(GLIB_LIBS) $(DBUS_LIBS) $(GCONF_LIBS)
+gecko_mediaplayer_wmp_so_LDADD = -ldl libgmlib/libgmlib.a $(GLIB_LIBS) $(DBUS_LIBS) $(GCONF_LIBS) $(CURL_LIBS) $(GIO_LIBS)
 
 gecko_mediaplayer_dvx_so_SOURCES = \
 	plugin_types_dvx.cpp \
@@ -76,7 +79,7 @@ gecko_mediaplayer_dvx_so_SOURCES = \
 	
 gecko_mediaplayer_dvx_so_CFLAGS = -fPIC 
 gecko_mediaplayer_dvx_so_LDFLAGS = -shared -fPIC
-gecko_mediaplayer_dvx_so_LDADD = -ldl libgmlib/libgmlib.a $(GLIB_LIBS) $(DBUS_LIBS) $(GCONF_LIBS)
+gecko_mediaplayer_dvx_so_LDADD = -ldl libgmlib/libgmlib.a $(GLIB_LIBS) $(DBUS_LIBS) $(GCONF_LIBS) $(CURL_LIBS) $(GIO_LIBS)
 
 gecko_mediaplayer_rm_so_SOURCES = \
 	plugin_types_rm.cpp \
@@ -84,7 +87,7 @@ gecko_mediaplayer_rm_so_SOURCES = \
 	
 gecko_mediaplayer_rm_so_CFLAGS = -fPIC 
 gecko_mediaplayer_rm_so_LDFLAGS = -shared -fPIC
-gecko_mediaplayer_rm_so_LDADD = -ldl libgmlib/libgmlib.a $(GLIB_LIBS) $(DBUS_LIBS) $(GCONF_LIBS)
+gecko_mediaplayer_rm_so_LDADD = -ldl libgmlib/libgmlib.a $(GLIB_LIBS) $(DBUS_LIBS) $(GCONF_LIBS) $(CURL_LIBS) $(GIO_LIBS)
 
 indent:
 	indent -kr -l100 -i4 -nut *.cpp

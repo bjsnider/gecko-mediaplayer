@@ -43,7 +43,6 @@
 #include <string.h>
 #include "memmem_compat.h"
 
-
 typedef struct _ListItem {
     gchar src[4096];
     gchar local[1024];
@@ -68,6 +67,7 @@ typedef struct _ListItem {
     gint loopcount;             // 0 - loop done, -1 loop forever
     gint bitrate;
     gint bitrate_requests;
+    void *plugin;
 } ListItem;
 
 
@@ -113,6 +113,7 @@ void list_mark_controlid_ready(GList * list, gint id);
 void list_mark_controlid_cancelled(GList * list, gint id, gboolean cancelled);
 void list_mark_id_played(GList * list, gint id);
 ListItem *list_find_next_playable(GList * list);
+void list_qualify_url(GList * list, gchar * page_url);
 GList *list_clear(GList * list);
 void list_dump(GList * list);
 GList *list_parse_qt(GList * list, ListItem * item);

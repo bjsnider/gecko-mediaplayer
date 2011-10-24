@@ -1,3 +1,74 @@
+1.0.4
+	Fix problem where file is downloaded before gnome-mplayer is started (locally cached)
+	Added Portuguese translation
+	Remove some whitespace
+	Updated French translation
+	Updated Polish translation
+	Updated Turkish translation
+1.0.4b2
+	If http is found in the URL it may not be a stream (this might break some sites)
+	Get status messages looking better, requires gnome-mplayer from SVN on same date
+	Disable Windows OnDSPlayStateChangeEvt callback
+	Emulate WMP status
+	Emulate WMP versionInfo
+	Add in some more WMP javascript emulation
+	Align PlayStateChanges similar to WMP
+	Rework how media events are handled
+	Fix problems with SetVolume
+	Remove a couple of state change callbacks to stop fork bomb
+	Call javascript function OnDSPlayStateChange if it is exists
+	Add .media.getItemInfo title,url, bitrate to WMP Javascript emulation
+	Add .URL to WMP Javascript emulation
+	Updated Polish translation
+	Add .media.duration to WMP Javascript emulation
+	Add .settings.volume to WMP Javascript emulation
+1.0.4b1
+	When getting a file from Apple, only play the first media link
+	Add udp as supported streaming format
+	Fix up some issues with apple trailers
+1.0.3
+	Allow files > 2GB to be loaded in NP_FULL mode
+	Always include gecko-mediaplayer.schema in tar file
+	Make configure option --with-gconf=yes override use of gsettings
+1.0.3beta
+	Cleanup some compile warnings
+	Try out silent make files
+	Mark asf files as streaming
+	Remove code to set the firefox preference
+	Version bump to 1.0.3beta
+	Apply changes to fix compiling on Ubuntu
+	Apply config changes to gconf schema
+	Apply changes to make gecko-mediaplayer with with gnome-mplayer 1.0.3beta and higher
+	Apply patch from issue #126
+	Updated Turkish translation
+	Work around xulrunner api change Issue #124
+	Fix a couple of NULL pointer errors Issue #123
+	Fixes to using libcurl
+	Only do list_dump when we process the list
+	Use libcurl to fetch content when running in QuickTime emulation
+	Fix spot where QuickTime was not set to 7.6.9 
+	Get width and height from the style attribute if present
+	Bump QuickTime emulated version to 7.6.9
+1.0.0
+	Fix problem with javascript seek function where value was coming in as an int where unexpected
+	Change libxul 2.0 check from 2.0b5 to just 2.0
+	Fix incorrect variable
+	Apply patch from Onur Kucuk to allow gecko-mediaplayer to compile against 
+		xulrunner 2.0beta5 and higher
+	Fully qualify streaming URLs loaded from the embed tag
+	Obtain the plugin caller page and use that to resolve streaming urls
+	Fix problem where first item on list is not playable
+	Support qtsrcdontusebrowser option
+	Updated Spanish translation
+	Add WEBM types to plugin
+	Handle nocache=1 better
+	Mark asx files with ENTRY in them as non-playable
+	Allow separate cache sizes for audio or video data, depends on mimetype identification
+	Protect against NULL console
+	Added German translation
+	Move "stream" test to streaming function, change from int to boolean
+	If url has "stream" in it, mark the url as streaming
+	Give each item in the RAM playlist a unique id 
 0.9.9.2
 	Detect and use NS_GetServiceManager dynamically
 	Keep requested flag consistent

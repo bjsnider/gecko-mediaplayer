@@ -125,6 +125,13 @@ gchar *GetMIMEDescription()
     // MNG
     g_strlcat(MimeTypes, "video/x-mng:mng:Multiple-Image Network Graphics;", sizeof(MimeTypes));
 
+    // WEBM
+    g_strlcat(MimeTypes,
+              "audio/webm:webm:WEBM audio File;"
+              "audio/x-webm:webm:WEBM audio File;"
+              "video/webm:webm:WEBM video File;"
+              "video/x-webm:webm:WEBM video File;", sizeof(MimeTypes));
+
     return g_strdup(MimeTypes);
 }
 
@@ -161,5 +168,5 @@ NPError PluginGetValue(NPPVariable variable, void *value)
 
 void pluginSpecific(CPlugin * instance)
 {
-
+    instance->quicktime_emulation = FALSE;
 }

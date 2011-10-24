@@ -1,6 +1,9 @@
 /* config.h.  Generated from config.h.in by configure.  */
 /* config.h.in.  Generated from configure.in by autoheader.  */
 
+/* Define to 1 if you have curl support */
+#define CURL_ENABLED 1
+
 /* always defined to indicate that i18n is enabled */
 #define ENABLE_NLS 1
 
@@ -10,6 +13,9 @@
 /* Define to 1 if you have GIO support */
 #define GIO_ENABLED 1
 
+/* Define to 1 if you have GLIB 2.26 or higher */
+#define GLIB2_26_ENABLED 1
+
 /* Define to 1 if you have the `bind_textdomain_codeset' function. */
 #define HAVE_BIND_TEXTDOMAIN_CODESET 1
 
@@ -17,7 +23,7 @@
 #define HAVE_DCGETTEXT 1
 
 /* Define to 1 to use GConf to store preferences */
-#define HAVE_GCONF 1
+/* #undef HAVE_GCONF */
 
 /* Define if the GNU gettext() function is already present or preinstalled. */
 #define HAVE_GETTEXT 1
@@ -35,7 +41,7 @@
 #define HAVE_MEMORY_H 1
 
 /* Define to 1 if using libxul 1.9.2 or higher */
-/* #undef HAVE_NEW_XULRUNNER */
+#define HAVE_NEW_XULRUNNER 1
 
 /* Define to 1 if you have the <stdint.h> header file. */
 #define HAVE_STDINT_H 1
@@ -76,6 +82,9 @@
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME ""
 
+/* Define to the home page for this package. */
+#define PACKAGE_URL ""
+
 /* Define to the version of this package. */
 #define PACKAGE_VERSION ""
 
@@ -83,4 +92,4 @@
 #define STDC_HEADERS 1
 
 /* Version number of package */
-#define VERSION "0.9.9.2"
+#define VERSION "1.0.4"

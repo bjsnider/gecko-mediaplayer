@@ -175,7 +175,7 @@ NPError OSCALL NP_Initialize(NPNetscapeFuncs * pFuncs
     pluginFuncs->javaClass = NPP_GetJavaClass();
 #endif
 
-    NPP_Initialize();
+    // NPP_Initialize();
 #endif
 
     return NPERR_NO_ERROR;
