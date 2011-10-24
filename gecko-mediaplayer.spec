@@ -1,4 +1,4 @@
-%define ver 0.9.0
+%define ver 0.9.2
 
 Name: gecko-mediaplayer
 Summary: Multimedia browser plugin for Gecko based browsers

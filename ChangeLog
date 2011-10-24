@@ -1,3 +1,9 @@
+Development
+	Convert to XDG cache location
+	Try using gnome-mplayer if not found use gnome-mplayer-minimal
+	Version bump
+	Fix up a couple of minor compile warnings
+	Move temporary files from TMPDIR to .gnome-mplayer cache directory
 0.9.0
 	Fix preference issue
 	Add feature to ASX parser to add url prefix if missing

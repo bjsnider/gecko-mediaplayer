@@ -58,9 +58,10 @@
 #endif
 
 gpointer init_preference_store();
-gboolean read_preference_bool(gpointer store, gchar * key);
-gint read_preference_int(gpointer store, gchar * key);
+gboolean read_preference_bool(gpointer store, const gchar * key);
+gint read_preference_int(gpointer store, const gchar * key);
 void release_preference_store(gpointer store);
+gchar *gmp_tempname(gchar *path,const gchar *name_template);
 
 // JavaScript Playstates
 #define STATE_UNDEFINED     0
