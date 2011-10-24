@@ -42,14 +42,14 @@ gchar *GetMIMEDescription()
     gchar MimeTypes[4000];
     gpointer store = NULL;
     gboolean wmp_disabled = FALSE;
-    
+
     g_type_init();
     store = init_preference_store();
     if (store != NULL) {
         wmp_disabled = read_preference_bool(store, DISABLE_WMP);
         release_preference_store(store);
     }
-    
+
     if (wmp_disabled) {
         return NULL;
     } else {

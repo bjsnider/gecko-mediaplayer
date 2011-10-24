@@ -59,7 +59,7 @@ ListItem *list_find(GList * list, gchar * url)
 //                // printf("found %s at %p\n",url,item);
 //                return item;
 //            }
-            
+
         }
     }
 
@@ -239,7 +239,7 @@ GList *list_parse_qt(GList * list, ListItem * item)
     gchar *rmdr;                // this is data about the URL
     gchar url[1024];
     gchar *ptr;
-    unsigned int code = 0;          // some value about the URL
+    unsigned int code = 0;      // some value about the URL
 
     printf("Entering list_parse_qt localsize = %i\n", item->localsize);
 
@@ -369,7 +369,7 @@ void replace_amp(gchar * data)
     pos = g_strrstr(data, "&");
     while (pos) {
         pos[0] = '\x01';
-        pos = g_strrstr(data, "&");        
+        pos = g_strrstr(data, "&");
     }
 }
 
@@ -380,7 +380,7 @@ void unreplace_amp(gchar * data)
     pos = g_strrstr(data, "\x01");
     while (pos) {
         pos[0] = '&';
-        pos = g_strrstr(data, "\x01");        
+        pos = g_strrstr(data, "\x01");
     }
 
 }
@@ -441,8 +441,8 @@ asx_start_element(GMarkupParseContext * context,
                         ptr = g_strrstr(url, "/");
                         if (ptr != NULL) {
                             ptr[1] = (char) NULL;
-                            g_strlcpy(newitem->src,url,1024);
-                            g_strlcat(newitem->src,value,1024);
+                            g_strlcpy(newitem->src, url, 1024);
+                            g_strlcat(newitem->src, value, 1024);
                         }
                     } else {
                         g_strlcpy(newitem->src, value, 1024);
@@ -496,8 +496,8 @@ asx_start_element(GMarkupParseContext * context,
                         ptr = g_strrstr(url, "/");
                         if (ptr != NULL) {
                             ptr[1] = (char) NULL;
-                            g_strlcpy(newitem->src,url,1024);
-                            g_strlcat(newitem->src,value,1024);
+                            g_strlcpy(newitem->src, url, 1024);
+                            g_strlcat(newitem->src, value, 1024);
                         }
                     } else {
                         g_strlcpy(newitem->src, value, 1024);

@@ -54,20 +54,18 @@ gchar *GetMIMEDescription()
               "audio/mp4:mp4:MPEG 4 audio;"
               "audio/x-mp4:mp4:MPEG 4 audio;"
               "video/mp4:mp4:MPEG 4 Video;"
-              "video/x-m4v:m4v:MPEG 4 Video;" 
-              "video/3gpp:mp4,3gp:MPEG 4 Video;",
-              sizeof(MimeTypes));
+              "video/x-m4v:m4v:MPEG 4 Video;"
+              "video/3gpp:mp4,3gp:MPEG 4 Video;", sizeof(MimeTypes));
     g_strlcat(MimeTypes,
               "audio/mpeg3:mp3:MPEG audio;" "audio/x-mpeg3:mp3:MPEG audio;"
               "audio/x-mpegurl:m3u:MPEG url;" "audio/mp3:mp3:MPEG audio;", sizeof(MimeTypes));
     g_strlcat(MimeTypes,
-              "application/x-ogg:ogg,oga,ogm:Ogg Vorbis Media;" 
-              "application/ogg:ogg,oga,ogm:Ogg Vorbis Media;" 
-              "audio/x-ogg:ogg,oga:Ogg Vorbis Audio;" 
-              "audio/ogg:ogg,oga:Ogg Vorbis Audio;" 
-              "video/x-ogg:ogg,ogm:Ogg Vorbis Video;" 
-              "video/ogg:ogg,ogm:Ogg Vorbis Video;", 
-              sizeof(MimeTypes));
+              "application/x-ogg:ogg,oga,ogm:Ogg Vorbis Media;"
+              "application/ogg:ogg,oga,ogm:Ogg Vorbis Media;"
+              "audio/x-ogg:ogg,oga:Ogg Vorbis Audio;"
+              "audio/ogg:ogg,oga:Ogg Vorbis Audio;"
+              "video/x-ogg:ogg,ogm:Ogg Vorbis Video;"
+              "video/ogg:ogg,ogm:Ogg Vorbis Video;", sizeof(MimeTypes));
     // FLAC
     g_strlcat(MimeTypes,
               "audio/flac:flac:FLAC Audio;" "audio/x-flac:flac:FLAC Audio;", sizeof(MimeTypes));
@@ -79,7 +77,7 @@ gchar *GetMIMEDescription()
 
     // FLV
     g_strlcat(MimeTypes, "video/x-flv:flv:Flash Video;"
-                         "video/flv:flv:Flash Video;", sizeof(MimeTypes));
+              "video/flv:flv:Flash Video;", sizeof(MimeTypes));
 
     // Vivo
     g_strlcat(MimeTypes, "video/vnd.vivo:viv,vivo:VivoActive;", sizeof(MimeTypes));
@@ -96,7 +94,7 @@ gchar *GetMIMEDescription()
     g_strlcat(MimeTypes, "audio/x-mod:mod:Soundtracker;", sizeof(MimeTypes));
 
     // AIFF
-    g_strlcat(MimeTypes, "audio/x-aiff:aif:AIFF Audio;", sizeof(MimeTypes));    
+    g_strlcat(MimeTypes, "audio/x-aiff:aif:AIFF Audio;", sizeof(MimeTypes));
 
     // Basic
     g_strlcat(MimeTypes,
@@ -117,7 +115,6 @@ NPError PluginGetValue(NPPVariable variable, void *value)
 
     // some sites use this description to figure out what formats can be played. So we have to make sure the 
     // description matches the features
-
     if (variable == NPPVpluginNameString) {
         *((const char **) value) = "gecko-mediaplayer " VERSION;
     }

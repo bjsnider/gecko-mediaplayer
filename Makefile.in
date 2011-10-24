@@ -34,8 +34,8 @@ subdir = .
 DIST_COMMON = README $(am__configure_deps) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(srcdir)/config.h.in \
 	$(srcdir)/gecko-mediaplayer.spec.in $(top_srcdir)/configure \
-	AUTHORS COPYING ChangeLog INSTALL NEWS config.guess config.sub \
-	depcomp install-sh ltmain.sh missing mkinstalldirs
+	AUTHORS COPYING ChangeLog INSTALL NEWS compile config.guess \
+	config.sub depcomp install-sh ltmain.sh missing mkinstalldirs
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.in
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
@@ -114,10 +114,7 @@ GCONF_LIBS = @GCONF_LIBS@
 GCONF_SCHEMA_CONFIG_SOURCE = @GCONF_SCHEMA_CONFIG_SOURCE@
 GCONF_SCHEMA_FILE_DIR = @GCONF_SCHEMA_FILE_DIR@
 GECKO_CFLAGS = @GECKO_CFLAGS@
-GECKO_HOME = @GECKO_HOME@
-GECKO_IDLDIR = @GECKO_IDLDIR@
 GECKO_LIBS = @GECKO_LIBS@
-GECKO_XPIDL = @GECKO_XPIDL@
 GETTEXT_PACKAGE = @GETTEXT_PACKAGE@
 GLIB_CFLAGS = @GLIB_CFLAGS@
 GLIB_LIBS = @GLIB_LIBS@
@@ -710,11 +707,9 @@ dist-hook:
 			cp -p $$specfile $(distdir); \
 		fi \
 	done
-	rm -rf $(distdir)/src/nsIScriptableGeckoMediaPlayer.h
 
 install-schemas: $(schema_DATA)
 	GCONF_CONFIG_SOURCE=$(GCONF_SCHEMA_CONFIG_SOURCE) gconftool-2 --makefile-install-rule $(schema_DATA) 2>&1 > /dev/null
-	gconftool-2 --shutdown
 
 @GCONF_SCHEMAS_INSTALL_TRUE@install-data-hook: install-schemas
 @GCONF_SCHEMAS_INSTALL_FALSE@install-data-hook:

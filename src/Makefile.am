@@ -2,8 +2,7 @@
 
 ## Created by Anjuta
 
-EXTRA_DIST = nsIScriptableGeckoMediaPlayer.idl
-
+DEFINES = -DMOZILLA_STRICT_API -DXP_UNIX
 INCLUDES = \
 	-fPIC \
 	-DPACKAGE_LOCALE_DIR=\""$(prefix)/$(DATADIRNAME)/locale"\" \
@@ -13,36 +12,17 @@ INCLUDES = \
 	$(GLIB_CFLAGS) \
 	$(DBUS_CFLAGS) \
 	$(GCONF_CFLAGS) \
-	$(GCONF_DEFINES)
+	$(GCONF_DEFINES) \
+	$(DEFINES)
 
 AM_CFLAGS =\
 	 -Wall \
 	 -g 
 
-DEFINES = -DMOZILLA_STRICT_API -DXP_UNIX
-
-xpt_DATA = \
-	gecko-mediaplayer-dvx.xpt \
-	gecko-mediaplayer-qt.xpt \
-	gecko-mediaplayer-rm.xpt \
-	gecko-mediaplayer.xpt \
-	gecko-mediaplayer-wmp.xpt
-	
-xptdir = $(libdir)/mozilla/plugins
-
-gecko-mediaplayer-dvx.xpt: nsIScriptableGeckoMediaPlayer.idl
-	$(GECKO_XPIDL) -w -m typelib -I $(GECKO_IDLDIR) -I $(srcdir) -e $@ $<
-gecko-mediaplayer-qt.xpt: nsIScriptableGeckoMediaPlayer.idl
-	$(GECKO_XPIDL) -w -m typelib -I $(GECKO_IDLDIR) -I $(srcdir) -e $@ $<
-gecko-mediaplayer-rm.xpt: nsIScriptableGeckoMediaPlayer.idl
-	$(GECKO_XPIDL) -w -m typelib -I $(GECKO_IDLDIR) -I $(srcdir) -e $@ $<
-gecko-mediaplayer.xpt: nsIScriptableGeckoMediaPlayer.idl
-	$(GECKO_XPIDL) -w -m typelib -I $(GECKO_IDLDIR) -I $(srcdir) -e $@ $<
-gecko-mediaplayer-wmp.xpt: nsIScriptableGeckoMediaPlayer.idl
-	$(GECKO_XPIDL) -w -m typelib -I $(GECKO_IDLDIR) -I $(srcdir) -e $@ $<
 
 COMMONCODE = \
 	../config.h \
+	memmem_compat.c \
 	plugin.cpp \
 	plugin.h \
 	plugin_list.h \
@@ -55,11 +35,7 @@ COMMONCODE = \
 	np_entry.cpp \
 	npn_gate.cpp \
 	npp_gate.cpp \
-	pluginbase.h \
-	nsScriptablePeer.cpp \
-	nsScriptablePeer.h \
-	nsIScriptableGeckoMediaPlayer.h \
-	npplat.h
+	npupp.h
 
 install_libexecdir = $(libdir)/mozilla/plugins
 install_libexec_PROGRAMS = \
@@ -104,3 +80,7 @@ gecko_mediaplayer_rm_so_SOURCES = \
 gecko_mediaplayer_rm_so_CFLAGS = -fPIC 
 gecko_mediaplayer_rm_so_LDFLAGS = -shared $(GLIB_LIBS) $(DBUS_LIBS) $(GCONF_LIBS) -fPIC
 
+indent:
+	indent -kr -l100 -i4 -nut *.cpp
+	indent -kr -l100 -i4 -nut *.h
+	rm *~

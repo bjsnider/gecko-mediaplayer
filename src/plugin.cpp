@@ -37,12 +37,16 @@
 
 
 #include "plugin.h"
+#include "npupp.h"
 #include "plugin_list.h"
 #include "plugin_setup.h"
 #include "plugin_types.h"
 #include "plugin_dbus.h"
-#include "nsIServiceManager.h"
-#include "nsISupportsUtils.h"   // some usefule macros are defined here
+
+static NPObject *sWindowObj;
+
+//#include "nsIServiceManager.h"
+//#include "nsISupportsUtils.h"   // some usefule macros are defined here
 
 #define MIME_TYPES_HANDLED  "application/scriptable-plugin"
 #define PLUGIN_NAME         "Scriptable Example Plugin for Mozilla"
@@ -51,11 +55,67 @@
 
 int32 STREAMBUFSIZE = 0X0FFFFFFF;
 
-char *NPP_GetMIMEDescription(void)
-{
-    return GetMIMEDescription();
-}
+// methods
+static NPIdentifier Play_id;
+static NPIdentifier PlayAt_id;
+static NPIdentifier Pause_id;
+static NPIdentifier PlayPause_id;
+static NPIdentifier Stop_id;
+static NPIdentifier quit_id;
+static NPIdentifier DoPlay_id;
+static NPIdentifier DoPause_id;
+static NPIdentifier FastForward_id;
+static NPIdentifier FastReverse_id;
+static NPIdentifier ff_id;
+static NPIdentifier rew_id;
+static NPIdentifier rewind_id;
+static NPIdentifier Seek_id;
+static NPIdentifier Open_id;
+static NPIdentifier SetVolume_id;
+static NPIdentifier GetVolume_id;
+static NPIdentifier SetFileName_id;
+static NPIdentifier GetFileName_id;
+static NPIdentifier SetIsLooping_id;
+static NPIdentifier GetIsLooping_id;
+static NPIdentifier SetAutoPlay_id;
+static NPIdentifier GetAutoPlay_id;
+static NPIdentifier SetHREF_id;
+static NPIdentifier GetHREF_id;
+static NPIdentifier SetURL_id;
+static NPIdentifier GetURL_id;
+static NPIdentifier GetMIMEType_id;
+static NPIdentifier getTime_id;
+static NPIdentifier getDuration_id;
+static NPIdentifier getPercent_id;
+static NPIdentifier isplaying_id;
+static NPIdentifier playlistAppend_id;
+static NPIdentifier playlistClear_id;
+static NPIdentifier onClick_id;
+static NPIdentifier onMediaComplete_id;
+static NPIdentifier onMouseUp_id;
+static NPIdentifier onMouseDown_id;
+static NPIdentifier onMouseOut_id;
+static NPIdentifier onMouseOver_id;
+static NPIdentifier onDestroy_id;
 
+static NPIdentifier controls_play_id;
+static NPIdentifier controls_pause_id;
+static NPIdentifier controls_stop_id;
+static NPIdentifier controls_fastForward_id;
+static NPIdentifier controls_fastReverse_id;
+static NPIdentifier controls_step_id;
+
+
+// properties
+static NPIdentifier filename_id;
+static NPIdentifier src_id;
+static NPIdentifier ShowControls_id;
+static NPIdentifier fullscreen_id;
+static NPIdentifier showlogo_id;
+static NPIdentifier playState_id;
+static NPIdentifier controls_id;
+
+static NPIdentifier controls_currentPosition_id;
 //////////////////////////////////////
 //
 // general initialization and shutdown
@@ -72,7 +132,7 @@ void NS_PluginShutdown()
 // get values per plugin
 NPError NS_PluginGetValue(NPPVariable aVariable, void *aValue)
 {
- 
+
     return PluginGetValue(aVariable, aValue);
 }
 
@@ -81,35 +141,37 @@ NPError NS_PluginGetValue(NPPVariable aVariable, void *aValue)
 //
 // construction and destruction of our plugin instance object
 //
-nsPluginInstanceBase *NS_NewPluginInstance(nsPluginCreateData * aCreateDataStruct)
+/*
+CPlugin *NS_NewPluginInstance(nsPluginCreateData * aCreateDataStruct)
 {
     if (!aCreateDataStruct)
         return NULL;
 
-    nsPluginInstance *plugin = new nsPluginInstance(aCreateDataStruct->instance);
+    CPlugin *plugin = new CPlugin(aCreateDataStruct->instance);
 
     new_instance(plugin, aCreateDataStruct);
     return plugin;
 }
 
-void NS_DestroyPluginInstance(nsPluginInstanceBase * aPlugin)
+void NS_DestroyPluginInstance(CPlugin * aPlugin)
 {
     if (aPlugin)
-        delete(nsPluginInstance *) aPlugin;
+        delete(CPlugin *) aPlugin;
 }
-
+*/
 ////////////////////////////////////////
 //
-// nsPluginInstance class implementation
+// CPlugin class implementation
 //
-nsPluginInstance::nsPluginInstance(NPP aInstance):nsPluginInstanceBase(),
-mInstance(aInstance),
+CPlugin::CPlugin(NPP pNPInstance):
+mInstance(pNPInstance),
+m_pNPStream(NULL),
 mInitialized(FALSE),
+m_pScriptableObject(NULL),
+m_pScriptableObjectControls(NULL),
 mWindow(0),
 playlist(NULL),
 player_launched(FALSE),
-mScriptablePeer(NULL),
-mControlsScriptablePeer(NULL),
 connection(NULL),
 dbus_dispatch(NULL),
 path(NULL),
@@ -132,11 +194,74 @@ event_destroy(NULL),
 event_mousedown(NULL),
 event_mouseup(NULL),
 event_mouseclicked(NULL), event_enterwindow(NULL), event_leavewindow(NULL), debug(FALSE),
-tv_driver(NULL),tv_device(NULL),tv_input(NULL),tv_width(0),tv_height(0)
+tv_driver(NULL), tv_device(NULL), tv_input(NULL), tv_width(0), tv_height(0)
 {
     GRand *rand;
     gpointer store = NULL;
-    
+
+    NPN_GetValue(mInstance, NPNVWindowNPObject, &sWindowObj);
+
+    // register methods
+    Play_id = NPN_GetStringIdentifier("Play");
+    PlayAt_id = NPN_GetStringIdentifier("PlayAt");
+    Pause_id = NPN_GetStringIdentifier("Pause");
+    PlayPause_id = NPN_GetStringIdentifier("PlayPause");
+    Stop_id = NPN_GetStringIdentifier("Stop");
+    quit_id = NPN_GetStringIdentifier("quit");
+    DoPlay_id = NPN_GetStringIdentifier("DoPlay");
+    DoPause_id = NPN_GetStringIdentifier("DoPause");
+    FastForward_id = NPN_GetStringIdentifier("FastForward");
+    FastReverse_id = NPN_GetStringIdentifier("FastReverse");
+    ff_id = NPN_GetStringIdentifier("ff");
+    rew_id = NPN_GetStringIdentifier("rew");
+    rewind_id = NPN_GetStringIdentifier("rewind");
+    Seek_id = NPN_GetStringIdentifier("Seek");
+    Open_id = NPN_GetStringIdentifier("Open");
+    SetVolume_id = NPN_GetStringIdentifier("SetVolume");
+    GetVolume_id = NPN_GetStringIdentifier("GetVolume");
+    SetFileName_id = NPN_GetStringIdentifier("SetFileName");
+    GetFileName_id = NPN_GetStringIdentifier("GetFileName");
+    SetIsLooping_id = NPN_GetStringIdentifier("SetIsLooping");
+    GetIsLooping_id = NPN_GetStringIdentifier("GetIsLooping");
+    SetAutoPlay_id = NPN_GetStringIdentifier("SetAutoPlay");
+    GetAutoPlay_id = NPN_GetStringIdentifier("GetAutoPlay");
+    SetHREF_id = NPN_GetStringIdentifier("SetHREF");
+    GetHREF_id = NPN_GetStringIdentifier("GetHREF");
+    SetURL_id = NPN_GetStringIdentifier("SetURL");
+    GetURL_id = NPN_GetStringIdentifier("GetURL");
+    GetMIMEType_id = NPN_GetStringIdentifier("GetMIMEType");
+    getTime_id = NPN_GetStringIdentifier("getTime");
+    getDuration_id = NPN_GetStringIdentifier("getDuration");
+    getPercent_id = NPN_GetStringIdentifier("getPercent");
+    isplaying_id = NPN_GetStringIdentifier("isplaying");
+    playlistAppend_id = NPN_GetStringIdentifier("playlistAppend");
+    playlistClear_id = NPN_GetStringIdentifier("playlistClear");
+    onClick_id = NPN_GetStringIdentifier("onClick");
+    onMediaComplete_id = NPN_GetStringIdentifier("onMediaComplete");
+    onMouseUp_id = NPN_GetStringIdentifier("onMouseUp");
+    onMouseDown_id = NPN_GetStringIdentifier("onMouseDown");
+    onMouseOut_id = NPN_GetStringIdentifier("onMouseOut");
+    onMouseOver_id = NPN_GetStringIdentifier("onMouseOver");
+    onDestroy_id = NPN_GetStringIdentifier("onDestroy");
+
+    controls_play_id = NPN_GetStringIdentifier("play");
+    controls_pause_id = NPN_GetStringIdentifier("pause");
+    controls_stop_id = NPN_GetStringIdentifier("stop");
+    controls_fastForward_id = NPN_GetStringIdentifier("fastForward");
+    controls_fastReverse_id = NPN_GetStringIdentifier("fastReverse");
+    controls_step_id = NPN_GetStringIdentifier("step");
+
+    // register properties
+    filename_id = NPN_GetStringIdentifier("filename");
+    src_id = NPN_GetStringIdentifier("src");
+    ShowControls_id = NPN_GetStringIdentifier("ShowControls");
+    fullscreen_id = NPN_GetStringIdentifier("fullscreen");
+    showlogo_id = NPN_GetStringIdentifier("showlogo");
+    playState_id = NPN_GetStringIdentifier("playState");
+    controls_id = NPN_GetStringIdentifier("controls");
+
+    controls_currentPosition_id = NPN_GetStringIdentifier("currentPosition");
+
     // generate a random controlid
     rand = g_rand_new();
     controlid = g_rand_int_range(rand, 0, 65535);
@@ -146,7 +271,6 @@ tv_driver(NULL),tv_device(NULL),tv_input(NULL),tv_width(0),tv_height(0)
         path = g_strdup_printf("/control/%i", controlid);
         // printf("using path %s\n",path);
     }
-
 #ifdef ENABLE_NLS
     bindtextdomain(GETTEXT_PACKAGE, PACKAGE_LOCALE_DIR);
     bind_textdomain_codeset(GETTEXT_PACKAGE, "UTF-8");
@@ -159,12 +283,7 @@ tv_driver(NULL),tv_device(NULL),tv_input(NULL),tv_width(0),tv_height(0)
         debug_level = read_preference_int(store, DEBUG_LEVEL);
         release_preference_store(store);
     }
-        
-    mScriptablePeer = getScriptablePeer();
-    mScriptablePeer->SetInstance(this);
-    mControlsScriptablePeer = getControlsScriptablePeer();
-    mScriptablePeer->InitControls(mControlsScriptablePeer);
-    mControlsScriptablePeer->AddRef();
+
 
     if (connection == NULL) {
         connection = dbus_hookup(this);
@@ -172,7 +291,7 @@ tv_driver(NULL),tv_device(NULL),tv_input(NULL),tv_width(0),tv_height(0)
     mInitialized = TRUE;
 }
 
-nsPluginInstance::~nsPluginInstance()
+CPlugin::~CPlugin()
 {
     // mScriptablePeer may be also held by the browser 
     // so releasing it here does not guarantee that it is over
@@ -183,35 +302,56 @@ nsPluginInstance::~nsPluginInstance()
 
     if (mInitialized)
         shut();
+    if (sWindowObj)
+        NPN_ReleaseObject(sWindowObj);
 
     mInstance = NULL;
-
+/*
     if (mControlsScriptablePeer != NULL) {
         mControlsScriptablePeer->SetInstance(NULL);
         mControlsScriptablePeer->Release();
         NS_IF_RELEASE(mControlsScriptablePeer);
     }
+*/
+    if (m_pScriptableObjectControls) {
+        NPN_ReleaseObject(m_pScriptableObjectControls);
+    }
 
-    if (mScriptablePeer != NULL) {
-        mScriptablePeer->InitControls(NULL);
-        mScriptablePeer->SetInstance(NULL);
-        NS_IF_RELEASE(mScriptablePeer);
+    if (m_pScriptableObject) {
+        NPN_ReleaseObject(m_pScriptableObject);
     }
 }
 
 
 
-NPBool nsPluginInstance::init(NPWindow * aWindow)
+NPBool CPlugin::init(NPWindow * pNPWindow)
 {
-    if (aWindow == NULL)
+    if (pNPWindow == NULL)
         return FALSE;
 
+    m_Window = pNPWindow;
     mInitialized = TRUE;
 
     return mInitialized;
 }
 
-NPError nsPluginInstance::SetWindow(NPWindow * aWindow)
+int16 CPlugin::handleEvent(void *event)
+{
+#ifdef XP_MAC
+    NPEvent *ev = (NPEvent *) event;
+    if (m_Window) {
+        Rect box = { m_Window->y, m_Window->x,
+            m_Window->y + m_Window->height, m_Window->x + m_Window->width
+        };
+        if (ev->what == updateEvt) {
+            ::TETextBox(m_String, strlen(m_String), &box, teJustCenter);
+        }
+    }
+#endif
+    return 0;
+}
+
+NPError CPlugin::SetWindow(NPWindow * aWindow)
 {
     GError *error = NULL;
     gchar *argvn[255];
@@ -239,7 +379,7 @@ NPError nsPluginInstance::SetWindow(NPWindow * aWindow)
     if (player_launched && mWidth > 0 && mHeight > 0) {
         resize_window(this, NULL, mWidth, mHeight);
     }
-    
+
     if (!player_launched && mWidth > 0 && mHeight > 0) {
         app_name = g_find_program_in_path("gnome-mplayer");
         if (app_name == NULL)
@@ -247,7 +387,7 @@ NPError nsPluginInstance::SetWindow(NPWindow * aWindow)
 
         argvn[arg++] = g_strdup_printf("%s", app_name);
         g_free(app_name);
-        argvn[arg++] = g_strdup_printf("--window=%i", (gint)mWindow);
+        argvn[arg++] = g_strdup_printf("--window=%i", (gint) mWindow);
         argvn[arg++] = g_strdup_printf("--controlid=%i", controlid);
         argvn[arg++] = g_strdup_printf("--width=%i", mWidth);
         argvn[arg++] = g_strdup_printf("--height=%i", mHeight);
@@ -260,28 +400,28 @@ NPError nsPluginInstance::SetWindow(NPWindow * aWindow)
         if (debug == TRUE)
             argvn[arg++] = g_strdup_printf("--verbose");
         if (name != NULL)
-            argvn[arg++] = g_strdup_printf("--rpname=%s",name);
+            argvn[arg++] = g_strdup_printf("--rpname=%s", name);
         if (console != NULL)
-            argvn[arg++] = g_strdup_printf("--rpconsole=%s",console);
+            argvn[arg++] = g_strdup_printf("--rpconsole=%s", console);
         if (controls != NULL) {
-            argvn[arg++] = g_strdup_printf("--rpcontrols=%s",controls);
+            argvn[arg++] = g_strdup_printf("--rpcontrols=%s", controls);
         }
         if (tv_device != NULL) {
-            argvn[arg++] = g_strdup_printf("--tvdevice=%s",tv_device);
+            argvn[arg++] = g_strdup_printf("--tvdevice=%s", tv_device);
         }
         if (tv_driver != NULL) {
-            argvn[arg++] = g_strdup_printf("--tvdriver=%s",tv_driver);
+            argvn[arg++] = g_strdup_printf("--tvdriver=%s", tv_driver);
         }
         if (tv_input != NULL) {
-            argvn[arg++] = g_strdup_printf("--tvinput=%s",tv_input);
+            argvn[arg++] = g_strdup_printf("--tvinput=%s", tv_input);
         }
         if (tv_width > 0) {
-            argvn[arg++] = g_strdup_printf("--tvwidth=%i",tv_width);
+            argvn[arg++] = g_strdup_printf("--tvwidth=%i", tv_width);
         }
         if (tv_height > 0) {
-            argvn[arg++] = g_strdup_printf("--tvheight=%i",tv_height);
+            argvn[arg++] = g_strdup_printf("--tvheight=%i", tv_height);
         }
-        
+
         argvn[arg] = NULL;
         playerready = FALSE;
         ok = g_spawn_async(NULL, argvn, NULL, G_SPAWN_SEARCH_PATH, NULL, NULL, NULL, &error);
@@ -289,12 +429,11 @@ NPError nsPluginInstance::SetWindow(NPWindow * aWindow)
         if (ok) {
             player_launched = TRUE;
         } else {
-            printf("Unable to launch gnome-mplayer: %s\n",error->message);
+            printf("Unable to launch gnome-mplayer: %s\n", error->message);
             g_error_free(error);
             error = NULL;
         }
     }
-
 
     if (playlist != NULL) {
         item = (ListItem *) playlist->data;
@@ -305,6 +444,7 @@ NPError nsPluginInstance::SetWindow(NPWindow * aWindow)
                 item->requested = 1;
             } else {
                 item->requested = 1;
+                printf("Calling GetURLNotify with item = %p src = %s\n", item, item->src);
                 NPN_GetURLNotify(mInstance, item->src, NULL, item);
             }
         }
@@ -313,7 +453,7 @@ NPError nsPluginInstance::SetWindow(NPWindow * aWindow)
 }
 
 
-void nsPluginInstance::shut()
+void CPlugin::shut()
 {
     ListItem *item;
     GList *iter;
@@ -334,7 +474,7 @@ void nsPluginInstance::shut()
     send_signal_when_ready(this, NULL, "Terminate");
     playerready = FALSE;
     playlist = list_clear(playlist);
-   
+
     if (event_destroy != NULL) {
         NPN_GetURL(mInstance, event_destroy, NULL);
     }
@@ -344,19 +484,18 @@ void nsPluginInstance::shut()
     }
 }
 
-NPBool nsPluginInstance::isInitialized()
+NPBool CPlugin::isInitialized()
 {
     return mInitialized;
 }
 
-NPError nsPluginInstance::NewStream(NPMIMEType type, NPStream * stream,
-                                    NPBool seekable, uint16 * stype)
+NPError CPlugin::NewStream(NPMIMEType type, NPStream * stream, NPBool seekable, uint16 * stype)
 {
-    //printf("New Stream Requested\n");
+    printf("New Stream Requested\n");
     return NPERR_NO_ERROR;
 }
 
-NPError nsPluginInstance::DestroyStream(NPStream * stream, NPError reason)
+NPError CPlugin::DestroyStream(NPStream * stream, NPError reason)
 {
     ListItem *item;
     gint id;
@@ -365,7 +504,7 @@ NPError nsPluginInstance::DestroyStream(NPStream * stream, NPError reason)
     gboolean ready;
     gboolean newwindow;
 
-    // printf("Entering destroy stream reason = %i for %s\n", reason,stream->url);
+    printf("Entering destroy stream reason = %i for %s\n", reason, stream->url);
     if (reason == NPRES_DONE) {
         item = (ListItem *) stream->notifyData;
         // item = list_find(playlist, (gchar*)stream->url);
@@ -415,7 +554,7 @@ NPError nsPluginInstance::DestroyStream(NPStream * stream, NPError reason)
     } else {
         item = (ListItem *) stream->notifyData;
         // item = list_find(playlist, (gchar*)stream->url);
-		printf("Exiting destroy stream reason = %i for %s\n", reason,stream->url);
+        printf("Exiting destroy stream reason = %i for %s\n", reason, stream->url);
         if (item == NULL) {
             return NPERR_NO_ERROR;
         }
@@ -431,13 +570,14 @@ NPError nsPluginInstance::DestroyStream(NPStream * stream, NPError reason)
     return NPERR_NO_ERROR;
 }
 
-void nsPluginInstance::URLNotify(const char *url, NPReason reason, void *notifyData)
+void CPlugin::URLNotify(const char *url, NPReason reason, void *notifyData)
 {
     ListItem *item = (ListItem *) notifyData;
     DBusMessage *message;
     const char *file;
 
-    //printf("URL Notify %s\n,%i = %i\n%s\n%s\n%s\n",url,reason, NPRES_DONE,item->src,item->local,path);
+    printf("URL Notify %s\n,%i = %i\n%s\n%s\n%s\n", url, reason, NPRES_DONE, item->src, item->local,
+           path);
     if (reason == NPRES_DONE) {
 
         if (!item->opened) {
@@ -458,12 +598,13 @@ void nsPluginInstance::URLNotify(const char *url, NPReason reason, void *notifyD
     }
 }
 
-int32 nsPluginInstance::WriteReady(NPStream * stream)
+int32 CPlugin::WriteReady(NPStream * stream)
 {
     ListItem *item;
     gchar *path;
     gchar *tmp;
 
+    //printf("WriteReady called\n");
     if (!acceptdata) {
         NPN_DestroyStream(mInstance, stream, NPRES_DONE);
         return -1;
@@ -484,7 +625,7 @@ int32 nsPluginInstance::WriteReady(NPStream * stream)
             playlist = g_list_append(playlist, item);
             stream->notifyData = item;
         } else {
-            //printf("item is null\nstream url %s\n",stream->url);
+            printf("item is null\nstream url %s\n", stream->url);
             NPN_DestroyStream(mInstance, stream, NPRES_DONE);
             return -1;
         }
@@ -529,7 +670,7 @@ int32 nsPluginInstance::WriteReady(NPStream * stream)
     return STREAMBUFSIZE;
 }
 
-int32 nsPluginInstance::Write(NPStream * stream, int32 offset, int32 len, void *buffer)
+int32 CPlugin::Write(NPStream * stream, int32 offset, int32 len, void *buffer)
 {
     ListItem *item;
     int32 wrotebytes = -1;
@@ -542,6 +683,7 @@ int32 nsPluginInstance::Write(NPStream * stream, int32 offset, int32 len, void *
     gboolean newwindow;
     gboolean ok_to_play = FALSE;
 
+    // printf("Write Called\n");
     if (!acceptdata) {
         NPN_DestroyStream(mInstance, stream, NPRES_DONE);
         return -1;
@@ -568,7 +710,6 @@ int32 nsPluginInstance::Write(NPStream * stream, int32 offset, int32 len, void *
         NPN_DestroyStream(mInstance, stream, NPRES_DONE);
         return -1;
     }
-
     // If item is a block of jpeg images, just stream it
     if (strstr((char *) buffer, "Content-length:") != NULL || item->streaming == TRUE) {
         item->streaming = TRUE;
@@ -616,32 +757,31 @@ int32 nsPluginInstance::Write(NPStream * stream, int32 offset, int32 len, void *
 
             percent = (gdouble) item->localsize / (gdouble) item->mediasize;
             if (difftime(time(NULL), lastupdate) > 0.5) {
-                if (item->opened) {
-
-                    send_signal_with_double(this, item, "SetCachePercent", percent);
-
-                } else {
-
-                    // send_signal_with_double(this, item, "SetPercent", percent);
-                    send_signal_with_double(this, item, "SetCachePercent", percent);
-                    rate = (gdouble)((item->localsize - item->lastsize) / 1024.0) / (gdouble)difftime(time(NULL), lastupdate);
-                    text = g_strdup_printf(_("Cache fill: %2.2f%% (%0.1f K/s)"), percent * 100.0, rate);
-                    send_signal_with_string(this, item, "SetProgressText", text);
+                send_signal_with_double(this, item, "SetCachePercent", percent);
+                rate =
+                    (gdouble) ((item->localsize -
+                                item->lastsize) / 1024.0) / (gdouble) difftime(time(NULL),
+                                                                               lastupdate);
+                text =
+                    g_strdup_printf(_("Cache fill: %2.2f%% (%0.1f K/s)"), percent * 100.0,
+                                    rate);
+                send_signal_with_string(this, item, "SetProgressText", text);
+                if (!item->opened)
                     send_signal_with_string(this, item, "SetURL", item->src);
-                    
-                }
+
                 time(&lastupdate);
                 item->lastsize = item->localsize;
             }
         }
-        if (!item->opened) {        
+        if (!item->opened) {
             if ((item->localsize >= (cache_size * 1024)) && (percent >= 0.2))
                 ok_to_play = TRUE;
-            if (ok_to_play == FALSE && (item->localsize > (cache_size * 2 * 1024)) && (cache_size >= 512))
+            if (ok_to_play == FALSE && (item->localsize > (cache_size * 2 * 1024))
+                && (cache_size >= 512))
                 ok_to_play = TRUE;
             if (ok_to_play == FALSE) {
-                if (item->bitrate == 0 && item->bitrate_requests < 5) {
-                    item->bitrate = request_bitrate(this,item,item->local);
+                if (item->bitrate == 0 && item->bitrate_requests < 5 && ((gint)(percent * 100) > item->bitrate_requests)) {
+                    item->bitrate = request_bitrate(this, item, item->local);
                     item->bitrate_requests++;
                 }
                 if (item->bitrate > 0) {
@@ -650,8 +790,8 @@ int32 nsPluginInstance::Write(NPStream * stream, int32 offset, int32 len, void *
                     }
                 }
             }
-            
-        }        
+
+        }
         // if not opened, over cache level and not an href target then try and open it
         if ((!item->opened) && ok_to_play == TRUE) {
             id = item->controlid;
@@ -683,82 +823,82 @@ int32 nsPluginInstance::Write(NPStream * stream, int32 offset, int32 len, void *
 }
 
 
-void nsPluginInstance::Play()
+void CPlugin::Play()
 {
     send_signal(this, this->lastopened, "Play");
 }
 
-void nsPluginInstance::Pause()
+void CPlugin::Pause()
 {
     send_signal(this, this->lastopened, "Pause");
 }
 
-void nsPluginInstance::Stop()
+void CPlugin::Stop()
 {
     send_signal(this, this->lastopened, "Stop");
 }
 
-void nsPluginInstance::FastForward()
+void CPlugin::FastForward()
 {
     send_signal(this, this->lastopened, "FastForward");
 }
 
-void nsPluginInstance::FastReverse()
+void CPlugin::FastReverse()
 {
     send_signal(this, this->lastopened, "FastReverse");
 }
 
-void nsPluginInstance::Seek(double counter)
+void CPlugin::Seek(double counter)
 {
     send_signal_with_double(this, this->lastopened, "Seek", counter);
 }
 
-void nsPluginInstance::SetShowControls(PRBool value)
+void CPlugin::SetShowControls(PRBool value)
 {
     send_signal_with_boolean(this, this->lastopened, "SetShowControls", value);
 }
 
-void nsPluginInstance::SetFullScreen(PRBool value)
+void CPlugin::SetFullScreen(PRBool value)
 {
     send_signal_with_boolean(this, this->lastopened, "SetFullScreen", value);
 }
 
-void nsPluginInstance::SetVolume(double value)
+void CPlugin::SetVolume(double value)
 {
     send_signal_with_double(this, this->lastopened, "Volume", value);
 }
 
-void nsPluginInstance::GetVolume(double *_retval)
+void CPlugin::GetVolume(double *_retval)
 {
     *_retval = request_double_value(this, this->lastopened, "GetVolume");
 }
 
-void nsPluginInstance::GetFullScreen(PRBool * _retval)
+void CPlugin::GetFullScreen(PRBool * _retval)
 {
     *_retval = request_boolean_value(this, this->lastopened, "GetFullScreen");
 }
 
-void nsPluginInstance::GetShowControls(PRBool * _retval)
+void CPlugin::GetShowControls(PRBool * _retval)
 {
     *_retval = request_boolean_value(this, this->lastopened, "GetShowControls");
 }
 
-void nsPluginInstance::GetTime(double *_retval)
+void CPlugin::GetTime(double *_retval)
 {
     *_retval = request_double_value(this, this->lastopened, "GetTime");
 }
 
-void nsPluginInstance::GetDuration(double *_retval)
+void CPlugin::GetDuration(double *_retval)
 {
     *_retval = request_double_value(this, this->lastopened, "GetDuration");
 }
 
-void nsPluginInstance::GetPercent(double *_retval)
+void CPlugin::GetPercent(double *_retval)
 {
     *_retval = request_double_value(this, this->lastopened, "GetPercent");
 }
 
-void nsPluginInstance::SetFilename(const char *filename)
+void CPlugin::SetFilename(const char *filename)
 {
     ListItem *item;
 
@@ -783,7 +923,7 @@ void nsPluginInstance::SetFilename(const char *filename)
     }
 }
 
-void nsPluginInstance::GetFilename(char **filename)
+void CPlugin::GetFilename(char **filename)
 {
     ListItem *item;
     if (this->lastopened != NULL) {
@@ -798,17 +938,17 @@ void nsPluginInstance::GetFilename(char **filename)
     }
 }
 
-void nsPluginInstance::GetMIMEType(char **_retval)
+void CPlugin::GetMIMEType(char **_retval)
 {
     *_retval = g_strdup(mimetype);
 }
 
-void nsPluginInstance::GetPlayState(PRInt32 * playstate)
+void CPlugin::GetPlayState(PRInt32 * playstate)
 {
     *playstate = request_int_value(this, this->lastopened, "GetPlayState");
 }
 
-void nsPluginInstance::GetLoop(PRBool * _retval)
+void CPlugin::GetLoop(PRBool * _retval)
 {
     if (lastopened != NULL) {
         *_retval = (PRBool) lastopened->loop;
@@ -818,7 +958,7 @@ void nsPluginInstance::GetLoop(PRBool * _retval)
 
 }
 
-void nsPluginInstance::SetLoop(PRBool value)
+void CPlugin::SetLoop(PRBool value)
 {
     if (lastopened != NULL) {
         lastopened->loop = (int) value;
@@ -826,27 +966,27 @@ void nsPluginInstance::SetLoop(PRBool value)
     }
 }
 
-void nsPluginInstance::PlayPause()
+void CPlugin::PlayPause()
 {
-    gint state;   
-    
+    gint state;
+
     state = request_int_value(this, this->lastopened, "GetPlayState");
     if (state == STATE_PAUSED) {
         send_signal(this, this->lastopened, "Play");
     }
-    
+
     if (state == STATE_PLAYING) {
         send_signal(this, this->lastopened, "Pause");
     }
 }
 
 
-void nsPluginInstance::SetOnClick(const char *event)
+void CPlugin::SetOnClick(const char *event)
 {
-	if(event_mouseclicked != NULL) {
-		g_free(event_mouseclicked);
-	}
-	 
+    if (event_mouseclicked != NULL) {
+        g_free(event_mouseclicked);
+    }
+
     if (g_ascii_strncasecmp(event, "javascript:", 11) == 0) {
         event_mouseclicked = g_strdup_printf("%s", event);
     } else {
@@ -854,12 +994,12 @@ void nsPluginInstance::SetOnClick(const char *event)
     }
 }
 
-void nsPluginInstance::SetOnMediaComplete(const char *event)
+void CPlugin::SetOnMediaComplete(const char *event)
 {
-	if(event_mediacomplete != NULL) {
-		g_free(event_mediacomplete);
-	}
-	 
+    if (event_mediacomplete != NULL) {
+        g_free(event_mediacomplete);
+    }
+
     if (g_ascii_strncasecmp(event, "javascript:", 11) == 0) {
         event_mediacomplete = g_strdup_printf("%s", event);
     } else {
@@ -867,12 +1007,12 @@ void nsPluginInstance::SetOnMediaComplete(const char *event)
     }
 }
 
-void nsPluginInstance::SetOnMouseUp(const char *event)
+void CPlugin::SetOnMouseUp(const char *event)
 {
-	if(event_mouseup != NULL) {
-		g_free(event_mouseup);
-	}
-	 
+    if (event_mouseup != NULL) {
+        g_free(event_mouseup);
+    }
+
     if (g_ascii_strncasecmp(event, "javascript:", 11) == 0) {
         event_mouseup = g_strdup_printf("%s", event);
     } else {
@@ -880,12 +1020,12 @@ void nsPluginInstance::SetOnMouseUp(const char *event)
     }
 }
 
-void nsPluginInstance::SetOnMouseDown(const char *event)
+void CPlugin::SetOnMouseDown(const char *event)
 {
-	if(event_mousedown != NULL) {
-		g_free(event_mousedown);
-	}
-	 
+    if (event_mousedown != NULL) {
+        g_free(event_mousedown);
+    }
+
     if (g_ascii_strncasecmp(event, "javascript:", 11) == 0) {
         event_mousedown = g_strdup_printf("%s", event);
     } else {
@@ -893,12 +1033,12 @@ void nsPluginInstance::SetOnMouseDown(const char *event)
     }
 }
 
-void nsPluginInstance::SetOnMouseOut(const char *event)
+void CPlugin::SetOnMouseOut(const char *event)
 {
-	if(event_leavewindow != NULL) {
-		g_free(event_leavewindow);
-	}
-	 
+    if (event_leavewindow != NULL) {
+        g_free(event_leavewindow);
+    }
+
     if (g_ascii_strncasecmp(event, "javascript:", 11) == 0) {
         event_leavewindow = g_strdup_printf("%s", event);
     } else {
@@ -906,12 +1046,12 @@ void nsPluginInstance::SetOnMouseOut(const char *event)
     }
 }
 
-void nsPluginInstance::SetOnMouseOver(const char *event)
+void CPlugin::SetOnMouseOver(const char *event)
 {
-	if(event_enterwindow != NULL) {
-		g_free(event_enterwindow);
-	}
-	 
+    if (event_enterwindow != NULL) {
+        g_free(event_enterwindow);
+    }
+
     if (g_ascii_strncasecmp(event, "javascript:", 11) == 0) {
         event_enterwindow = g_strdup_printf("%s", event);
     } else {
@@ -919,18 +1059,19 @@ void nsPluginInstance::SetOnMouseOver(const char *event)
     }
 }
 
-void nsPluginInstance::SetOnDestroy(const char *event)
+void CPlugin::SetOnDestroy(const char *event)
 {
-	if(event_destroy != NULL) {
-		g_free(event_destroy);
-	}
-	 
+    if (event_destroy != NULL) {
+        g_free(event_destroy);
+    }
+
     if (g_ascii_strncasecmp(event, "javascript:", 11) == 0) {
         event_destroy = g_strdup_printf("%s", event);
     } else {
         event_destroy = g_strdup_printf("javascript:%s", event);
     }
 }
+
 // ==============================
 // ! Scriptability related code !
 // ==============================
@@ -940,96 +1081,674 @@ void nsPluginInstance::SetOnDestroy(const char *event)
 // nsScriptablePeer interface which we should have implemented
 // and which should be defined in the corressponding *.xpt file
 // in the bin/components folder
-NPError nsPluginInstance::GetValue(NPPVariable aVariable, void *aValue)
-{
-    NPError rv = NPERR_NO_ERROR;
-
-    if (aVariable == NPPVpluginScriptableInstance) {
-        // addref happens in getter, so we don't addref here
-        nsIScriptableGeckoMediaPlayer *scriptablePeer = getScriptablePeer();
-        if (scriptablePeer) {
-            *(nsISupports **) aValue = scriptablePeer;
-        } else {
-            rv = NPERR_OUT_OF_MEMORY_ERROR;
-        }
+class ScriptablePluginObjectBase:public NPObject {
+  public:
+    ScriptablePluginObjectBase(NPP npp)
+    :mNpp(npp) {
+    } virtual ~ ScriptablePluginObjectBase() {
     }
 
-    if (aVariable == NPPVpluginScriptableIID) {
-        static nsIID scriptableIID = NS_ISCRIPTABLEGECKOMEDIAPLAYER_IID;
-        nsIID *ptr = (nsIID *) NPN_MemAlloc(sizeof(nsIID));
-        if (ptr) {
-            *ptr = scriptableIID;
-            *(nsIID **) aValue = ptr;
-        } else {
-            rv = NPERR_OUT_OF_MEMORY_ERROR;
-        }
-    }
+    // Virtual NPObject hooks called through this base class. Override
+    // as you see fit.
 
-    if (aVariable == NPPVpluginNeedsXEmbed) {
-        *(PRBool *) aValue = PR_TRUE;
-        rv = NPERR_NO_ERROR;
-    }
+    virtual void Invalidate();
+    virtual bool HasMethod(NPIdentifier name);
+    virtual bool Invoke(NPIdentifier name, const NPVariant * args,
+                        uint32_t argCount, NPVariant * result);
+    virtual bool InvokeDefault(const NPVariant * args, uint32_t argCount, NPVariant * result);
+    virtual bool HasProperty(NPIdentifier name);
+    virtual bool GetProperty(NPIdentifier name, NPVariant * result);
+    virtual bool SetProperty(NPIdentifier name, const NPVariant * value);
+    virtual bool RemoveProperty(NPIdentifier name);
 
-    return rv;
+  public:
+
+    static void _Deallocate(NPObject * npobj);
+    static void _Invalidate(NPObject * npobj);
+    static bool _HasMethod(NPObject * npobj, NPIdentifier name);
+    static bool _Invoke(NPObject * npobj, NPIdentifier name,
+                        const NPVariant * args, uint32_t argCount, NPVariant * result);
+    static bool _InvokeDefault(NPObject * npobj, const NPVariant * args,
+                               uint32_t argCount, NPVariant * result);
+    static bool _HasProperty(NPObject * npobj, NPIdentifier name);
+    static bool _GetProperty(NPObject * npobj, NPIdentifier name, NPVariant * result);
+    static bool _SetProperty(NPObject * npobj, NPIdentifier name, const NPVariant * value);
+    static bool _RemoveProperty(NPObject * npobj, NPIdentifier name);
+
+  protected:
+    NPP mNpp;
+};
+
+#define DECLARE_NPOBJECT_CLASS_WITH_BASE(_class, ctor)                        \
+static NPClass s##_class##_NPClass = {                                        \
+  NP_CLASS_STRUCT_VERSION,                                                    \
+  ctor,                                                                       \
+  ScriptablePluginObjectBase::_Deallocate,                                    \
+  ScriptablePluginObjectBase::_Invalidate,                                    \
+  ScriptablePluginObjectBase::_HasMethod,                                     \
+  ScriptablePluginObjectBase::_Invoke,                                        \
+  ScriptablePluginObjectBase::_InvokeDefault,                                 \
+  ScriptablePluginObjectBase::_HasProperty,                                   \
+  ScriptablePluginObjectBase::_GetProperty,                                   \
+  ScriptablePluginObjectBase::_SetProperty,                                   \
+  ScriptablePluginObjectBase::_RemoveProperty                                 \
 }
 
-// ==============================
-// ! Scriptability related code !
-// ==============================
-//
-// this method will return the scriptable object (and create it if necessary)
-nsScriptablePeer *nsPluginInstance::getScriptablePeer()
-{
-    if (!mScriptablePeer) {
-        mScriptablePeer = new nsScriptablePeer(this);
-        if (!mScriptablePeer)
-            return NULL;
+#define GET_NPOBJECT_CLASS(_class) &s##_class##_NPClass
 
-        NS_ADDREF(mScriptablePeer);
-    }
-    // add reference for the caller requesting the object
-    NS_ADDREF(mScriptablePeer);
-    return mScriptablePeer;
+void ScriptablePluginObjectBase::Invalidate()
+{
 }
 
-nsControlsScriptablePeer *nsPluginInstance::getControlsScriptablePeer()
+bool ScriptablePluginObjectBase::HasMethod(NPIdentifier name)
 {
-    if (!mControlsScriptablePeer) {
-        mControlsScriptablePeer = new nsControlsScriptablePeer(this);
-        if (!mControlsScriptablePeer)
-            return NULL;
-
-        NS_ADDREF(mControlsScriptablePeer);
-    }
-    // add reference for the caller requesting the object
-    NS_ADDREF(mControlsScriptablePeer);
-    return mControlsScriptablePeer;
+    return false;
 }
 
-gchar *gmp_tempname(gchar *path,const gchar *name_template)
+bool ScriptablePluginObjectBase::Invoke(NPIdentifier name, const NPVariant * args,
+                                        uint32_t argCount, NPVariant * result)
 {
-	gchar *result;
-	gchar *replace;
-	gchar *basename;
-	gchar *localpath;
+    return false;
+}
 
-	basename = g_strdup(name_template);
+bool ScriptablePluginObjectBase::InvokeDefault(const NPVariant * args,
+                                               uint32_t argCount, NPVariant * result)
+{
+    return false;
+}
 
-	if (path == NULL && g_getenv("TMPDIR") == NULL) {
-		localpath = g_strdup("/tmp");
-	} else if(path == NULL && g_getenv("TMPDIR") != NULL) {
-		localpath = g_strdup(g_getenv("TMPDIR"));
-	} else {
-		localpath = g_strdup(path);
-	}
+bool ScriptablePluginObjectBase::HasProperty(NPIdentifier name)
+{
+    return false;
+}
 
-	while((replace = g_strrstr(basename,"X"))) {
-		replace[0] = (gchar)g_random_int_range((gint)'a',(gint)'z');
-	}
+bool ScriptablePluginObjectBase::GetProperty(NPIdentifier name, NPVariant * result)
+{
 
-	result = g_strdup_printf("%s/%s",localpath,basename);
-	g_free(basename);
-	g_free(localpath);
+    VOID_TO_NPVARIANT(*result);
 
-	return result;
+    return false;
+}
+
+bool ScriptablePluginObjectBase::SetProperty(NPIdentifier name, const NPVariant * value)
+{
+    return false;
+}
+
+bool ScriptablePluginObjectBase::RemoveProperty(NPIdentifier name)
+{
+    return false;
+}
+
+// static
+void ScriptablePluginObjectBase::_Deallocate(NPObject * npobj)
+{
+    // Call the virtual destructor.
+    delete(ScriptablePluginObjectBase *) npobj;
+}
+
+// static
+void ScriptablePluginObjectBase::_Invalidate(NPObject * npobj)
+{
+    ((ScriptablePluginObjectBase *) npobj)->Invalidate();
+}
+
+// static
+bool ScriptablePluginObjectBase::_HasMethod(NPObject * npobj, NPIdentifier name)
+{
+    return ((ScriptablePluginObjectBase *) npobj)->HasMethod(name);
+}
+
+// static
+bool ScriptablePluginObjectBase::_Invoke(NPObject * npobj, NPIdentifier name,
+                                         const NPVariant * args, uint32_t argCount,
+                                         NPVariant * result)
+{
+    return ((ScriptablePluginObjectBase *) npobj)->Invoke(name, args, argCount, result);
+}
+
+// static
+bool ScriptablePluginObjectBase::_InvokeDefault(NPObject * npobj,
+                                                const NPVariant * args,
+                                                uint32_t argCount, NPVariant * result)
+{
+    return ((ScriptablePluginObjectBase *) npobj)->InvokeDefault(args, argCount, result);
+}
+
+// static
+bool ScriptablePluginObjectBase::_HasProperty(NPObject * npobj, NPIdentifier name)
+{
+    return ((ScriptablePluginObjectBase *) npobj)->HasProperty(name);
+}
+
+// static
+bool ScriptablePluginObjectBase::_GetProperty(NPObject * npobj, NPIdentifier name,
+                                              NPVariant * result)
+{
+    return ((ScriptablePluginObjectBase *) npobj)->GetProperty(name, result);
+}
+
+// static
+bool ScriptablePluginObjectBase::_SetProperty(NPObject * npobj, NPIdentifier name,
+                                              const NPVariant * value)
+{
+    return ((ScriptablePluginObjectBase *) npobj)->SetProperty(name, value);
+}
+
+// static
+bool ScriptablePluginObjectBase::_RemoveProperty(NPObject * npobj, NPIdentifier name)
+{
+    return ((ScriptablePluginObjectBase *) npobj)->RemoveProperty(name);
+}
+
+class ScriptablePluginObjectControls:public ScriptablePluginObjectBase {
+  public:
+    ScriptablePluginObjectControls(NPP npp)
+    :ScriptablePluginObjectBase(npp) {
+    } virtual bool HasMethod(NPIdentifier name);
+    virtual bool Invoke(NPIdentifier name, const NPVariant * args,
+                        uint32_t argCount, NPVariant * result);
+    virtual bool InvokeDefault(const NPVariant * args, uint32_t argCount, NPVariant * result);
+    virtual bool HasProperty(NPIdentifier name);
+    virtual bool GetProperty(NPIdentifier name, NPVariant * result);
+    virtual bool SetProperty(NPIdentifier name, const NPVariant * value);
+
+};
+
+static NPObject *AllocateScriptablePluginObjectControls(NPP npp, NPClass * aClass)
+{
+    return new ScriptablePluginObjectControls(npp);
+}
+
+DECLARE_NPOBJECT_CLASS_WITH_BASE(ScriptablePluginObjectControls, AllocateScriptablePluginObjectControls);
+
+bool ScriptablePluginObjectControls::HasMethod(NPIdentifier name)
+{
+    if (name == controls_play_id ||
+        name == controls_pause_id ||
+        name == controls_stop_id ||
+        name == controls_fastForward_id ||
+        name == controls_fastReverse_id ||
+        name == controls_step_id) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+bool ScriptablePluginObjectControls::Invoke(NPIdentifier name, const NPVariant * args,
+                                    uint32_t argCount, NPVariant * result)
+{
+    CPlugin *pPlugin = (CPlugin *) mNpp->pdata;
+    if (pPlugin == NULL) {
+        printf("Can't find plugin pointer\n");
+        return PR_FALSE;
+    }
+
+    if (name == controls_play_id) {
+        pPlugin->Play();
+        return PR_TRUE;
+    }
+
+    if (name == controls_pause_id) {
+        pPlugin->Pause();
+        return PR_TRUE;
+    }
+
+    if (name == controls_stop_id) {
+        pPlugin->Stop();
+        return PR_TRUE;
+    }
+
+    return false;
+}
+
+bool ScriptablePluginObjectControls::InvokeDefault(const NPVariant * args, uint32_t argCount,
+                                           NPVariant * result)
+{
+    printf("ScriptablePluginObject default method called!\n");
+
+    STRINGZ_TO_NPVARIANT(strdup("default method return val"), *result);
+
+    return PR_TRUE;
+}
+
+bool ScriptablePluginObjectControls::HasProperty(NPIdentifier name)
+{
+    if (name == controls_currentPosition_id) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+bool ScriptablePluginObjectControls::GetProperty(NPIdentifier name, NPVariant * result)
+{
+    double position;
+
+    CPlugin *pPlugin = (CPlugin *) mNpp->pdata;
+    if (pPlugin == NULL) {
+        printf("Can't find plugin pointer\n");
+        VOID_TO_NPVARIANT(*result);
+        return false;
+    }
+
+    if (name == controls_currentPosition_id) {
+        pPlugin->GetTime(&position);
+        DOUBLE_TO_NPVARIANT(position,*result);
+        return true;
+    }                
+
+    VOID_TO_NPVARIANT(*result);
+    return false;
+}
+
+bool ScriptablePluginObjectControls::SetProperty(NPIdentifier name, const NPVariant * value)
+{
+    CPlugin *pPlugin = (CPlugin *) mNpp->pdata;
+    if (pPlugin == NULL) {
+        printf("Can't find plugin pointer\n");
+        return false;
+    }
+
+    if (name == controls_currentPosition_id) {
+        pPlugin->Seek(NPVARIANT_TO_DOUBLE(*value));
+        return true;
+    }                
+
+    return false;
+}
+
+
+class ScriptablePluginObject:public ScriptablePluginObjectBase {
+  public:
+    ScriptablePluginObject(NPP npp)
+    :ScriptablePluginObjectBase(npp) {
+    } virtual bool HasMethod(NPIdentifier name);
+    virtual bool Invoke(NPIdentifier name, const NPVariant * args,
+                        uint32_t argCount, NPVariant * result);
+    virtual bool InvokeDefault(const NPVariant * args, uint32_t argCount, NPVariant * result);
+    virtual bool HasProperty(NPIdentifier name);
+    virtual bool GetProperty(NPIdentifier name, NPVariant * result);
+    virtual bool SetProperty(NPIdentifier name, const NPVariant * value);
+
+};
+
+static NPObject *AllocateScriptablePluginObject(NPP npp, NPClass * aClass)
+{
+    return new ScriptablePluginObject(npp);
+}
+
+DECLARE_NPOBJECT_CLASS_WITH_BASE(ScriptablePluginObject, AllocateScriptablePluginObject);
+
+
+bool ScriptablePluginObject::HasMethod(NPIdentifier name)
+{
+    if (name == Play_id || 
+        name == PlayAt_id ||
+        name == Pause_id ||
+        name == PlayPause_id ||
+        name == Stop_id ||
+        name == quit_id ||
+        name == DoPlay_id ||
+        name == DoPause_id ||
+        name == FastForward_id ||
+        name == FastReverse_id ||
+        name == ff_id ||
+        name == rew_id ||
+        name == rewind_id ||
+        name == Seek_id ||
+        name == Open_id ||
+        name == SetVolume_id ||
+        name == GetVolume_id ||
+        name == SetFileName_id ||
+        name == GetFileName_id ||
+        name == SetIsLooping_id ||
+        name == GetIsLooping_id ||
+        name == SetAutoPlay_id ||
+        name == GetAutoPlay_id ||
+        name == SetHREF_id ||
+        name == GetHREF_id ||
+        name == SetURL_id ||
+        name == GetURL_id ||
+        name == GetMIMEType_id ||
+        name == getTime_id ||
+        name == getDuration_id ||
+        name == getPercent_id ||
+        name == isplaying_id ||
+        name == playlistAppend_id ||
+        name == playlistClear_id ||
+        name == onClick_id ||
+        name == onMediaComplete_id ||
+        name == onMouseUp_id ||
+        name == onMouseDown_id ||
+        name == onMouseOut_id ||
+        name == onMouseOver_id ||
+        name == onDestroy_id ) {
+            return true;
+    } else {
+            return false;
+    }
+}
+
+bool ScriptablePluginObject::Invoke(NPIdentifier name, const NPVariant * args,
+                                    uint32_t argCount, NPVariant * result)
+{
+    double d;
+    char *s;
+    PRBool b;
+
+    CPlugin *pPlugin = (CPlugin *) mNpp->pdata;
+    if (pPlugin == NULL) {
+        printf("Can't find plugin pointer\n");
+        return PR_FALSE;
+    }
+
+    if (name == Play_id || name == DoPlay_id) {
+        pPlugin->Play();
+        return PR_TRUE;
+    }
+        
+    if (name == Pause_id || name == DoPause_id) {
+        pPlugin->Pause();
+        return PR_TRUE;
+    }
+
+    if (name == PlayPause_id) {
+        pPlugin->PlayPause();
+        return PR_TRUE;
+    }
+
+    if (name == Stop_id) {
+        pPlugin->Stop();
+        return PR_TRUE;
+    }
+
+    if (name == FastForward_id || name == ff_id) {
+        pPlugin->FastForward();
+        return PR_TRUE;
+    }
+
+    if (name == FastReverse_id || name == rew_id || name == rewind_id) {
+        pPlugin->FastReverse();
+        return PR_TRUE;
+    }
+
+    if (name == Seek_id) {
+        pPlugin->Seek(NPVARIANT_TO_DOUBLE(args[0]));
+        return PR_TRUE;
+    }
+
+    if (name == Open_id || name == SetFileName_id || name == SetHREF_id || name == SetURL_id) {
+        pPlugin->SetFilename(NPVARIANT_TO_STRING(args[0]).utf8characters);
+        return PR_TRUE;
+    }
+
+    if (name == GetFileName_id || name == GetHREF_id || name == GetURL_id) {
+        pPlugin->GetFilename(&s);
+        STRINGZ_TO_NPVARIANT(s,*result);
+        g_free(s);
+        return PR_TRUE;
+    }
+
+    if (name == SetVolume_id) {
+        pPlugin->SetVolume(NPVARIANT_TO_DOUBLE(args[0]));
+        return PR_TRUE;
+    }
+
+    if (name == GetVolume_id) {
+        pPlugin->GetVolume(&d);
+        DOUBLE_TO_NPVARIANT(d,*result);
+        return PR_TRUE;
+    }
+
+    if (name == SetIsLooping_id) {
+        pPlugin->SetLoop(NPVARIANT_TO_BOOLEAN(args[0]));
+        return PR_TRUE;
+    }
+
+    if (name == GetIsLooping_id) {
+        pPlugin->GetLoop(&b);
+        BOOLEAN_TO_NPVARIANT(b,*result);
+        return PR_TRUE;
+    }
+
+    if (name == SetAutoPlay_id || name == GetAutoPlay_id) {
+            
+        return PR_TRUE;
+    }
+
+    if (name == GetMIMEType_id) {
+        pPlugin->GetMIMEType(&s);
+        STRINGZ_TO_NPVARIANT(s,*result);
+        g_free(s);
+        return PR_TRUE;
+    }
+
+    if (name == getTime_id ) {
+        pPlugin->GetTime(&d);
+        DOUBLE_TO_NPVARIANT(d,*result);
+        return PR_TRUE;
+    }
+
+    if (name == getDuration_id) {
+        pPlugin->GetDuration(&d);
+        DOUBLE_TO_NPVARIANT(d,*result);
+        return PR_TRUE;
+    }
+
+    if (name == getPercent_id) {
+        pPlugin->GetPercent(&d);
+        DOUBLE_TO_NPVARIANT(d,*result);
+        return PR_TRUE;
+    }
+
+    if (name == isplaying_id || name == playlistAppend_id || name == playlistClear_id) {
+        return PR_TRUE;
+    }
+
+    if (name == onClick_id) {
+        pPlugin->SetOnClick(NPVARIANT_TO_STRING(args[0]).utf8characters);
+        return PR_TRUE;
+    }
+
+    if (name == onMediaComplete_id) {
+        pPlugin->SetOnMediaComplete(NPVARIANT_TO_STRING(args[0]).utf8characters);
+        return PR_TRUE;
+    }
+
+    if (name == onMouseUp_id) {
+        pPlugin->SetOnMouseUp(NPVARIANT_TO_STRING(args[0]).utf8characters);
+        return PR_TRUE;
+    }
+
+    if (name == onMouseDown_id) {
+        pPlugin->SetOnMouseDown(NPVARIANT_TO_STRING(args[0]).utf8characters);
+        return PR_TRUE;
+    }
+
+    if (name == onMouseOut_id) {
+        pPlugin->SetOnMouseOut(NPVARIANT_TO_STRING(args[0]).utf8characters);
+        return PR_TRUE;
+    }
+
+    if (name == onMouseOver_id) {
+        pPlugin->SetOnMouseOver(NPVARIANT_TO_STRING(args[0]).utf8characters);
+        return PR_TRUE;
+    }
+
+    if (name == onDestroy_id) {
+        pPlugin->SetOnDestroy(NPVARIANT_TO_STRING(args[0]).utf8characters);
+        return PR_TRUE;
+    }
+
+    return PR_FALSE;
+}
+
+bool ScriptablePluginObject::InvokeDefault(const NPVariant * args, uint32_t argCount,
+                                           NPVariant * result)
+{
+    printf("ScriptablePluginObject default method called!\n");
+
+    STRINGZ_TO_NPVARIANT(strdup("default method return val"), *result);
+
+    return PR_TRUE;
+}
+
+bool ScriptablePluginObject::HasProperty(NPIdentifier name)
+{
+    if (name == filename_id ||
+        name == src_id ||
+        name == ShowControls_id ||
+        name == fullscreen_id ||
+        name == showlogo_id ||
+        name == playState_id ||
+        name == controls_id) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+bool ScriptablePluginObject::GetProperty(NPIdentifier name, NPVariant * result)
+{
+    char *filename;
+    PRBool setting;
+    PRInt32 state;
+
+    CPlugin *pPlugin = (CPlugin *) mNpp->pdata;
+    if (pPlugin == NULL) {
+        printf("Can't find plugin pointer\n");
+        VOID_TO_NPVARIANT(*result);
+        return false;
+    }
+
+    if (name == filename_id || name == src_id) {
+        pPlugin->GetFilename(&filename);
+        STRINGZ_TO_NPVARIANT(filename,*result);
+        return true;
+    }                
+
+    if (name == ShowControls_id) {
+        pPlugin->GetShowControls(&setting);
+        BOOLEAN_TO_NPVARIANT(setting,*result);
+        return true;
+    }    
+
+    if (name == fullscreen_id) {
+        pPlugin->GetFullScreen(&setting);
+        BOOLEAN_TO_NPVARIANT(setting,*result);
+        return true;
+    }    
+
+    if (name == showlogo_id) {
+        setting = true;
+        BOOLEAN_TO_NPVARIANT(setting,*result);
+        return true;
+    }    
+
+    if (name == playState_id) {
+        pPlugin->GetPlayState(&state);
+        INT32_TO_NPVARIANT(state,*result);
+        return true;
+    }    
+
+    if (name == controls_id) {
+        OBJECT_TO_NPVARIANT(pPlugin->GetScriptableObjectControls(),*result);
+        return true;
+    }
+
+    VOID_TO_NPVARIANT(*result);
+    return false;
+}
+
+bool ScriptablePluginObject::SetProperty(NPIdentifier name, const NPVariant * value)
+{
+    CPlugin *pPlugin = (CPlugin *) mNpp->pdata;
+    if (pPlugin == NULL) {
+        printf("Can't find plugin pointer\n");
+        return false;
+    }
+
+    if (name == filename_id || name == src_id) {
+        pPlugin->SetFilename(NPVARIANT_TO_STRING(*value).utf8characters);
+        return true;
+    }                
+
+    if (name == ShowControls_id) {
+        pPlugin->SetShowControls(NPVARIANT_TO_BOOLEAN(*value));
+        return true;
+    }    
+
+    if (name == fullscreen_id) {
+        pPlugin->SetFullScreen(NPVARIANT_TO_BOOLEAN(*value));
+        return true;
+    }    
+
+    if (name == showlogo_id) {
+        return true;
+    }    
+
+    if (name == playState_id) {
+        // readonly property
+        return true;
+    }    
+
+    return false;
+}
+
+NPObject *CPlugin::GetScriptableObject()
+{
+    if (!m_pScriptableObject) {
+        m_pScriptableObject =
+            NPN_CreateObject(mInstance, GET_NPOBJECT_CLASS(ScriptablePluginObject));
+    }
+
+    if (m_pScriptableObject) {
+        NPN_RetainObject(m_pScriptableObject);
+    }
+
+    return m_pScriptableObject;
+}
+
+NPObject *CPlugin::GetScriptableObjectControls()
+{
+    if (!m_pScriptableObjectControls) {
+        m_pScriptableObjectControls =
+            NPN_CreateObject(mInstance, GET_NPOBJECT_CLASS(ScriptablePluginObjectControls));
+    }
+
+    if (m_pScriptableObjectControls) {
+        NPN_RetainObject(m_pScriptableObjectControls);
+    }
+
+    return m_pScriptableObjectControls;
+}
+
+gchar *gmp_tempname(gchar * path, const gchar * name_template)
+{
+    gchar *result;
+    gchar *replace;
+    gchar *basename;
+    gchar *localpath;
+
+    basename = g_strdup(name_template);
+
+    if (path == NULL && g_getenv("TMPDIR") == NULL) {
+        localpath = g_strdup("/tmp");
+    } else if (path == NULL && g_getenv("TMPDIR") != NULL) {
+        localpath = g_strdup(g_getenv("TMPDIR"));
+    } else {
+        localpath = g_strdup(path);
+    }
+
+    while ((replace = g_strrstr(basename, "X"))) {
+        replace[0] = (gchar) g_random_int_range((gint) 'a', (gint) 'z');
+    }
+
+    result = g_strdup_printf("%s/%s", localpath, basename);
+    g_free(basename);
+    g_free(localpath);
+
+    return result;
 }
