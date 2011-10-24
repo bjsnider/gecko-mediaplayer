@@ -121,6 +121,7 @@ cache_size(2048),
 hidden(FALSE),
 autostart(1),
 lastupdate(0),
+show_controls(1),
 name(NULL),
 console(NULL),
 controls(NULL),
@@ -134,7 +135,7 @@ event_mouseclicked(NULL), event_enterwindow(NULL), event_leavewindow(NULL), debu
 tv_driver(NULL),tv_device(NULL),tv_input(NULL),tv_width(0),tv_height(0)
 {
     GRand *rand;
-    GConfClient *gconf = NULL;
+    gpointer store = NULL;
     
     // generate a random controlid
     rand = g_rand_new();
@@ -147,10 +148,10 @@ tv_driver(NULL),tv_device(NULL),tv_input(NULL),tv_width(0),tv_height(0)
     }
 
     g_type_init();
-    gconf = gconf_client_get_default();
-    if (gconf != NULL) {
-        debug_level = gconf_client_get_int(gconf, DEBUG_LEVEL, NULL);
-        g_object_unref(G_OBJECT(gconf));
+    store = init_preference_store();
+    if (store != NULL) {
+        debug_level = read_preference_int(store, DEBUG_LEVEL);
+        release_preference_store(store);
     }
         
     mScriptablePeer = getScriptablePeer();
@@ -239,6 +240,7 @@ NPError nsPluginInstance::SetWindow(NPWindow * aWindow)
         argvn[arg++] = g_strdup_printf("--width=%i", mWidth);
         argvn[arg++] = g_strdup_printf("--height=%i", mHeight);
         argvn[arg++] = g_strdup_printf("--autostart=%i", autostart);
+        argvn[arg++] = g_strdup_printf("--showcontrols=%i", show_controls);
         if (disable_context_menu == TRUE)
             argvn[arg++] = g_strdup_printf("--disablecontextmenu");
         if (disable_fullscreen == TRUE)

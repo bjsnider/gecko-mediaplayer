@@ -13,10 +13,12 @@ gecko_mediaplayerdoc_DATA = \
 	NEWS\
 	DOCS/tech/javascript.txt
 
-gecko_mediaplayeretcdir = ${sysconfdir}/gconf/schemas
-gecko_mediaplayeretc_DATA = gecko-mediaplayer.schemas
+if GCONF_SCHEMAS_INSTALL
+schemadir   = @GCONF_SCHEMA_FILE_DIR@
+schema_DATA = gecko-mediaplayer.schemas
+endif
 
-EXTRA_DIST = $(gecko_mediaplayerdoc_DATA) $(gecko_mediaplayeretc_DATA) gecko-mediaplayer.spec.in
+EXTRA_DIST = $(gecko_mediaplayerdoc_DATA) $(schema_DATA) gecko-mediaplayer.spec.in
 
 # Copy all the spec files. Of cource, only one is actually used.
 dist-hook:
@@ -27,6 +29,13 @@ dist-hook:
 	done
 	rm -rf $(distdir)/src/nsIScriptableGeckoMediaPlayer.h
 
+install-schemas: $(schema_DATA)
+	GCONF_CONFIG_SOURCE=$(GCONF_SCHEMA_CONFIG_SOURCE) gconftool-2 --makefile-install-rule $(schema_DATA) 2>&1 > /dev/null
+	gconftool-2 --shutdown
+
+if GCONF_SCHEMAS_INSTALL
+install-data-hook: install-schemas
+else
 install-data-hook:
-	if [ -e ${sysconfdir}/gconf/schemas/gecko-mediaplayer.schemas ]; then GCONF_CONFIG_SOURCE=`gconftool-2 --get-default-source` gconftool-2 --makefile-install-rule ${sysconfdir}/gconf/schemas/gecko-mediaplayer.schemas > /dev/null;	fi
+endif
 

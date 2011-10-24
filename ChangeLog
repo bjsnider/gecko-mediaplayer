@@ -1,5 +1,15 @@
+0.9.0
+	Fix preference issue
+	Add feature to ASX parser to add url prefix if missing
+	Fix make dist so that rpmbuild works again
+	Fix automake rules to allow --disable-schemas-install configure flag
+	Make requirement on GCONF optional (--without-gconf on ./configure line)
+0.8.0
+	Add embed 'showcontrols' option and 'onendofstream' event
+    	Add mimetypes for matroska audio and video files
+	Remove gthread from the list of requirements
 0.7.0
-    Limit bitrate requests to 5 per item, should prevent CPU peg
+    	Limit bitrate requests to 5 per item, should prevent CPU peg
 	Add in audio mp4 mime types
 	Add libxul-unstable checks in
 	Remove mozilla-plugin out of the libxul test

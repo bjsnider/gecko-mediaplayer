@@ -77,6 +77,16 @@ void new_instance(nsPluginInstance * instance, nsPluginCreateData * parameters)
                     instance->controls = g_strdup(parameters->argv[i]);
             }
 
+            if (g_ascii_strcasecmp(parameters->argn[i], "showcontrols") == 0) {
+                if (strstr(parameters->argv[i], "true")
+                    || strstr(parameters->argv[i], "yes")
+                    || strstr(parameters->argv[i], "1")) {
+                    instance->show_controls = 1;
+                } else {
+                    instance->show_controls = 0;
+                }            
+            }
+
             if (g_ascii_strcasecmp(parameters->argn[i], "width") == 0) {
                     sscanf(parameters->argv[i], "%i",&width);
             }
@@ -249,7 +259,8 @@ void new_instance(nsPluginInstance * instance, nsPluginCreateData * parameters)
                 }
             }
 
-            if (g_ascii_strcasecmp(parameters->argn[i], "onmediacomplete") == 0) {
+            if (g_ascii_strcasecmp(parameters->argn[i], "onmediacomplete") == 0 
+                || g_ascii_strcasecmp(parameters->argn[i], "onendofstream") == 0) {
                 if (g_ascii_strncasecmp(parameters->argv[i], "javascript:", 11) == 0) {
                     instance->event_mediacomplete = g_strdup_printf("%s", parameters->argv[i]);
                 } else {
@@ -439,4 +450,99 @@ gint streaming(gchar * url)
         }
     }
     return ret;
+}
+
+gpointer init_preference_store()
+{
+#ifdef HAVE_GCONF
+    GConfClient *gconf;
+    gconf = gconf_client_get_default();
+    return gconf;
+
+#else
+    gchar *filename;
+    GKeyFile *config;
+
+    config = g_key_file_new();
+    filename = g_strdup_printf("%s/.mplayer/gnome-mplayer.conf", getenv("HOME"));
+    g_key_file_load_from_file(config,
+                              filename,
+                              (GKeyFileFlags)(G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS), NULL);
+
+    return config;
+#endif
+    
+}
+
+gboolean read_preference_bool(gpointer store, gchar * key)
+{
+    gboolean value = FALSE;
+#ifdef HAVE_GCONF
+    gchar *full_key = NULL;
+
+    if (strstr(key, "/")) {
+        full_key = g_strdup_printf("%s", key);
+    } else {
+        full_key = g_strdup_printf("/apps/gnome-mplayer/preferences/%s", key);
+    }
+    value = gconf_client_get_bool((GConfClient *)store, full_key, NULL);
+    g_free(full_key);
+#else
+    gchar *short_key;
+
+    if (strstr(key, "/")) {
+        short_key = g_strrstr(key, "/") + sizeof(gchar);
+    } else {
+        short_key = g_strdup_printf("%s", key);
+    }
+
+    value = g_key_file_get_boolean((GKeyFile*)store, "gnome-mplayer", short_key, NULL);
+#endif
+    return value;
+}
+
+gint read_preference_int(gpointer store, gchar * key)
+{
+    gint value = 0;
+#ifdef HAVE_GCONF
+    gchar *full_key = NULL;
+
+    if (strstr(key, "/")) {
+        full_key = g_strdup(key);
+    } else {
+        full_key = g_strdup_printf("/apps/gnome-mplayer/preferences/%s", key);
+    }
+    value = gconf_client_get_int((GConfClient*)store, full_key, NULL);
+    g_free(full_key);
+#else
+    gchar *short_key;
+
+    if (strstr(key, "/")) {
+        short_key = g_strrstr(key, "/") + sizeof(gchar);
+    } else {
+        short_key = g_strdup_printf("%s", key);
+    }
+
+    value = g_key_file_get_integer((GKeyFile*)store, "gnome-mplayer", short_key, NULL);
+#endif
+    return value;
+}
+void release_preference_store(gpointer store)
+{
+#ifdef HAVE_GCONF
+    if (G_IS_OBJECT(store))
+        g_object_unref(G_OBJECT(store));
+#else
+    gchar *filename;
+    gchar *data;
+
+    filename = g_strdup_printf("%s/.mplayer/gnome-mplayer.conf", getenv("HOME"));
+    data = g_key_file_to_data((GKeyFile*)store, NULL, NULL);
+
+    g_file_set_contents(filename, data, -1, NULL);
+    g_free(data);
+    g_free(filename);
+    g_key_file_free((GKeyFile*)store);
+
+#endif
 }
