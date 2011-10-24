@@ -47,8 +47,8 @@ CONFIG_CLEAN_FILES =
 am__installdirs = "$(DESTDIR)$(install_libexecdir)"
 install_libexecPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(install_libexec_PROGRAMS)
-am__objects_1 = gecko_mediaplayer_dvx_so-memmem_compat.$(OBJEXT) \
-	plugin.$(OBJEXT) plugin_list.$(OBJEXT) plugin_setup.$(OBJEXT) \
+am__objects_1 = plugin.$(OBJEXT) memmem_compat.$(OBJEXT) \
+	plugin_list.$(OBJEXT) plugin_setup.$(OBJEXT) \
 	plugin_dbus.$(OBJEXT) np_entry.$(OBJEXT) npn_gate.$(OBJEXT) \
 	npp_gate.$(OBJEXT)
 am_gecko_mediaplayer_dvx_so_OBJECTS = plugin_types_dvx.$(OBJEXT) \
@@ -58,45 +58,29 @@ gecko_mediaplayer_dvx_so_OBJECTS =  \
 gecko_mediaplayer_dvx_so_LDADD = $(LDADD)
 gecko_mediaplayer_dvx_so_LINK = $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) \
 	$(gecko_mediaplayer_dvx_so_LDFLAGS) $(LDFLAGS) -o $@
-am__objects_2 = gecko_mediaplayer_qt_so-memmem_compat.$(OBJEXT) \
-	plugin.$(OBJEXT) plugin_list.$(OBJEXT) plugin_setup.$(OBJEXT) \
-	plugin_dbus.$(OBJEXT) np_entry.$(OBJEXT) npn_gate.$(OBJEXT) \
-	npp_gate.$(OBJEXT)
 am_gecko_mediaplayer_qt_so_OBJECTS = plugin_types_qt.$(OBJEXT) \
-	$(am__objects_2)
+	$(am__objects_1)
 gecko_mediaplayer_qt_so_OBJECTS =  \
 	$(am_gecko_mediaplayer_qt_so_OBJECTS)
 gecko_mediaplayer_qt_so_LDADD = $(LDADD)
 gecko_mediaplayer_qt_so_LINK = $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) \
 	$(gecko_mediaplayer_qt_so_LDFLAGS) $(LDFLAGS) -o $@
-am__objects_3 = gecko_mediaplayer_rm_so-memmem_compat.$(OBJEXT) \
-	plugin.$(OBJEXT) plugin_list.$(OBJEXT) plugin_setup.$(OBJEXT) \
-	plugin_dbus.$(OBJEXT) np_entry.$(OBJEXT) npn_gate.$(OBJEXT) \
-	npp_gate.$(OBJEXT)
 am_gecko_mediaplayer_rm_so_OBJECTS = plugin_types_rm.$(OBJEXT) \
-	$(am__objects_3)
+	$(am__objects_1)
 gecko_mediaplayer_rm_so_OBJECTS =  \
 	$(am_gecko_mediaplayer_rm_so_OBJECTS)
 gecko_mediaplayer_rm_so_LDADD = $(LDADD)
 gecko_mediaplayer_rm_so_LINK = $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) \
 	$(gecko_mediaplayer_rm_so_LDFLAGS) $(LDFLAGS) -o $@
-am__objects_4 = gecko_mediaplayer_wmp_so-memmem_compat.$(OBJEXT) \
-	plugin.$(OBJEXT) plugin_list.$(OBJEXT) plugin_setup.$(OBJEXT) \
-	plugin_dbus.$(OBJEXT) np_entry.$(OBJEXT) npn_gate.$(OBJEXT) \
-	npp_gate.$(OBJEXT)
 am_gecko_mediaplayer_wmp_so_OBJECTS = plugin_types_wmp.$(OBJEXT) \
-	$(am__objects_4)
+	$(am__objects_1)
 gecko_mediaplayer_wmp_so_OBJECTS =  \
 	$(am_gecko_mediaplayer_wmp_so_OBJECTS)
 gecko_mediaplayer_wmp_so_LDADD = $(LDADD)
 gecko_mediaplayer_wmp_so_LINK = $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) \
 	$(gecko_mediaplayer_wmp_so_LDFLAGS) $(LDFLAGS) -o $@
-am__objects_5 = gecko_mediaplayer_so-memmem_compat.$(OBJEXT) \
-	plugin.$(OBJEXT) plugin_list.$(OBJEXT) plugin_setup.$(OBJEXT) \
-	plugin_dbus.$(OBJEXT) np_entry.$(OBJEXT) npn_gate.$(OBJEXT) \
-	npp_gate.$(OBJEXT)
 am_gecko_mediaplayer_so_OBJECTS = plugin_types_std.$(OBJEXT) \
-	$(am__objects_5)
+	$(am__objects_1)
 gecko_mediaplayer_so_OBJECTS = $(am_gecko_mediaplayer_so_OBJECTS)
 gecko_mediaplayer_so_LDADD = $(LDADD)
 gecko_mediaplayer_so_LINK = $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) \
@@ -104,15 +88,15 @@ gecko_mediaplayer_so_LINK = $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) \
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
-COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
-	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
-CCLD = $(CC)
-LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
 CXXLD = $(CXX)
 CXXLINK = $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) \
 	-o $@
+COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
+	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
+CCLD = $(CC)
+LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 SOURCES = $(gecko_mediaplayer_dvx_so_SOURCES) \
 	$(gecko_mediaplayer_qt_so_SOURCES) \
 	$(gecko_mediaplayer_rm_so_SOURCES) \
@@ -266,8 +250,9 @@ AM_CFLAGS = \
 
 COMMONCODE = \
 	../config.h \
-	memmem_compat.c \
 	plugin.cpp \
+	memmem_compat.h \
+	memmem_compat.cpp \
 	plugin.h \
 	plugin_list.h \
 	plugin_list.cpp \
@@ -315,7 +300,7 @@ gecko_mediaplayer_rm_so_LDFLAGS = -shared $(GLIB_LIBS) $(DBUS_LIBS) $(GCONF_LIBS
 all: all-am
 
 .SUFFIXES:
-.SUFFIXES: .c .cpp .o .obj
+.SUFFIXES: .cpp .o .obj
 $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
@@ -390,11 +375,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gecko_mediaplayer_dvx_so-memmem_compat.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gecko_mediaplayer_qt_so-memmem_compat.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gecko_mediaplayer_rm_so-memmem_compat.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gecko_mediaplayer_so-memmem_compat.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gecko_mediaplayer_wmp_so-memmem_compat.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/memmem_compat.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/np_entry.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/npn_gate.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/npp_gate.Po@am__quote@
@@ -407,90 +388,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/plugin_types_rm.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/plugin_types_std.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/plugin_types_wmp.Po@am__quote@
-
-.c.o:
-@am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(COMPILE) -c $<
-
-.c.obj:
-@am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ `$(CYGPATH_W) '$<'`
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(COMPILE) -c `$(CYGPATH_W) '$<'`
-
-gecko_mediaplayer_dvx_so-memmem_compat.o: memmem_compat.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gecko_mediaplayer_dvx_so_CFLAGS) $(CFLAGS) -MT gecko_mediaplayer_dvx_so-memmem_compat.o -MD -MP -MF $(DEPDIR)/gecko_mediaplayer_dvx_so-memmem_compat.Tpo -c -o gecko_mediaplayer_dvx_so-memmem_compat.o `test -f 'memmem_compat.c' || echo '$(srcdir)/'`memmem_compat.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/gecko_mediaplayer_dvx_so-memmem_compat.Tpo $(DEPDIR)/gecko_mediaplayer_dvx_so-memmem_compat.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='memmem_compat.c' object='gecko_mediaplayer_dvx_so-memmem_compat.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gecko_mediaplayer_dvx_so_CFLAGS) $(CFLAGS) -c -o gecko_mediaplayer_dvx_so-memmem_compat.o `test -f 'memmem_compat.c' || echo '$(srcdir)/'`memmem_compat.c
-
-gecko_mediaplayer_dvx_so-memmem_compat.obj: memmem_compat.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gecko_mediaplayer_dvx_so_CFLAGS) $(CFLAGS) -MT gecko_mediaplayer_dvx_so-memmem_compat.obj -MD -MP -MF $(DEPDIR)/gecko_mediaplayer_dvx_so-memmem_compat.Tpo -c -o gecko_mediaplayer_dvx_so-memmem_compat.obj `if test -f 'memmem_compat.c'; then $(CYGPATH_W) 'memmem_compat.c'; else $(CYGPATH_W) '$(srcdir)/memmem_compat.c'; fi`
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/gecko_mediaplayer_dvx_so-memmem_compat.Tpo $(DEPDIR)/gecko_mediaplayer_dvx_so-memmem_compat.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='memmem_compat.c' object='gecko_mediaplayer_dvx_so-memmem_compat.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gecko_mediaplayer_dvx_so_CFLAGS) $(CFLAGS) -c -o gecko_mediaplayer_dvx_so-memmem_compat.obj `if test -f 'memmem_compat.c'; then $(CYGPATH_W) 'memmem_compat.c'; else $(CYGPATH_W) '$(srcdir)/memmem_compat.c'; fi`
-
-gecko_mediaplayer_qt_so-memmem_compat.o: memmem_compat.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gecko_mediaplayer_qt_so_CFLAGS) $(CFLAGS) -MT gecko_mediaplayer_qt_so-memmem_compat.o -MD -MP -MF $(DEPDIR)/gecko_mediaplayer_qt_so-memmem_compat.Tpo -c -o gecko_mediaplayer_qt_so-memmem_compat.o `test -f 'memmem_compat.c' || echo '$(srcdir)/'`memmem_compat.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/gecko_mediaplayer_qt_so-memmem_compat.Tpo $(DEPDIR)/gecko_mediaplayer_qt_so-memmem_compat.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='memmem_compat.c' object='gecko_mediaplayer_qt_so-memmem_compat.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gecko_mediaplayer_qt_so_CFLAGS) $(CFLAGS) -c -o gecko_mediaplayer_qt_so-memmem_compat.o `test -f 'memmem_compat.c' || echo '$(srcdir)/'`memmem_compat.c
-
-gecko_mediaplayer_qt_so-memmem_compat.obj: memmem_compat.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gecko_mediaplayer_qt_so_CFLAGS) $(CFLAGS) -MT gecko_mediaplayer_qt_so-memmem_compat.obj -MD -MP -MF $(DEPDIR)/gecko_mediaplayer_qt_so-memmem_compat.Tpo -c -o gecko_mediaplayer_qt_so-memmem_compat.obj `if test -f 'memmem_compat.c'; then $(CYGPATH_W) 'memmem_compat.c'; else $(CYGPATH_W) '$(srcdir)/memmem_compat.c'; fi`
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/gecko_mediaplayer_qt_so-memmem_compat.Tpo $(DEPDIR)/gecko_mediaplayer_qt_so-memmem_compat.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='memmem_compat.c' object='gecko_mediaplayer_qt_so-memmem_compat.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gecko_mediaplayer_qt_so_CFLAGS) $(CFLAGS) -c -o gecko_mediaplayer_qt_so-memmem_compat.obj `if test -f 'memmem_compat.c'; then $(CYGPATH_W) 'memmem_compat.c'; else $(CYGPATH_W) '$(srcdir)/memmem_compat.c'; fi`
-
-gecko_mediaplayer_rm_so-memmem_compat.o: memmem_compat.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gecko_mediaplayer_rm_so_CFLAGS) $(CFLAGS) -MT gecko_mediaplayer_rm_so-memmem_compat.o -MD -MP -MF $(DEPDIR)/gecko_mediaplayer_rm_so-memmem_compat.Tpo -c -o gecko_mediaplayer_rm_so-memmem_compat.o `test -f 'memmem_compat.c' || echo '$(srcdir)/'`memmem_compat.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/gecko_mediaplayer_rm_so-memmem_compat.Tpo $(DEPDIR)/gecko_mediaplayer_rm_so-memmem_compat.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='memmem_compat.c' object='gecko_mediaplayer_rm_so-memmem_compat.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gecko_mediaplayer_rm_so_CFLAGS) $(CFLAGS) -c -o gecko_mediaplayer_rm_so-memmem_compat.o `test -f 'memmem_compat.c' || echo '$(srcdir)/'`memmem_compat.c
-
-gecko_mediaplayer_rm_so-memmem_compat.obj: memmem_compat.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gecko_mediaplayer_rm_so_CFLAGS) $(CFLAGS) -MT gecko_mediaplayer_rm_so-memmem_compat.obj -MD -MP -MF $(DEPDIR)/gecko_mediaplayer_rm_so-memmem_compat.Tpo -c -o gecko_mediaplayer_rm_so-memmem_compat.obj `if test -f 'memmem_compat.c'; then $(CYGPATH_W) 'memmem_compat.c'; else $(CYGPATH_W) '$(srcdir)/memmem_compat.c'; fi`
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/gecko_mediaplayer_rm_so-memmem_compat.Tpo $(DEPDIR)/gecko_mediaplayer_rm_so-memmem_compat.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='memmem_compat.c' object='gecko_mediaplayer_rm_so-memmem_compat.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gecko_mediaplayer_rm_so_CFLAGS) $(CFLAGS) -c -o gecko_mediaplayer_rm_so-memmem_compat.obj `if test -f 'memmem_compat.c'; then $(CYGPATH_W) 'memmem_compat.c'; else $(CYGPATH_W) '$(srcdir)/memmem_compat.c'; fi`
-
-gecko_mediaplayer_wmp_so-memmem_compat.o: memmem_compat.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gecko_mediaplayer_wmp_so_CFLAGS) $(CFLAGS) -MT gecko_mediaplayer_wmp_so-memmem_compat.o -MD -MP -MF $(DEPDIR)/gecko_mediaplayer_wmp_so-memmem_compat.Tpo -c -o gecko_mediaplayer_wmp_so-memmem_compat.o `test -f 'memmem_compat.c' || echo '$(srcdir)/'`memmem_compat.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/gecko_mediaplayer_wmp_so-memmem_compat.Tpo $(DEPDIR)/gecko_mediaplayer_wmp_so-memmem_compat.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='memmem_compat.c' object='gecko_mediaplayer_wmp_so-memmem_compat.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gecko_mediaplayer_wmp_so_CFLAGS) $(CFLAGS) -c -o gecko_mediaplayer_wmp_so-memmem_compat.o `test -f 'memmem_compat.c' || echo '$(srcdir)/'`memmem_compat.c
-
-gecko_mediaplayer_wmp_so-memmem_compat.obj: memmem_compat.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gecko_mediaplayer_wmp_so_CFLAGS) $(CFLAGS) -MT gecko_mediaplayer_wmp_so-memmem_compat.obj -MD -MP -MF $(DEPDIR)/gecko_mediaplayer_wmp_so-memmem_compat.Tpo -c -o gecko_mediaplayer_wmp_so-memmem_compat.obj `if test -f 'memmem_compat.c'; then $(CYGPATH_W) 'memmem_compat.c'; else $(CYGPATH_W) '$(srcdir)/memmem_compat.c'; fi`
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/gecko_mediaplayer_wmp_so-memmem_compat.Tpo $(DEPDIR)/gecko_mediaplayer_wmp_so-memmem_compat.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='memmem_compat.c' object='gecko_mediaplayer_wmp_so-memmem_compat.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gecko_mediaplayer_wmp_so_CFLAGS) $(CFLAGS) -c -o gecko_mediaplayer_wmp_so-memmem_compat.obj `if test -f 'memmem_compat.c'; then $(CYGPATH_W) 'memmem_compat.c'; else $(CYGPATH_W) '$(srcdir)/memmem_compat.c'; fi`
-
-gecko_mediaplayer_so-memmem_compat.o: memmem_compat.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gecko_mediaplayer_so_CFLAGS) $(CFLAGS) -MT gecko_mediaplayer_so-memmem_compat.o -MD -MP -MF $(DEPDIR)/gecko_mediaplayer_so-memmem_compat.Tpo -c -o gecko_mediaplayer_so-memmem_compat.o `test -f 'memmem_compat.c' || echo '$(srcdir)/'`memmem_compat.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/gecko_mediaplayer_so-memmem_compat.Tpo $(DEPDIR)/gecko_mediaplayer_so-memmem_compat.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='memmem_compat.c' object='gecko_mediaplayer_so-memmem_compat.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gecko_mediaplayer_so_CFLAGS) $(CFLAGS) -c -o gecko_mediaplayer_so-memmem_compat.o `test -f 'memmem_compat.c' || echo '$(srcdir)/'`memmem_compat.c
-
-gecko_mediaplayer_so-memmem_compat.obj: memmem_compat.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gecko_mediaplayer_so_CFLAGS) $(CFLAGS) -MT gecko_mediaplayer_so-memmem_compat.obj -MD -MP -MF $(DEPDIR)/gecko_mediaplayer_so-memmem_compat.Tpo -c -o gecko_mediaplayer_so-memmem_compat.obj `if test -f 'memmem_compat.c'; then $(CYGPATH_W) 'memmem_compat.c'; else $(CYGPATH_W) '$(srcdir)/memmem_compat.c'; fi`
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/gecko_mediaplayer_so-memmem_compat.Tpo $(DEPDIR)/gecko_mediaplayer_so-memmem_compat.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='memmem_compat.c' object='gecko_mediaplayer_so-memmem_compat.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gecko_mediaplayer_so_CFLAGS) $(CFLAGS) -c -o gecko_mediaplayer_so-memmem_compat.obj `if test -f 'memmem_compat.c'; then $(CYGPATH_W) 'memmem_compat.c'; else $(CYGPATH_W) '$(srcdir)/memmem_compat.c'; fi`
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<

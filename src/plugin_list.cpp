@@ -246,7 +246,7 @@ GList *list_parse_qt(GList * list, ListItem * item)
     if (item->localsize < (16 * 1024)) {
         if (g_file_get_contents(item->local, &data, &datalen, NULL)) {
             //printf("read %i bytes from %s\n",datalen, item->local);
-            p = (gchar *) memmem(data, datalen, "rmda", 4);
+            p = (gchar *) memmem_compat(data, datalen, "rmda", 4);
             if (p == NULL) {
                 printf("unable to find rmda in %s\n", item->local);
                 return list;
@@ -254,15 +254,15 @@ GList *list_parse_qt(GList * list, ListItem * item)
                 if (datalen > 4) {
                     p += 4;     // skip the rmda tag we just found
                     // and find the next one
-                    nextrmda = (gchar *) memmem(p, datalen - (p - data), "rmda", 4);
+                    nextrmda = (gchar *) memmem_compat(p, datalen - (p - data), "rmda", 4);
                     if (nextrmda == NULL) {
                         nextrmda = data + datalen;      // point the pointer at the end of the buffer
                     }
                 }
 
                 while (p != NULL) {
-                    rdrf = (gchar *) memmem(p, datalen - ((long) nextrmda - (long) p), "rdrf", 4);
-                    rmdr = (gchar *) memmem(p, datalen - ((long) nextrmda - (long) p), "rmdr", 4);
+                    rdrf = (gchar *) memmem_compat(p, datalen - ((long) nextrmda - (long) p), "rdrf", 4);
+                    rmdr = (gchar *) memmem_compat(p, datalen - ((long) nextrmda - (long) p), "rmdr", 4);
 
                     if (rdrf != NULL) {
                         code = (unsigned int) (rdrf[15]);
@@ -307,7 +307,7 @@ GList *list_parse_qt(GList * list, ListItem * item)
                     if (p > (data + datalen)) {
                         p = NULL;
                     } else {
-                        nextrmda = (gchar *) memmem(p, datalen - (p - data), "rmda", 4);
+                        nextrmda = (gchar *) memmem_compat(p, datalen - (p - data), "rmda", 4);
                         if (nextrmda == NULL) {
                             nextrmda = data + datalen;  // point the pointer at the end of the buffer
                         }
