@@ -40,14 +40,14 @@
 gchar *GetMIMEDescription()
 {
     gchar MimeTypes[4000];
-    gpointer store = NULL;
+    GmPrefStore * store;
     gboolean dvx_disabled = FALSE;
 
     g_type_init();
-    store = init_preference_store();
+    store = gm_pref_store_new("gecko-mediaplayer");
     if (store != NULL) {
-        dvx_disabled = read_preference_bool(store, DISABLE_DVX);
-        release_preference_store(store);
+        dvx_disabled = gm_pref_store_get_boolean(store, DISABLE_DVX);
+        gm_pref_store_free(store);
     }
 
     if (dvx_disabled) {

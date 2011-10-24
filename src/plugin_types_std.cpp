@@ -40,6 +40,15 @@
 gchar *GetMIMEDescription()
 {
     gchar MimeTypes[8192];
+    GmPrefStore *store;
+    gboolean midi_disabled = FALSE;
+
+    g_type_init();
+    store = gm_pref_store_new("gecko-mediaplayer");
+    if (store != NULL) {
+        midi_disabled = gm_pref_store_get_boolean(store, DISABLE_MIDI);
+        gm_pref_store_free(store);
+    }
 
     g_strlcpy(MimeTypes,
               "audio/x-mpegurl:m3u:MPEG Playlist;"
@@ -101,7 +110,8 @@ gchar *GetMIMEDescription()
               "audio/basic:au,snd:Basic Audio File;"
               "audio/x-basic:au,snd:Basic Audio File;", sizeof(MimeTypes));
     // MIDI
-    g_strlcat(MimeTypes, "audio/midi:mid,midi,kar:MIDI Audio;", sizeof(MimeTypes));
+    if (!midi_disabled)
+        g_strlcat(MimeTypes, "audio/midi:mid,midi,kar:MIDI Audio;", sizeof(MimeTypes));
 
     // Playlist
     g_strlcat(MimeTypes, "audio/x-scpls:pls:Shoutcast Playlist;", sizeof(MimeTypes));
@@ -116,7 +126,7 @@ NPError PluginGetValue(NPPVariable variable, void *value)
     // some sites use this description to figure out what formats can be played. So we have to make sure the 
     // description matches the features
     if (variable == NPPVpluginNameString) {
-        *((const char **) value) = "gecko-mediaplayer " VERSION;
+        *((const char **) value) = "mplayerplug-in is now gecko-mediaplayer " VERSION;
     }
     if (variable == NPPVpluginDescriptionString) {
         *((const char **) value) =

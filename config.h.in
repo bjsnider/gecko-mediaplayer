@@ -12,6 +12,9 @@
 /* Define to 1 if you have the `dcgettext' function. */
 #undef HAVE_DCGETTEXT
 
+/* Define to 1 if you have the <dlfcn.h> header file. */
+#undef HAVE_DLFCN_H
+
 /* Define to 1 to use GConf to store preferences */
 #undef HAVE_GCONF
 
@@ -50,9 +53,6 @@
 
 /* Define to 1 if you have the <unistd.h> header file. */
 #undef HAVE_UNISTD_H
-
-/* Define to 1 if your C compiler doesn't accept -c and -o together. */
-#undef NO_MINUS_C_MINUS_O
 
 /* Name of package */
 #undef PACKAGE
