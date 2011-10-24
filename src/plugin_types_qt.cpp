@@ -97,3 +97,9 @@ NPError PluginGetValue(NPPVariable variable, void *value)
 
 
 }
+
+void pluginSpecific(CPlugin * instance)
+{
+    setPreference(instance, "general.useragent.override", "QuickTime/7.6.2");
+}
+

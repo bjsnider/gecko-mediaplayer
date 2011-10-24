@@ -1,3 +1,15 @@
+0.9.8
+	When cancelling a stream (USER_BREAK) and the cancelled one is streaming
+		don't automatically load the next item on the playlist
+	When stream->lastmodified == 0 mark stream as streaming
+		fixes http://www.radioswissclassic.ch/en
+	Various fixes from the mailing list
+	Version bump
+	Add in new type of qt parser, make videos at PBS.org work
+	Move on to the next item in the playlist, when the an open item gives an error
+	Fix the autostart property when then plugin window is hidden
+	Only emulate QuickTime with the qt plugin
+	Change the user agent to "QuickTime/7.6.2" while the plugin is loaded, makes Apple.com/trailers work again
 0.9.7
 	Clean up code with 'make indent'
 	Added a RAM parser

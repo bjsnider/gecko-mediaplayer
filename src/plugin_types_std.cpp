@@ -149,3 +149,8 @@ NPError PluginGetValue(NPPVariable variable, void *value)
     return err;
 
 }
+
+void pluginSpecific(CPlugin * instance)
+{
+
+}
