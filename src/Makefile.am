@@ -20,7 +20,6 @@ AM_CFLAGS =\
 	 -Wall \
 	 -g 
 
-
 COMMONCODE = \
 	../config.h \
 	plugin.cpp \
@@ -53,15 +52,15 @@ gecko_mediaplayer_so_SOURCES = \
 		
 gecko_mediaplayer_so_CFLAGS = -fPIC 
 gecko_mediaplayer_so_LDFLAGS = -shared -fPIC
-gecko_mediaplayer_so_LDADD = libgmlib/libgmlib.a $(GLIB_LIBS) $(DBUS_LIBS) $(GCONF_LIBS)
+gecko_mediaplayer_so_LDADD = -ldl libgmlib/libgmlib.a $(GLIB_LIBS) $(DBUS_LIBS) $(GCONF_LIBS)
 
 gecko_mediaplayer_qt_so_SOURCES = \
 	plugin_types_qt.cpp \
 	$(COMMONCODE)
 	
 gecko_mediaplayer_qt_so_CFLAGS = -fPIC 
-gecko_mediaplayer_qt_so_LDFLAGS = -shared -fPIC 
-gecko_mediaplayer_qt_so_LDADD = libgmlib/libgmlib.a $(GLIB_LIBS) $(DBUS_LIBS) $(GCONF_LIBS)
+gecko_mediaplayer_qt_so_LDFLAGS = -shared -fPIC
+gecko_mediaplayer_qt_so_LDADD = -ldl libgmlib/libgmlib.a $(GLIB_LIBS) $(DBUS_LIBS) $(GCONF_LIBS)
 
 gecko_mediaplayer_wmp_so_SOURCES = \
 	plugin_types_wmp.cpp \
@@ -69,7 +68,7 @@ gecko_mediaplayer_wmp_so_SOURCES = \
 	
 gecko_mediaplayer_wmp_so_CFLAGS = -fPIC 
 gecko_mediaplayer_wmp_so_LDFLAGS = -shared -fPIC 
-gecko_mediaplayer_wmp_so_LDADD = libgmlib/libgmlib.a $(GLIB_LIBS) $(DBUS_LIBS) $(GCONF_LIBS)
+gecko_mediaplayer_wmp_so_LDADD = -ldl libgmlib/libgmlib.a $(GLIB_LIBS) $(DBUS_LIBS) $(GCONF_LIBS)
 
 gecko_mediaplayer_dvx_so_SOURCES = \
 	plugin_types_dvx.cpp \
@@ -77,7 +76,7 @@ gecko_mediaplayer_dvx_so_SOURCES = \
 	
 gecko_mediaplayer_dvx_so_CFLAGS = -fPIC 
 gecko_mediaplayer_dvx_so_LDFLAGS = -shared -fPIC
-gecko_mediaplayer_dvx_so_LDADD = libgmlib/libgmlib.a $(GLIB_LIBS) $(DBUS_LIBS) $(GCONF_LIBS)
+gecko_mediaplayer_dvx_so_LDADD = -ldl libgmlib/libgmlib.a $(GLIB_LIBS) $(DBUS_LIBS) $(GCONF_LIBS)
 
 gecko_mediaplayer_rm_so_SOURCES = \
 	plugin_types_rm.cpp \
@@ -85,7 +84,7 @@ gecko_mediaplayer_rm_so_SOURCES = \
 	
 gecko_mediaplayer_rm_so_CFLAGS = -fPIC 
 gecko_mediaplayer_rm_so_LDFLAGS = -shared -fPIC
-gecko_mediaplayer_rm_so_LDADD = libgmlib/libgmlib.a $(GLIB_LIBS) $(DBUS_LIBS) $(GCONF_LIBS)
+gecko_mediaplayer_rm_so_LDADD = -ldl libgmlib/libgmlib.a $(GLIB_LIBS) $(DBUS_LIBS) $(GCONF_LIBS)
 
 indent:
 	indent -kr -l100 -i4 -nut *.cpp

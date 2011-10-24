@@ -1,4 +1,12 @@
-Developement
+0.9.9.2
+	Detect and use NS_GetServiceManager dynamically
+	Keep requested flag consistent
+	Work better with .m3u playlists
+	Reorder configure.in checks
+	Fix Apple HD Gallery site (target = QuickTime issue)
+	Add --enable-new-libxul when using --with-xulrunner-sdk
+	User proper NPERR and NPRES codes in the URLNotify and DestroyStream
+0.9.9
 	Minor changes to the preference setting code
 	Start preparing for 0.9.9 release
 	Revert website change from movies to www at apple.com

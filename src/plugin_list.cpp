@@ -213,6 +213,7 @@ void list_dump(GList * list)
                 printf("src = %s\n", item->src);
                 printf("local = %s\n", item->local);
                 printf("id = %i\n", item->id);
+                printf("hrefid = %i\n", item->hrefid);
                 printf("play = %i\n", item->play);
                 printf("path = %s\n", item->path);
                 printf("controlid = %i\n", item->controlid);
@@ -356,8 +357,8 @@ GList *list_parse_qt2(GList * list, ListItem * item)
                 return list;
             } else {
                 while (p != NULL) {
-                    urlptr = (gchar *) memmem_compat(p,datalen - (p - data), "url ", 4);
-                    
+                    urlptr = (gchar *) memmem_compat(p, datalen - (p - data), "url ", 4);
+
 
                     if (urlptr == NULL) {
                         p = NULL;
@@ -385,7 +386,7 @@ GList *list_parse_qt2(GList * list, ListItem * item)
                             item->id = -1;
                             list = g_list_append(list, newitem);
                         }
-                        p = (gchar *) memmem_compat(urlptr,datalen - (urlptr - data),"mmdr",4);
+                        p = (gchar *) memmem_compat(urlptr, datalen - (urlptr - data), "mmdr", 4);
                     }
 
                 }

@@ -93,8 +93,8 @@ NPError NPN_PostURLNotify(NPP instance, const char *url, const char *window, uin
     return rv;
 }
 
-NPError NPN_PostURL(NPP instance, const char *url, const char *window, uint32_t len, const char *buf,
-                    NPBool file)
+NPError NPN_PostURL(NPP instance, const char *url, const char *window, uint32_t len,
+                    const char *buf, NPBool file)
 {
     NPError rv = NPNFuncs.posturl(instance, url, window, len, buf, file);
     return rv;

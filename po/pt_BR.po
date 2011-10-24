@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gecko-mediaplayer 0.9.4\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-02-05 16:39-0700\n"
+"POT-Creation-Date: 2010-02-25 14:13-0700\n"
 "PO-Revision-Date: 2008-05-31 12:46-0300\n"
 "Last-Translator: \n"
 "Language-Team: Portugese <LL@li.org>\n"
@@ -15,17 +15,22 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/plugin.cpp:618
+#: src/plugin.cpp:650
 #, c-format
 msgid "Cache fill: %2.2f%%"
 msgstr "Armazenando cache: %2.2f%%"
 
-#: src/plugin.cpp:843
-#, c-format
-msgid "Write unable to write because item is NULL"
+#: src/plugin.cpp:913
+#, fuzzy, c-format
+msgid "Write unable to write because item is NULL\n"
 msgstr "Não foi possível escrever porque o item é inválido (NULL)"
 
-#: src/plugin.cpp:898
+#: src/plugin.cpp:978
+#, fuzzy, c-format
+msgid "Caching %iK (%0.1f K/s)"
+msgstr "Armazenando cache: %2.2f%% (%0.1f K/s)"
+
+#: src/plugin.cpp:981
 #, c-format
 msgid "Cache fill: %2.2f%% (%0.1f K/s)"
 msgstr "Armazenando cache: %2.2f%% (%0.1f K/s)"

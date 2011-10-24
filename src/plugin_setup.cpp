@@ -43,7 +43,8 @@
 void new_instance(CPlugin * instance, int16_t argc, char *argn[], char *argv[])
 {
 
-    guint i, j;
+    int16_t i;
+    guint j;
     gint newwindow = 0;
     gint loop = 0;
     gboolean autohref = FALSE;
@@ -54,7 +55,6 @@ void new_instance(CPlugin * instance, int16_t argc, char *argn[], char *argv[])
     gchar *arg[10];
     GRand *rand;
     gchar *tmp;
-    gchar *tmpsrc;
     gchar **parse;
     gint width = 0, height = 0;
     GError *error;
@@ -64,10 +64,10 @@ void new_instance(CPlugin * instance, int16_t argc, char *argn[], char *argv[])
 
     if (instance->mode == NP_EMBED) {
         for (i = 0; i < argc; i++) {
-        
+
             if (argn[i] == NULL)
                 continue;
-                
+
             printf("ARG: %s = %s\n", argn[i], argv[i]);
 
             if (g_ascii_strcasecmp(argn[i], "name") == 0) {
@@ -109,17 +109,16 @@ void new_instance(CPlugin * instance, int16_t argc, char *argn[], char *argv[])
                 sscanf(argv[i], "%i", &height);
             }
 
-            if (g_ascii_strcasecmp(argn[i], "src") == 0
-                || g_ascii_strcasecmp(argn[i], "url") == 0) {
+            if (g_ascii_strcasecmp(argn[i], "src") == 0 || g_ascii_strcasecmp(argn[i], "url") == 0) {
                 item = g_new0(ListItem, 1);
-                if (g_strrstr(argv[i],"XXmovies.apple.com")) {  // tmp disabled, to reenable remove XX
+                if (g_strrstr(argv[i], "XXmovies.apple.com")) { // tmp disabled, to reenable remove XX
                     tmp = g_strrstr(argv[i], "movies.");
                     if (tmp != NULL && strlen(tmp) > strlen("movies.")) {
-                        tmp = tmp + strlen("movies.");    
-                        g_snprintf(item->src, 4096, "http://www.%s", tmp);  
+                        tmp = tmp + strlen("movies.");
+                        g_snprintf(item->src, 4096, "http://www.%s", tmp);
                     } else {
                         g_strlcpy(item->src, argv[i], 4096);
-                    }               
+                    }
                 } else {
                     g_strlcpy(item->src, argv[i], 4096);
                 }
@@ -144,14 +143,14 @@ void new_instance(CPlugin * instance, int16_t argc, char *argn[], char *argv[])
 
             if (g_ascii_strcasecmp(argn[i], "href") == 0) {
                 item = g_new0(ListItem, 1);
-                if (g_strrstr(argv[i],"XXmovies.apple.com")) {
+                if (g_strrstr(argv[i], "XXmovies.apple.com")) {
                     tmp = g_strrstr(argv[i], "movies.");
                     if (tmp != NULL && strlen(tmp) > strlen("movies.")) {
-                        tmp = tmp + strlen("movies.");    
-                        g_snprintf(item->src, 4096, "http://www.%s", tmp);  
+                        tmp = tmp + strlen("movies.");
+                        g_snprintf(item->src, 4096, "http://www.%s", tmp);
                     } else {
                         g_strlcpy(item->src, argv[i], 4096);
-                    }               
+                    }
                 } else {
                     g_strlcpy(item->src, argv[i], 4096);
                 }
@@ -192,18 +191,20 @@ void new_instance(CPlugin * instance, int16_t argc, char *argn[], char *argv[])
             }
 
             if (g_ascii_strcasecmp(argn[i], "target") == 0) {
-                item = g_new0(ListItem, 1);
-                g_strlcpy(item->src, argv[i], 4096);
-                // printf("Item href = %s\n",item->src);
-                item->streaming = streaming(item->src);
-                item->play = FALSE;
-                item->id = instance->nextid++;
-                instance->playlist = g_list_append(instance->playlist, item);
-                src = item;
-                instance->show_controls = 0;
                 if (g_ascii_strcasecmp(argv[i], "quicktimeplayer") == 0) {
                     newwindow = TRUE;
+                } else {
+                    item = g_new0(ListItem, 1);
+                    g_strlcpy(item->src, argv[i], 4096);
+                    // printf("Item href = %s\n",item->src);
+                    item->streaming = streaming(item->src);
+                    item->play = FALSE;
+                    item->id = instance->nextid++;
+                    instance->playlist = g_list_append(instance->playlist, item);
+                    src = item;
+                    instance->show_controls = 0;
                 }
+
             }
 
             if (g_ascii_strcasecmp(argn[i], "hidden") == 0) {
@@ -245,6 +246,10 @@ void new_instance(CPlugin * instance, int16_t argc, char *argn[], char *argv[])
                 } else {
                     autohref = FALSE;
                 }
+            }
+
+            if (g_ascii_strcasecmp(argn[i], "data") == 0) {
+                // autohref = TRUE;
             }
 
             if ((g_ascii_strcasecmp(argn[i], "autoplay") == 0)
@@ -379,7 +384,7 @@ void new_instance(CPlugin * instance, int16_t argc, char *argn[], char *argv[])
                     || g_ascii_strcasecmp(argv[i], "yes") == 0
                     || g_ascii_strcasecmp(argv[i], "1") == 0) {
                     instance->debug = TRUE;
-                                                   
+
                 } else {
                     instance->debug = FALSE;
                 }
@@ -395,8 +400,8 @@ void new_instance(CPlugin * instance, int16_t argc, char *argn[], char *argv[])
                 }
             }
 
-            if (g_ascii_strncasecmp(argn[i], "qtnext",6) == 0) {
-                parse = g_strsplit_set(argv[i],"<>",0);
+            if (g_ascii_strncasecmp(argn[i], "qtnext", 6) == 0) {
+                parse = g_strsplit_set(argv[i], "<>", 0);
                 if (parse[1] != NULL) {
                     item = g_new0(ListItem, 1);
                     tmp = g_strrstr(src->src, "/");
@@ -412,7 +417,7 @@ void new_instance(CPlugin * instance, int16_t argc, char *argn[], char *argv[])
                     item->play = TRUE;
                     item->id = instance->nextid++;
                     instance->playlist = g_list_append(instance->playlist, item);
-                }        
+                }
                 g_strfreev(parse);
             }
 
@@ -421,9 +426,8 @@ void new_instance(CPlugin * instance, int16_t argc, char *argn[], char *argv[])
 
     }
 
-    nperror =
-        NPN_GetValue(instance->mInstance, (NPNVariable) 17 /* NPNVSupportsWindowless */ ,
-                     &supportsWindowless);
+    nperror = NPN_GetValue(instance->mInstance, (NPNVariable) 17 /* NPNVSupportsWindowless */ ,
+                           &supportsWindowless);
     supportsWindowless = (nperror == NPERR_NO_ERROR) && supportsWindowless;
     if (instance->windowless) {
         if (supportsWindowless) {
@@ -487,6 +491,7 @@ void new_instance(CPlugin * instance, int16_t argc, char *argn[], char *argv[])
         // generate a random controlid
         rand = g_rand_new();
         href->controlid = g_rand_int_range(rand, 0, 65535);
+        // printf("autohref controlid = %i\n", href->controlid);
         g_rand_free(rand);
         tmp = g_strdup_printf("/control/%i", href->controlid);
         g_strlcpy(href->path, tmp, 1024);
@@ -540,6 +545,9 @@ gint streaming(gchar * url)
         ret = 1;
 
     if (g_ascii_strncasecmp(url, "dvd://", 6) == 0)
+        ret = 1;
+
+    if (g_strrstr(url, ".m3u") != NULL)
         ret = 1;
 
     if (g_ascii_strncasecmp(url, "file://", 7) == 0) {
