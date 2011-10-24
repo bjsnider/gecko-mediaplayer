@@ -39,9 +39,10 @@
 
 gchar *GetMIMEDescription()
 {
-    gchar MimeTypes[4000];
+    gchar MimeTypes[8192];
 
     g_strlcpy(MimeTypes,
+              "audio/x-mpegurl:m3u:MPEG Playlist;"
               "video/mpeg:mpg,mpeg:MPEG;"
               "audio/mpeg:mpg,mpeg:MPEG;"
               "video/x-mpeg:mpg,mpeg:MPEG;"
@@ -53,14 +54,19 @@ gchar *GetMIMEDescription()
               "audio/mp4:mp4:MPEG 4 audio;"
               "audio/x-mp4:mp4:MPEG 4 audio;"
               "video/mp4:mp4:MPEG 4 Video;"
-              "video/x-m4v:m4v:MPEG 4 Video;" "video/3gpp:mp4,3gp:MPEG 4 Video;",
+              "video/x-m4v:m4v:MPEG 4 Video;" 
+              "video/3gpp:mp4,3gp:MPEG 4 Video;",
               sizeof(MimeTypes));
     g_strlcat(MimeTypes,
               "audio/mpeg3:mp3:MPEG audio;" "audio/x-mpeg3:mp3:MPEG audio;"
               "audio/x-mpegurl:m3u:MPEG url;" "audio/mp3:mp3:MPEG audio;", sizeof(MimeTypes));
     g_strlcat(MimeTypes,
-              "application/x-ogg:ogg:Ogg Vorbis Media;" "audio/ogg:ogg:Ogg Vorbis Audio;"
-              "audio/x-ogg:ogg:Ogg Vorbis Audio;" "application/ogg:ogg:Ogg Vorbis / Ogg Theora;",
+              "application/x-ogg:ogg,oga,ogm:Ogg Vorbis Media;" 
+              "application/ogg:ogg,oga,ogm:Ogg Vorbis Media;" 
+              "audio/x-ogg:ogg,oga:Ogg Vorbis Audio;" 
+              "audio/ogg:ogg,oga:Ogg Vorbis Audio;" 
+              "video/x-ogg:ogg,ogm:Ogg Vorbis Video;" 
+              "video/ogg:ogg,ogm:Ogg Vorbis Video;", 
               sizeof(MimeTypes));
     // FLAC
     g_strlcat(MimeTypes,
@@ -72,7 +78,8 @@ gchar *GetMIMEDescription()
               "video/x-fli:fli,flc:FLI animation;", sizeof(MimeTypes));
 
     // FLV
-    g_strlcat(MimeTypes, "video/x-flv:flv:Flash Video;", sizeof(MimeTypes));
+    g_strlcat(MimeTypes, "video/x-flv:flv:Flash Video;"
+                         "video/flv:flv:Flash Video;", sizeof(MimeTypes));
 
     // Vivo
     g_strlcat(MimeTypes, "video/vnd.vivo:viv,vivo:VivoActive;", sizeof(MimeTypes));
@@ -87,6 +94,9 @@ gchar *GetMIMEDescription()
 
     // Soundtracker
     g_strlcat(MimeTypes, "audio/x-mod:mod:Soundtracker;", sizeof(MimeTypes));
+
+    // AIFF
+    g_strlcat(MimeTypes, "audio/x-aiff:aif:AIFF Audio;", sizeof(MimeTypes));    
 
     // Basic
     g_strlcat(MimeTypes,

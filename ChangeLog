@@ -1,4 +1,17 @@
-Development
+0.9.3
+	Make http://everadio.gamingradio.net work
+	Fix compilation dependancy
+	Now translations work
+	Enable translations hopefully
+	Replace call to getenv with g_getenv
+	Flip to streaming mode when we get a sequence starting with "Content-length"
+	Fix video/mpeg declaration
+	More mimetype cleanup
+	Add audio/ogg and video/ogg mimetypes
+	Add mimetype application/ogg
+	Allow compile against xulrunner-sdk
+	Added a couple of additional mimetypes
+0.9.2
 	Convert to XDG cache location
 	Try using gnome-mplayer if not found use gnome-mplayer-minimal
 	Version bump

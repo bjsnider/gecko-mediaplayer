@@ -147,6 +147,12 @@ tv_driver(NULL),tv_device(NULL),tv_input(NULL),tv_width(0),tv_height(0)
         // printf("using path %s\n",path);
     }
 
+#ifdef ENABLE_NLS
+    bindtextdomain(GETTEXT_PACKAGE, PACKAGE_LOCALE_DIR);
+    bind_textdomain_codeset(GETTEXT_PACKAGE, "UTF-8");
+    textdomain(GETTEXT_PACKAGE);
+#endif
+
     g_type_init();
     store = init_preference_store();
     if (store != NULL) {
@@ -553,6 +559,29 @@ int32 nsPluginInstance::Write(NPStream * stream, int32 offset, int32 len, void *
         NPN_DestroyStream(mInstance, stream, NPRES_USER_BREAK);
 
     if (strstr((char *) buffer, "ICY 200 OK") != NULL || item->streaming == TRUE) {
+        item->streaming = TRUE;
+        open_location(this, item, FALSE);
+        item->requested = TRUE;
+        if (item->localfp) {
+            fclose(item->localfp);
+        }
+        NPN_DestroyStream(mInstance, stream, NPRES_DONE);
+        return -1;
+    }
+
+    // If item is a block of jpeg images, just stream it
+    if (strstr((char *) buffer, "Content-length:") != NULL || item->streaming == TRUE) {
+        item->streaming = TRUE;
+        open_location(this, item, FALSE);
+        item->requested = TRUE;
+        if (item->localfp) {
+            fclose(item->localfp);
+        }
+        NPN_DestroyStream(mInstance, stream, NPRES_DONE);
+        return -1;
+    }
+
+    if (strstr((char *) buffer, "<HTML>") != NULL || item->streaming == TRUE) {
         item->streaming = TRUE;
         open_location(this, item, FALSE);
         item->requested = TRUE;
@@ -986,10 +1015,10 @@ gchar *gmp_tempname(gchar *path,const gchar *name_template)
 
 	basename = g_strdup(name_template);
 
-	if (path == NULL && getenv("TMPDIR") == NULL) {
+	if (path == NULL && g_getenv("TMPDIR") == NULL) {
 		localpath = g_strdup("/tmp");
-	} else if(path == NULL && getenv("TMPDIR") != NULL) {
-		localpath = g_strdup(getenv("TMPDIR"));
+	} else if(path == NULL && g_getenv("TMPDIR") != NULL) {
+		localpath = g_strdup(g_getenv("TMPDIR"));
 	} else {
 		localpath = g_strdup(path);
 	}
