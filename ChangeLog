@@ -1,3 +1,26 @@
+Developement
+	Minor changes to the preference setting code
+	Start preparing for 0.9.9 release
+	Revert website change from movies to www at apple.com
+	Fix javascript calls PlayAt, Get/SetAutoPlay
+	Bump QuickTime emulation to 7.6.4
+	Fix new apple HD trailers, where trailers is downloaded from the menu
+	Use correct controlid with launching some apple.com HD videos
+	For apple.com videos change movies.apple.com to www.apple.com
+	Fix compile with libxul 1.9.2 and higher
+	Fix crash on http://itunes.apple.com/us/album/endangered-species-live-at-abbey/id309810246
+	Support the qtnext parameter
+	Rework code to work better with xulrunner 1.9.2
+	Use preferred player in all launch cases
+	Add support for VLC plugin emulation
+	Add new mimetype video/x-ms-asx
+	Allow for configurable backend (fosfor or gnome-mplayer or something else)
+	Make dom event javascript a little more unique
+	React to Network Errors in DestroyStream differently
+	Added /DEBUG path for debugging purposes
+	Added ListDump dbus method
+	konqueror patch from Christian.Morales.Vega
+	plugin-dir patch from Christian.Morales.Vega
 0.9.8
 	When cancelling a stream (USER_BREAK) and the cancelled one is streaming
 		don't automatically load the next item on the playlist

@@ -33,6 +33,9 @@
 /* Define to 1 if you have the <memory.h> header file. */
 #undef HAVE_MEMORY_H
 
+/* Define to 1 if using libxul 1.9.2 or higher */
+#undef HAVE_NEW_XULRUNNER
+
 /* Define to 1 if you have the <stdint.h> header file. */
 #undef HAVE_STDINT_H
 

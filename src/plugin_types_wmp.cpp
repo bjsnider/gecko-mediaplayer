@@ -63,6 +63,7 @@ gchar *GetMIMEDescription()
                   "application/x-mplayer2:*:Media Files;"
                   "application/x-ms-wmv:wmv,*:Microsoft WMV video;"
                   "video/x-ms-asf:asf,asx,*:Media Files;"
+                  "video/x-ms-asx:asx,*:Media Files;"
                   "video/x-ms-wm:wm,*:Media Files;"
                   "video/x-ms-wmv:wmv,*:Microsoft WMV video;"
                   "audio/x-ms-wmv:wmv,*:Windows Media;"
@@ -99,7 +100,7 @@ NPError PluginGetValue(NPPVariable variable, void *value)
     }
 
     if (variable == NPPVpluginNeedsXEmbed) {
-        *((PRBool *) value) = PR_TRUE;
+        *((bool *) value) = TRUE;
     }
 
     if ((variable != NPPVpluginNameString)

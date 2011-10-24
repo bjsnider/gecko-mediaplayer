@@ -39,7 +39,7 @@
 #define __PLUGIN_H__
 #include <npapi.h>
 #include <npruntime.h>
-#include "npupp.h"
+#include <npfunctions.h>
 #include <X11/Xlib.h>
 #include <dbus/dbus.h>
 #include <dbus/dbus-glib-lowlevel.h>
@@ -84,6 +84,7 @@
 #define DISABLE_DVX		"disable_dvx"
 #define DEBUG_LEVEL		"debug_level"
 #define DISABLE_MIDI    "disable_midi"
+#define PLAYER_BACKEND  "player_backend"
 
 typedef enum {
     PLAYING,
@@ -109,18 +110,18 @@ class CPlugin {
     NPBool init(NPWindow * aWindow);
     void shut();
     NPBool isInitialized();
-    int16 handleEvent(void *event);
+    int16_t handleEvent(void *event);
 
     NPObject *GetScriptableObject();
     NPObject *GetScriptableObjectControls();
 
     NPError GetValue(NPPVariable variable, void *value);
     NPError SetWindow(NPWindow * aWindow);
-    NPError NewStream(NPMIMEType type, NPStream * stream, NPBool seekable, uint16 * stype);
+    NPError NewStream(NPMIMEType type, NPStream * stream, NPBool seekable, uint16_t * stype);
     NPError DestroyStream(NPStream * stream, NPError reason);
     void URLNotify(const char *url, NPReason reason, void *notifyData);
-    int32 WriteReady(NPStream * stream);
-    int32 Write(NPStream * stream, int32 offset, int32 len, void *buffer);
+    int32_t WriteReady(NPStream * stream);
+    int32_t Write(NPStream * stream, int32_t offset, int32_t len, void *buffer);
 
 
 
@@ -131,21 +132,21 @@ class CPlugin {
     void FastForward();
     void FastReverse();
     void Seek(double counter);
-    void SetShowControls(PRBool value);
-    void SetFullScreen(PRBool value);
+    void SetShowControls(bool value);
+    void SetFullScreen(bool value);
     void SetVolume(double value);
     void GetVolume(double *_retval);
-    void GetFullScreen(PRBool * _retval);
-    void GetShowControls(PRBool * _retval);
+    void GetFullScreen(bool * _retval);
+    void GetShowControls(bool * _retval);
     void GetTime(double *_retval);
     void GetDuration(double *_retval);
     void GetPercent(double *_retval);
-    void GetPlayState(PRInt32 * playstate);
+    void GetPlayState(int32_t * playstate);
     void SetFilename(const char *filename);
     void GetFilename(char **filename);
     void GetMIMEType(char **_retval);
-    void GetLoop(PRBool * _retval);
-    void SetLoop(PRBool value);
+    void GetLoop(bool * _retval);
+    void SetLoop(bool value);
     void SetOnClick(const char *event);
     void SetOnMediaComplete(const char *event);
     void SetOnMouseUp(const char *event);
@@ -164,7 +165,7 @@ class CPlugin {
     NPP mInstance;
     gboolean windowless;
     gint nextid;
-    uint16 mode;
+    uint16_t mode;
     gchar *mimetype;
     GList *playlist;
     gboolean acceptdata;
@@ -189,6 +190,7 @@ class CPlugin {
     gchar *console;
     gchar *controls;
     gchar *user_agent;
+    gchar *player_backend;
 
     // events
     gboolean post_dom_events;

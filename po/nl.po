@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gecko-mediaplayer\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-09-18 07:56-0600\n"
+"POT-Creation-Date: 2010-02-05 16:39-0700\n"
 "PO-Revision-Date: 2009-06-24 13:53+0100\n"
 "Last-Translator: Mark Huijgen <mark.sf.net@huijgen.tk>\n"
 "Language-Team: Mark Huijgen <mark.sf.net@huijgen.tk>\n"
@@ -16,17 +16,17 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/plugin.cpp:603
+#: src/plugin.cpp:618
 #, c-format
 msgid "Cache fill: %2.2f%%"
 msgstr "Buffer niveau: %2.2f%%"
 
-#: src/plugin.cpp:809
+#: src/plugin.cpp:843
 #, c-format
 msgid "Write unable to write because item is NULL"
 msgstr "Schrijven niet mogelijk omdat item NULL is"
 
-#: src/plugin.cpp:864
+#: src/plugin.cpp:898
 #, c-format
 msgid "Cache fill: %2.2f%% (%0.1f K/s)"
 msgstr "Buffer niveau: %2.2f%% (%0.1f K/s)"
