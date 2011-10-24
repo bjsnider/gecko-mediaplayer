@@ -1,0 +1,120 @@
+dnl Process this file with autoconf to produce a configure script.
+dnl Created by Anjuta application wizard.
+
+AC_INIT(configure.in)
+AM_INIT_AUTOMAKE(gecko-mediaplayer, 0.6.3)
+AM_CONFIG_HEADER(config.h)
+AM_MAINTAINER_MODE
+
+AC_ISC_POSIX
+AC_PROG_CC
+AM_PROG_CC_STDC
+AC_HEADER_STDC
+
+
+AC_PROG_CPP
+AC_PROG_CXX
+
+
+
+dnl Set gettext package name
+GETTEXT_PACKAGE=gecko-mediaplayer
+AC_SUBST(GETTEXT_PACKAGE)
+AC_DEFINE_UNQUOTED(GETTEXT_PACKAGE,"$GETTEXT_PACKAGE", [GETTEXT package name])
+
+dnl Add the languages which your application supports here.
+ALL_LINGUAS="es fr pl pt_BR tr"
+AM_GLIB_GNU_GETTEXT
+
+
+
+AM_PROG_LIBTOOL
+
+
+
+PKG_CHECK_MODULES(GLIB, [glib-2.0 gthread-2.0 ])
+AC_SUBST(GLIB_CFLAGS)
+AC_SUBST(GLIB_LIBS)
+
+PKG_CHECK_MODULES(GECKO, [mozilla-plugin mozilla-xpcom],[
+    GECKO_HOME=`$PKG_CONFIG --variable=libdir mozilla-plugin`
+    GECKO_IDLDIR=`$PKG_CONFIG --variable=idldir mozilla-xpcom`
+    ],[AC_MSG_WARN([mozilla-plugin not found, trying another])])
+
+if test "$GECKO_CFLAGS" = ""; then
+PKG_CHECK_MODULES(GECKO, [firefox-plugin firefox-xpcom],[
+    GECKO_HOME=`$PKG_CONFIG --variable=libdir firefox-plugin`
+    GECKO_IDLDIR=`$PKG_CONFIG --variable=idldir firefox-xpcom`
+    ],[AC_MSG_WARN([firefox-plugin not found, trying another])])
+fi
+
+if test "$GECKO_CFLAGS" = ""; then
+PKG_CHECK_MODULES(GECKO, [seamonkey-plugin seamonkey-xpcom],[
+    GECKO_HOME=`$PKG_CONFIG --variable=libdir seamonkey-plugin`
+    GECKO_IDLDIR=`$PKG_CONFIG --variable=idldir seamonkey-xpcom`
+    ],[AC_MSG_WARN([seamokey-plugin not found, trying another])])
+fi
+
+if test "$GECKO_CFLAGS" = ""; then
+PKG_CHECK_MODULES(GECKO, [xulrunner-plugin xulrunner-xpcom],[
+    GECKO_HOME=`$PKG_CONFIG --variable=libdir xulrunner-plugin`
+    GECKO_IDLDIR=`$PKG_CONFIG --variable=idldir xulrunner-xpcom`
+    ],[AC_MSG_WARN([xulrunner-plugin not found, trying another])])
+fi
+
+if test "$GECKO_CFLAGS" = ""; then
+PKG_CHECK_MODULES(GECKO, [mozilla-plugin libxul],[
+    GECKO_HOME=`$PKG_CONFIG --variable=libdir libxul`
+    GECKO_IDLDIR=`$PKG_CONFIG --variable=idldir libxul`
+    ],[AC_MSG_WARN([libxul/mozilla-plugin not found, trying another])])
+fi
+
+if test "$GECKO_CFLAGS" = ""; then
+PKG_CHECK_MODULES(GECKO, [iceape-plugin iceape-xpcom],[
+    GECKO_HOME=`$PKG_CONFIG --variable=libdir iceape-plugin`
+    GECKO_IDLDIR=`$PKG_CONFIG --variable=idldir iceape-xpcom`
+    ],[AC_MSG_WARN([iceape-plugin not found, trying another])])
+fi
+
+AC_SUBST(GECKO_CFLAGS)
+AC_SUBST(GECKO_LIBS)
+AC_SUBST(GECKO_HOME)
+
+AC_PATH_PROG([GECKO_XPIDL], [xpidl], [no], [$GECKO_HOME:$PATH])
+if test "x$GECKO_XPIDL" = "xno"; then
+	AC_MSG_ERROR([xpidl compiler not found])
+fi
+
+if test "x$GECKO_IDLDIR" = "x"; then
+    GECKO_IDLDIR="`echo $GECKO_HOME | sed -e s!lib!share/idl!`"
+fi
+
+AC_SUBST(GECKO_XPIDL)
+AC_SUBST(GECKO_IDLDIR)
+
+PKG_CHECK_MODULES(DBUS, [dbus-1 >= 0.95 dbus-glib-1 >= 0.70])
+AC_SUBST(DBUS_CFLAGS)
+AC_SUBST(DBUS_LIBS)
+
+PKG_CHECK_MODULES(GCONF, [gconf-2.0])
+AC_SUBST(GCONF_CFLAGS)
+AC_SUBST(GCONF_LIBS)
+
+
+AC_ARG_ENABLE(caching,
+	AC_HELP_STRING([--disable-caching],[Disable caching of remote media to local storage]),
+	[usecache=$enableval],[usecache=yes])
+
+if test $usecache != yes; then
+	GECKO_CFLAGS="$GECKO_CFLAGS -DDISABLE_CACHE"
+fi
+
+AC_OUTPUT([
+Makefile
+gecko-mediaplayer.spec
+src/Makefile
+po/Makefile.in
+])
+
+echo "$GECKO_XPIDL -w -m header -I $GECKO_IDLDIR -I $srcdir -e src/nsIScriptableGeckoMediaPlayer.h src/nsIScriptableGeckoMediaPlayer.idl"
+`$GECKO_XPIDL -w -m header -I $GECKO_IDLDIR -I $srcdir -e src/nsIScriptableGeckoMediaPlayer.h src/nsIScriptableGeckoMediaPlayer.idl`

@@ -1,0 +1,66 @@
+#include "nsISupports.idl"
+[scriptable, uuid(f728830e-1dd1-4444-6666-fb9f414f2465)]
+interface nsIScriptableGeckoMediaPlayerControls : nsISupports
+{
+	void play();
+	void pause();
+	void stop();
+	void fastForward();
+	void fastReverse();
+	void step();
+	attribute double currentPosition;
+	
+};
+
+[scriptable, uuid(f728830f-1dd1-4444-6666-fb9f414f2465)]
+interface nsIScriptableGeckoMediaPlayer : nsISupports
+{
+	void Play();
+	void PlayAt(in double value);
+	void Pause();
+	void PlayPause();
+	void Stop();
+	void quit();
+	void DoPlay();
+	void DoPause();
+	void FastForward();
+	void FastReverse();
+	void ff();
+	void rew();
+	void rewind();
+	void Seek(in double value);
+	void Open(in string filename);
+	void SetVolume(in double value);
+	double GetVolume();
+	void SetFileName(in string filename);
+	void SetIsLooping(in boolean loop);
+	boolean GetIsLooping();
+	void SetAutoPlay(in boolean autoPlay);
+	boolean GetAutoPlay();
+	void SetHREF(in string url);
+	string GetHREF();
+	void SetURL(in string url);
+	string GetURL();
+	string GetMIMEType();
+	double getTime();
+	double getDuration();
+	double getPercent();
+	boolean isplaying();
+	void playlistAppend(in string item);
+	boolean playlistClear();
+	attribute string filename;
+	attribute string src;
+	attribute boolean ShowControls;
+	attribute boolean fullscreen;
+	attribute boolean showlogo;
+	readonly attribute long playState;
+    readonly attribute nsIScriptableGeckoMediaPlayerControls controls;
+    void onClick(in string event);
+    void onMediaComplete(in string event);
+    void onMouseUp(in string event);
+    void onMouseDown(in string event);
+    void onMouseOut(in string event);
+    void onMouseOver(in string event);
+    void onDestroy(in string event);
+    
+};

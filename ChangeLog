@@ -1,0 +1,152 @@
+0.6.3
+        Update URL in about:plugins page
+0.6.2
+	Add Turkish translation by Onur Küçük
+	Add back in "Plug-in" to QT description
+	Change "QuickTime Plug-in 6.0 /7" to "QuickTime 7.4.5"
+	Better local file handling
+    	Detect local files and play them directly
+0.6.1
+	Update Makefile.am to install schema file correctly 
+	Update aclocal/automake settings
+	Add embedoption "enablefullscreen" works like "enablecontextmenu" to prevent user from
+		making the window fullscreen
+	No longer require libxul-embedding on F9
+	Remove debian files, add DOCS/tech/javascript.txt
+	Added Spanish translation by Festor Wailon Dacoba
+0.6.0
+	Set start trigger to be based off of media bitrate
+		New trigger code works like this
+		Test for > 20% and over cache size
+		Test for 2 * cache size as long as cache size > 512
+		Test for downloaded amount / bitrate > 10
+	Trigger at either 20% of media or 2 * cache size whichever is smaller
+	Fix compliation problem with xulrunner on Fedora 9
+0.5.4
+	Fix .h generation problem
+	Add support for tv:// type devices
+	Change "Windows Media Player Plugin" to "Windows Media Player Plug-in"
+0.5.3
+	Added Polish translation
+	Print Error on unable to launch gnome-mplayer
+	Increase URL buffer from 1K to 4K
+	Added pt_BR language
+	Set Copy Url eariler in the code, so that you can copy the url before 20% buffer
+	Fix problem with uninitialized width and height and NP_FULL media
+0.5.2
+	Add French translation
+	Add javascript src attribute
+	Fix for BBC radio to work
+	Turn off forcing of streaming for flash media
+	More work on realplayer emulation
+0.5.1
+	Implement several WMP controls methods
+	Tell the player what URL we are getting the data from via SetURL
+	Cleanup K/s display to show only tenths, also make sure we use floating point math
+	A K/s info while caching for non-streaming data
+	New dbus callback "ReloadPlugins" tells browser to reload its plugin settings
+	Allow configuration of plugins by setting from gconf
+	In send_signal_when_ready change the sleep to a smaller value and then only try 100 times before dropping out
+	Implement PlayPause JS method
+	Remove custom dbus dispatcher for Opera, doesn't seem to be needed
+	Make sure dbus dispatcher is stopped
+	Use private dbus connection
+0.5.0
+	If mimetype is video/x-flv then mark the media as streaming
+	Version sync with gnome-mplayer
+	Handle more javascript methods, that allow setting callbacks on events
+	Make qtsrc locations work, makes some apple sites work
+	Add configure option --disable-caching, which never uses local storage for the media cache
+	If cache size from gnome-mplayer is 0, set media to streaming
+	Fix several bugs in dbus event processor
+	Add the ability to set the onClick callback via a javascript method
+0.0.7
+	Add "debug" option to the embed tag so that we can watch output in certain test cases
+	Detect ICY streams on download and switch them to streaming media
+	Add embed command 'NoCache'
+	Callback event "onDestroy"
+	Add support for option "enableContextMenu"
+	Add more callback events onmouseclick, onmousedown, onmouseup, onmouseover, onmouseout
+	GUI message improvements
+	Implement MediaComplete event and callback
+	Implement Event handling from gnome-mplayer
+	Added video/x-m4v mimetype, made a video at arstechnica work.
+	Slow down the cache update messages to only 1 per 1/2 second
+	Fix SetWindow return value, helps Opera some
+	More safety checks in Write method
+	Don't allow NULL filename
+	When opening the media and no window has been set, tell gnome-mplayer to run hidden
+	Fix problem with looping
+	QuickTime Media Link Parsing Support now plays http://movies.yahoo.com/feature/transformers.html
+0.0.6
+    Debian-ized the package
+    Another ASX fix, strip out invalid unicode characters
+    More work on the ASX parser to handle XMLish URLs and not break
+    Fix ASX parser to increment the entry pointer when we encounter a entry tag
+        This used for single ASX files where the entry entity contains several
+        ref tags all pointing to the same content
+    Fix ASX parser to handle entryrefs which basically is a url to another 
+        asx file that contains the same media at different sites (mirrors)
+    If the local version of the url is requested but not found then use the url as the source
+    Handle request for "Next" item off the playlist differently
+    Implement ASX parser and extract the ASX fields out
+    Switch from using dbus_connection_setup_with_g_main to 
+        using our own dbus dispatcher but only when we can't connect to 
+        g_main_loop. Fixes some trailers in Opera and in Firefox
+0.0.5 (Not released)    
+    Create autobuilding spec file
+    Fix doc location
+    Make quicktime autohref urls work
+    Version bump
+0.0.4
+    Fix looping problem and initialization
+    Mark cancelled player as not ready
+    Marked cancelled items as not opened
+    Fix problem with request_*_value methods using wrong dest
+    Handle Cancel signal from player
+    Change request calls to use unique (based on controlid) object names
+    Remove unnecessary glib flushes
+    Trap several instance = NULL cases
+    Fix problem where window is destroyed immediately
+    Fix NULL pointer problem in several places
+    Put xpt files in place that browser can find them
+    Bump version
+    Make Apple HD trailers cache properly
+    When sending command, check for control id on item and then use instance
+    Handle "filename" embed tag
+    Implement GetLoop, SetLoop and loop embed tag methods
+    Implement GetMIMEType JS Method
+    Fix problem when starting an hrefid and over cache
+0.0.3   Mar 12, 2007
+    Fix up install issues
+    Switch to using controlid when using GNOME MPlayer allows control of hidden windows
+    Fix infinite loop problem when hidden=true
+    Fix problem where streaming media not started when hidden
+    Fix problem with non-streaming media not playing when hidden
+    Use cache setting from GNOME MPlayer so now play amount cached > cache_size * 1024
+    Set cache percent value
+    Start playing when cache percent is > 20% and amount cached is > 2000K
+    Fixed a bug when the player is not launched and open is called, plugin would spin forever
+    Add javascript methods
+        ShowControls
+        Fullscreen
+        Seek
+        FF/FastForward
+        Rew/Rewind/FastReverse
+        GetVolume
+        GetFullScreen
+        GetShowControls
+        SetVolume
+        GetTime
+        GetDuration
+        GetPercent
+    Fix firefox-xpcom not being included with firefox 2.0.0.2
+0.0.2
+    Cleanup some of the chattyness
+    Implement signal handlers for signals: RequestById, Next
+    Add wrappers for dbus signals, makes calling things simpler
+    Implement qt reference file parseing, makes non-HD Apple trailers work
+    Make Apple HD Trailer work (caching still a problem)
+    Make HREF links work, when coming back to same player
+0.0.1   Feb 19,2007
+    Initial release
