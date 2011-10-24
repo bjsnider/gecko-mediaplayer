@@ -2,7 +2,7 @@ dnl Process this file with autoconf to produce a configure script.
 dnl Created by Anjuta application wizard.
 
 AC_INIT(configure.in)
-AM_INIT_AUTOMAKE(gecko-mediaplayer, 0.6.3)
+AM_INIT_AUTOMAKE(gecko-mediaplayer, 0.7.0)
 AM_CONFIG_HEADER(config.h)
 AM_MAINTAINER_MODE
 
@@ -63,11 +63,19 @@ PKG_CHECK_MODULES(GECKO, [xulrunner-plugin xulrunner-xpcom],[
 fi
 
 if test "$GECKO_CFLAGS" = ""; then
-PKG_CHECK_MODULES(GECKO, [mozilla-plugin libxul],[
+PKG_CHECK_MODULES(GECKO, [libxul],[
     GECKO_HOME=`$PKG_CONFIG --variable=libdir libxul`
     GECKO_IDLDIR=`$PKG_CONFIG --variable=idldir libxul`
-    ],[AC_MSG_WARN([libxul/mozilla-plugin not found, trying another])])
+    ],[AC_MSG_WARN([libxul not found, trying another])])
 fi
+
+if test "$GECKO_CFLAGS" = ""; then
+PKG_CHECK_MODULES(GECKO, [libxul-unstable],[
+    GECKO_HOME=`$PKG_CONFIG --variable=libdir libxul-unstable`
+    GECKO_IDLDIR=`$PKG_CONFIG --variable=idldir libxul-unstable`
+    ],[AC_MSG_WARN([libxul-unstable not found, trying another])])
+fi
+
 
 if test "$GECKO_CFLAGS" = ""; then
 PKG_CHECK_MODULES(GECKO, [iceape-plugin iceape-xpcom],[

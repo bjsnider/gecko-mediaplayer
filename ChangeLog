@@ -1,3 +1,8 @@
+0.7.0
+    Limit bitrate requests to 5 per item, should prevent CPU peg
+	Add in audio mp4 mime types
+	Add libxul-unstable checks in
+	Remove mozilla-plugin out of the libxul test
 0.6.3
         Update URL in about:plugins page
 0.6.2
