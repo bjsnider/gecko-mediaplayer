@@ -1,4 +1,14 @@
+0.9.7
+	Clean up code with 'make indent'
+	Added a RAM parser
+	Added Czech translation by Petr Pisar
+	Add Dutch translation
+	Add in check for GIO, enables functionality in libgmlib
+	Remove need for LIBTOOL, program should compile cleaner now
+	Patch to correct --as-needed linker flag
 0.9.6
+	Fix constant issue with old xulrunner kits
+	Update GUI while cache is loading
 	Make Copy Location get the entire url
 	Add support for Apple's 'postdomevents' option
 	Apply browser id patch to work around site specifically looking for mplayerplug-in

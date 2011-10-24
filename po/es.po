@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Gecko Mediaplayer\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-06-05 10:10-0600\n"
+"POT-Creation-Date: 2009-08-20 11:32-0600\n"
 "PO-Revision-Date: 2008-02-20 19:52+0100\n"
 "Last-Translator: Festor Wailon Dacoba <festor90@gmail.com>\n"
 "Language-Team: \n"
@@ -23,7 +23,7 @@ msgstr ""
 msgid "Cache fill: %2.2f%%"
 msgstr "Almacenando cache: %2.2f%%"
 
-#: src/plugin.cpp:735
+#: src/plugin.cpp:736
 #, c-format
 msgid "Write unable to write because item is NULL"
 msgstr "Es imposible de escribir ya que el objeto es NULL"

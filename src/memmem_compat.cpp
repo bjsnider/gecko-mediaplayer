@@ -26,12 +26,10 @@
 /* This function implements the Boyer-Moore algorithm.
    It is assumed that chars have eight bits.  */
 void *memmem_compat(const void *haystack, const size_t haystack_len,
-	     const void *needle, const size_t needle_len)
+                    const void *needle, const size_t needle_len)
 {
-    const unsigned char *const haystack_endptr =
-	(const unsigned char *) haystack + haystack_len;
-    const unsigned char *const needle_endptr =
-	(const unsigned char *) needle + needle_len;
+    const unsigned char *const haystack_endptr = (const unsigned char *) haystack + haystack_len;
+    const unsigned char *const needle_endptr = (const unsigned char *) needle + needle_len;
     const unsigned char *haystack_shifting_ptr;
 
     size_t *shift_good_suffix;
@@ -39,98 +37,88 @@ void *memmem_compat(const void *haystack, const size_t haystack_len,
 
 
     if (needle_len > haystack_len)
-	return 0;
+        return 0;
 
     haystack_shifting_ptr = (const unsigned char *) haystack + needle_len;
 
 
     /* Compute good suffix function.  */
-    shift_good_suffix = (size_t*)malloc(2 * needle_len * sizeof *shift_good_suffix);
+    shift_good_suffix = (size_t *) malloc(2 * needle_len * sizeof *shift_good_suffix);
     if (shift_good_suffix != 0) {
-	const unsigned char *needle_ptr;
-	size_t i, j;
+        const unsigned char *needle_ptr;
+        size_t i, j;
 
-	shift_good_suffix[0] = 0;
-	needle_ptr = (const unsigned char *) needle + 1;
-	for (i = 1, j = 0; i < needle_len; ++i) {
-	    while (j > 0
-		   && ((const unsigned char *) needle)[j] != *needle_ptr)
-		j = shift_good_suffix[j - 1];
-	    if (((const unsigned char *) needle)[j] == *needle_ptr)
-		++j;
-	    shift_good_suffix[i] = j;
-	    ++needle_ptr;
-	}
+        shift_good_suffix[0] = 0;
+        needle_ptr = (const unsigned char *) needle + 1;
+        for (i = 1, j = 0; i < needle_len; ++i) {
+            while (j > 0 && ((const unsigned char *) needle)[j] != *needle_ptr)
+                j = shift_good_suffix[j - 1];
+            if (((const unsigned char *) needle)[j] == *needle_ptr)
+                ++j;
+            shift_good_suffix[i] = j;
+            ++needle_ptr;
+        }
 
-	shift_good_suffix[needle_len] = 0;
-	needle_ptr = (const unsigned char *) needle + needle_len - 1;
-	for (i = 1, j = 0; i < needle_len; ++i) {
-	    --needle_ptr;
-	    while (j > 0
-		   && ((const unsigned char *) needle)[needle_len - 1 -
-						       j] != *needle_ptr)
-		j = shift_good_suffix[needle_len - 1 + j];
-	    if (((const unsigned char *) needle)[needle_len - 1 - j] ==
-		*needle_ptr)
-		++j;
-	    shift_good_suffix[needle_len + i] = j;
-	}
+        shift_good_suffix[needle_len] = 0;
+        needle_ptr = (const unsigned char *) needle + needle_len - 1;
+        for (i = 1, j = 0; i < needle_len; ++i) {
+            --needle_ptr;
+            while (j > 0 && ((const unsigned char *) needle)[needle_len - 1 - j] != *needle_ptr)
+                j = shift_good_suffix[needle_len - 1 + j];
+            if (((const unsigned char *) needle)[needle_len - 1 - j] == *needle_ptr)
+                ++j;
+            shift_good_suffix[needle_len + i] = j;
+        }
 
-	for (i = 0; i < needle_len; ++i)
-	    shift_good_suffix[i] = needle_len - shift_good_suffix[i];
+        for (i = 0; i < needle_len; ++i)
+            shift_good_suffix[i] = needle_len - shift_good_suffix[i];
 
-	for (i = 0; i < needle_len; ++i) {
-	    j = needle_len - 1 - shift_good_suffix[needle_len + i];
-	    if (shift_good_suffix[j] >
-		i + 1 - shift_good_suffix[needle_len + i])
-		shift_good_suffix[j] =
-		    i + 1 - shift_good_suffix[needle_len + i];
-	}
+        for (i = 0; i < needle_len; ++i) {
+            j = needle_len - 1 - shift_good_suffix[needle_len + i];
+            if (shift_good_suffix[j] > i + 1 - shift_good_suffix[needle_len + i])
+                shift_good_suffix[j] = i + 1 - shift_good_suffix[needle_len + i];
+        }
     }
 
 
     /* Compute last occurence function.  */
     {
-	const unsigned char *needle_ptr = (const unsigned char *)needle;
-	size_t i;
+        const unsigned char *needle_ptr = (const unsigned char *) needle;
+        size_t i;
 
-	for (i = 0; i < 256; ++i)
-	    shift_last_occurrence[i] = 0;
-	for (i = 0; i < needle_len; ++i)
-	    shift_last_occurrence[*needle_ptr++] = i + 1;
+        for (i = 0; i < 256; ++i)
+            shift_last_occurrence[i] = 0;
+        for (i = 0; i < needle_len; ++i)
+            shift_last_occurrence[*needle_ptr++] = i + 1;
     }
 
 
     /* Matching algorithm.  */
     while (haystack_shifting_ptr <= haystack_endptr) {
-	const unsigned char *haystack_ptr = haystack_shifting_ptr;
-	const unsigned char *needle_ptr = needle_endptr;
-	size_t len = needle_len;
+        const unsigned char *haystack_ptr = haystack_shifting_ptr;
+        const unsigned char *needle_ptr = needle_endptr;
+        size_t len = needle_len;
 
-	while (len > 0 && *--haystack_ptr == *--needle_ptr)
-	    --len;
+        while (len > 0 && *--haystack_ptr == *--needle_ptr)
+            --len;
 
-	if (len == 0) {
-	    if (shift_good_suffix != 0)
-		free(shift_good_suffix);
-	    return (void *) haystack_ptr;
-	}
+        if (len == 0) {
+            if (shift_good_suffix != 0)
+                free(shift_good_suffix);
+            return (void *) haystack_ptr;
+        }
 
-	{
-	    const size_t shift1 =
-		shift_good_suffix != 0 ? shift_good_suffix[len - 1] : 1;
-	    const size_t shift2 =
-		(len > shift_last_occurrence[*haystack_ptr]
-		 ? len - shift_last_occurrence[*haystack_ptr] : 1);
+        {
+            const size_t shift1 = shift_good_suffix != 0 ? shift_good_suffix[len - 1] : 1;
+            const size_t shift2 = (len > shift_last_occurrence[*haystack_ptr]
+                                   ? len - shift_last_occurrence[*haystack_ptr] : 1);
 
-	    haystack_shifting_ptr += shift1 > shift2 ? shift1 : shift2;
-	}
+            haystack_shifting_ptr += shift1 > shift2 ? shift1 : shift2;
+        }
     }
 
 
     if (shift_good_suffix != 0)
-	free(shift_good_suffix);
+        free(shift_good_suffix);
     return 0;
 }
-
-

@@ -3,7 +3,7 @@
 
 SUBDIRS = src po
 
-gecko_mediaplayerdocdir = ${prefix}/share/doc/gecko-mediaplayer
+gecko_mediaplayerdocdir = ${docdir}
 gecko_mediaplayerdoc_DATA = \
 	README\
 	COPYING\

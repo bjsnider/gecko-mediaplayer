@@ -85,6 +85,15 @@
 #define DEBUG_LEVEL		"debug_level"
 #define DISABLE_MIDI    "disable_midi"
 
+typedef enum {
+    PLAYING,
+    PAUSED,
+    STOPPED,
+    QUIT
+} PLAYSTATE;
+
+void postDOMEvent(NPP mInstance, const gchar * id, const gchar * event);
+
 class CPlugin {
   private:
     NPWindow * m_Window;

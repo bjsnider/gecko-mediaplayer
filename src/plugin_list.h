@@ -118,4 +118,6 @@ void list_dump(GList * list);
 GList *list_parse_qt(GList * list, ListItem * item);
 GList *list_parse_asx(GList * list, ListItem * item);
 GList *list_parse_qml(GList * list, ListItem * item);   // Quick Time Media Link
+GList *list_parse_ram(GList * list, ListItem * item);   // Real Audio Playlist
+
 #endif                          // _PLUGIN_LIST_H

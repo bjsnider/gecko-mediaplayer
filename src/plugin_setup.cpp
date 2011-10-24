@@ -43,7 +43,7 @@
 void new_instance(CPlugin * instance, int16 argc, char *argn[], char *argv[])
 {
 
-    gint i,j;
+    gint i, j;
     gint newwindow = 0;
     gint loop = 0;
     gboolean autohref = FALSE;
@@ -74,11 +74,11 @@ void new_instance(CPlugin * instance, int16 argc, char *argn[], char *argv[])
 
             if (g_ascii_strcasecmp(argn[i], "console") == 0) {
                 instance->console = g_strdup(argv[i]);
-                    for (j = 0; j < strlen(instance->console); j++) {
-                        if (!g_ascii_isalnum(instance->console[j])) {
-                            instance->console[j] = 'a';
-                        }
+                for (j = 0; j < strlen(instance->console); j++) {
+                    if (!g_ascii_isalnum(instance->console[j])) {
+                        instance->console[j] = 'a';
                     }
+                }
             }
 
             if (g_ascii_strcasecmp(argn[i], "controls") == 0) {
@@ -362,16 +362,18 @@ void new_instance(CPlugin * instance, int16 argc, char *argn[], char *argv[])
 
     }
 
-    nperror = NPN_GetValue (instance->mInstance, NPNVSupportsWindowless, &supportsWindowless);
-	supportsWindowless = (nperror == NPERR_NO_ERROR) && supportsWindowless;
-	if (instance->windowless) {
-		if (supportsWindowless) {
-			// NPN_SetValue (instance->mInstance, NPPVpluginWindowBool, (void *) FALSE);
-			// NPN_SetValue (instance->mInstance, NPPVpluginTransparentBool, (void *) TRUE);
-		} else {
-			instance->windowless = FALSE;
-		}
-	}
+    nperror =
+        NPN_GetValue(instance->mInstance, (NPNVariable) 17 /* NPNVSupportsWindowless */ ,
+                     &supportsWindowless);
+    supportsWindowless = (nperror == NPERR_NO_ERROR) && supportsWindowless;
+    if (instance->windowless) {
+        if (supportsWindowless) {
+            // NPN_SetValue (instance->mInstance, NPPVpluginWindowBool, (void *) FALSE);
+            // NPN_SetValue (instance->mInstance, NPPVpluginTransparentBool, (void *) TRUE);
+        } else {
+            instance->windowless = FALSE;
+        }
+    }
 
     if (src != NULL) {
         if (loop != 0) {
@@ -483,4 +485,3 @@ gint streaming(gchar * url)
     }
     return ret;
 }
-
