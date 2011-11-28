@@ -2,13 +2,23 @@ gecko-mediaplayer (1.0.4-3) unstable; urgency=low
 
   [ Julien Lavergne ]
   * debian/patches:
-   - force-no-gsettings.patch: Remove, since gnome-mplayer provide the
-     gsettings schemas.
+    - force-no-gsettings.patch: Remove, since gnome-mplayer provide the
+      gsettings schemas.
+
+  [ Jonathan Nieder ]
+  * debian/rules: (Closes: #638336)
+    - Mark build-arch and build-indep targets phony.
+    - Make build-arch target actually build the architecture-dependent part
+      of the package so the build does not run with (fake) root privileges
+      when autobuilders start to use it.
+    - binary-arch and binary-indep depend on build-arch and build-indep,
+      respectively, to save arch-all builds some time.
 
   [ Aron Xu ]
   * debian/control:
-   - Move to Debian Multimedia Team, add Julien and myself to Uploaders.
-   + Add Vcs-* fields.
+    - Move to Debian Multimedia Team, add Julien and myself to Uploaders.
+      (Closes: #628997)
+    + Add Vcs-* fields.
 
  -- Aron Xu <aron@debian.org>  Mon, 28 Nov 2011 20:22:05 +0800
 

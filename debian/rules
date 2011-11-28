@@ -36,8 +36,7 @@ configure-stamp:
 
 	touch configure-stamp
 
-build: build-stamp
-
+build-arch: build-stamp
 build-stamp: configure-stamp
 	dh_testdir
 
@@ -67,11 +66,9 @@ install: build
 	rm -rf $(CURDIR)/debian/gecko-mediaplayer/usr/share/doc/gecko-mediaplayer
 
 build-indep:
-build-arch:
 
-binary-indep: build install
-
-binary-arch: build install
+binary-indep: build-indep
+binary-arch: build-arch install
 	dh_testdir
 	dh_testroot
 	dh_installchangelogs ChangeLog
@@ -87,5 +84,7 @@ binary-arch: build install
 	dh_md5sums
 	dh_builddeb
 
+build: build-indep build-arch
 binary: binary-indep binary-arch
-.PHONY: build clean binary-indep binary-arch binary install configure
+.PHONY: build-indep build-arch build binary-indep binary-arch binary
+.PHONY: clean install configure
