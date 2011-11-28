@@ -1,7 +1,8 @@
 Source: gecko-mediaplayer
 Section: video
 Priority: optional
-Maintainer: Debian QA Group <packages@qa.debian.org>
+Maintainer: Debian Multimedia Team <debian-multimedia@lists.debian.org>
+Uploaders: Julien Lavergne <gilir@ubuntu.com>, Aron Xu <aron@debian.org>
 Build-Depends: debhelper (>= 7),
 	       autotools-dev,
 	       pkg-config (>= 0.20),
@@ -15,6 +16,8 @@ Build-Depends: debhelper (>= 7),
                libcurl4-gnutls-dev | libcurl-dev
 Standards-Version: 3.9.2
 Homepage: http://code.google.com/p/gecko-mediaplayer/
+Vcs-Git: git://anonscm.debian.org/pkg-multimedia/gecko-mediaplayer.git
+Vcs-Browser: http://anonscm.debian.org/gitweb/?p=pkg-multimedia/gecko-mediaplayer.git
 
 Package: gecko-mediaplayer
 Architecture: any
