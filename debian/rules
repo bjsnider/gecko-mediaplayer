@@ -17,74 +17,11 @@ endif
 
 CXXFLAGS += -DMOZ_NO_MOZALLOC
 
-configure: configure-stamp
-configure-stamp:
-	dh_testdir
-#	dh_quilt_patch
+%:
+	dh $@ 
 
-	ln -sf /usr/share/misc/config.sub config.sub
-	ln -sf /usr/share/misc/config.guess config.guess
+override_dh_auto_configure:
+	./configure --prefix=/usr --sysconfdir=\$${prefix}/share \
+	--with-plugin-dir=/usr/lib/mozilla/plugins \
+	CXXFLAGS="$(CXXFLAGS)" LDFLAGS="$(LDFLAGS)"
 
-	./configure \
-		--host=$(DEB_HOST_GNU_TYPE) --build=$(DEB_BUILD_GNU_TYPE) \
-		--prefix=/usr --sysconfdir=\$${prefix}/share \
-		--with-plugin-dir=/usr/lib/mozilla/plugins \
-		--without-gconf --with-gio --disable-schemas-install \
-                --with-xulrunner-sdk=$(shell pkg-config --variable=sdkdir libxul) \
-                --enable-new-libxul \
-		CXXFLAGS="$(CXXFLAGS)" LDFLAGS="$(LDFLAGS)"
-
-	touch configure-stamp
-
-build-arch: build-stamp
-build-stamp: configure-stamp
-	dh_testdir
-
-	$(MAKE)
-
-	touch $@
-
-clean:
-	dh_testdir
-	dh_testroot
-#	dh_quilt_unpatch
-	rm -f build-stamp configure-stamp
-
-	[ ! -f Makefile ] || $(MAKE) distclean
-
-	rm -f config.sub config.guess
-	dh_clean
-
-install: build
-	dh_testdir
-	dh_testroot
-	dh_prep
-
-	$(MAKE) DESTDIR=$(CURDIR)/debian/gecko-mediaplayer install
-
-	# remove docs installed by upstream
-	rm -rf $(CURDIR)/debian/gecko-mediaplayer/usr/share/doc/gecko-mediaplayer
-
-build-indep:
-
-binary-indep: build-indep
-binary-arch: build-arch install
-	dh_testdir
-	dh_testroot
-	dh_installchangelogs ChangeLog
-	dh_installdocs
-	dh_install
-	dh_gconf
-	dh_strip
-	dh_compress
-	dh_fixperms
-	dh_installdeb
-	dh_shlibdeps
-	dh_gencontrol
-	dh_md5sums
-	dh_builddeb
-
-build: build-indep build-arch
-binary: binary-indep binary-arch
-.PHONY: build-indep build-arch build binary-indep binary-arch binary
-.PHONY: clean install configure
